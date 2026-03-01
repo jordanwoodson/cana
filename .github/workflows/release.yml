@@ -2,9 +2,10 @@ name: 📦🚀 Build & deploy Android app for an environment
 
 on:
   workflow_dispatch:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - 'v*'
+
 jobs:
   deployAndroid:
     permissions: write-all
@@ -44,8 +45,23 @@ jobs:
           sha256sum *.apk > SHA256SUMS.txt
       - name: "Echo SHA-256 sums"
         run: cat app/build/outputs/apk/release/SHA256SUMS.txt
-      - name: 🤖🚀 Upload to GitHub release
-        uses: AButler/upload-release-assets@v2.0
-        with:
-          files: "app/build/outputs/apk/release/*.apk"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup GitHub CLI
+        run: |
+          gh auth setup-git
+          gh config set prompt disabled
+
+      - name: 📦 Create draft GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --draft \
+            --title "${{ github.ref_name }}" \
+            --notes "Automated Immutable Release"
+
+      - name: 🚀 Upload assets and publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} app/build/outputs/apk/release/*.apk
+          gh release edit ${{ github.ref_name }} --draft=false
