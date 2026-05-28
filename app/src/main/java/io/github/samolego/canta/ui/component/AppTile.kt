@@ -40,7 +40,7 @@ import io.github.samolego.canta.util.apps.AppInfo
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AppTile(
-    modifier: Modifier = Modifier.background(color = MaterialTheme.colorScheme.background),
+    modifier: Modifier = Modifier,
     appInfo: AppInfo,
     isSelected: Boolean,
     enabled: Boolean = true,
@@ -53,7 +53,7 @@ fun AppTile(
     ),
 ) {
     Card(
-            modifier = modifier,
+            modifier = modifier.background(color = MaterialTheme.colorScheme.background),
             elevation =
                     CardDefaults.cardElevation(defaultElevation = if (isSelected) 4.dp else 1.dp),
             border =

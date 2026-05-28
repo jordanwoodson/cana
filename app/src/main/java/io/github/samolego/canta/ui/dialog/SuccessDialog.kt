@@ -1,7 +1,6 @@
 package io.github.samolego.canta.ui.dialog
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.net.toUri
 import io.github.samolego.canta.R
 
 private const val DONATE_URL = "https://www.paypal.com/donate/?hosted_button_id=FD4R46ZZ5EWME"
@@ -102,7 +102,7 @@ fun SuccessDialog(
                         onClick = {
                             onDismissRequest()
                             // Launch URL for donations
-                            val donationIntent = Intent(Intent.ACTION_VIEW, Uri.parse(DONATE_URL))
+                            val donationIntent = Intent(Intent.ACTION_VIEW, DONATE_URL.toUri())
                             context.startActivity(donationIntent)
                         }
                     ) {
