@@ -22,6 +22,7 @@ Powered by [Shizuku](https://shizuku.rikka.app/) ([Android 16 fork](https://gith
 [![donate badge](https://img.shields.io/badge/Donate_via-Paypal-blue)](https://www.paypal.com/donate/?hosted_button_id=FD4R46ZZ5EWME)
 ---
 
+
 </div>
 
 > [!Warning]
@@ -36,10 +37,11 @@ It integrates with the [Universal Debloat List](https://github.com/Universal-Deb
 
 - ✅ No root required  
 - ✅ Detects previously uninstalled apps (even across reinstalls)  
-- ✅ Works on Android **9.0+ (SDK 28+)**
+- ✅ Works on Android **9.0+ (SDK 28+)** up to Android 16. **Google has disabled uninstalling the apps via adb with Android 17!**
 - ⚠️ No *permanent* bricking (If you uninstall **critical apps**, you can experience bootloop and have to **factory reset**!)
 
 \* **Some oplus apps** are known to be stubborn and don't allow uninstallations. See [tracking issue](https://github.com/samolego/Canta/issues/338).
+
 
 ---
 
