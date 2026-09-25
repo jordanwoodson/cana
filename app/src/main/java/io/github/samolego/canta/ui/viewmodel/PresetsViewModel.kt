@@ -85,7 +85,7 @@ class PresetsViewModel : ViewModel() {
     ) {
         val jsonString = presetStore.exportToJson(preset)
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Canta Preset", jsonString)
+        val clip = ClipData.newPlainText("Cana Preset", jsonString)
         clipboard.setPrimaryClip(clip)
     }
 

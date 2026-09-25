@@ -32,7 +32,7 @@
     <string name="copy">コピー</string>
     <string name="app_settings">アプリ情報</string>
     <string name="close">閉じる</string>
-    <string name="canta_description">Cantaは、Shizukuを使用してシステムとユーザーアプリを削除するオープンソースのアンインストーラーです。PC無しで自分の好きな様にデバイスの不要な物を削除出来ます。\n\n %sありがとうございます。\n彼らの仕事無しには今の様にはなりませんでした。</string>
+    <string name="canta_description">Canaは、Shizukuを使用してシステムとユーザーアプリを削除するオープンソースのアンインストーラーです。PC無しで自分の好きな様にデバイスの不要な物を削除出来ます。\n\n %sありがとうございます。\n彼らの仕事無しには今の様にはなりませんでした。</string>
     <string name="search_apps">アプリを検索</string>
     <string name="auto_update_bloat_list">ブロートリストを自動更新</string>
     <string name="auto_update_bloat_list_description">アプリのブロート情報を自動的に取得します。これにより、最新のバッジとアプリの説明が常に最新になります。</string>
@@ -55,7 +55,7 @@
     <string name="import_preset">プリセットをインポート</string>
     <string name="import_preset_description">クリップボードからプリセットをインポートするか、JSON テキストを直接貼り付けます。</string>
     <string name="clipboard">クリップボード</string>
-    <string name="import_preset_clipboard_description">クリップボードからプリセットをインポートします。有効な Canta のプリセット JSON をコピーしたことを確認してください。</string>
+    <string name="import_preset_clipboard_description">クリップボードからプリセットをインポートします。有効な Cana のプリセット JSON をコピーしたことを確認してください。</string>
     <string name="paste_preset_json">プリセット JSON を貼り付け</string>
     <string name="paste_preset_json_here">JSON プリセットをここに貼り付け...</string>
     <string name="enter_valid_json">有効な JSON を入力してください</string>
@@ -87,9 +87,9 @@
     <string name="text">テキスト</string>
     <string name="install_shizuku">Shizuku アプリをインストール</string>
     <string name="start_shizuku_service">Shizuku サービスを開始</string>
-    <string name="grant_shizuku_permission_to_canta">Shizuku で Canta の権限を許可してください</string>
+    <string name="grant_shizuku_permission_to_canta">Shizuku で Cana の権限を許可してください</string>
     <string name="shizuku_required">Shizuku が必要です</string>
-    <string name="shizuku_requirement_description">Canta は Shizuku を使用して root アクセスを必要とせずにアプリをアンインストールします。Shizuku は、安全にシステムレベルの SDK へアクセスする方法を提供します。</string>
+    <string name="shizuku_requirement_description">Cana は Shizuku を使用して root アクセスを必要とせずにアプリをアンインストールします。Shizuku は、安全にシステムレベルの SDK へアクセスする方法を提供します。</string>
     <string name="commits_url">コミット URL</string>
     <string name="commits_url_description">更新のコミット情報の取得先になります。</string>
     <string name="reset_to_default">デフォルトにリセット</string>
@@ -100,7 +100,6 @@
     <string name="allow_unsafe_selections">unsafe の選択を許可</string>
     <string name="allow_unsafe_uninstalls_description">unsafe とマークされたアプリの選択を許可するかどうかを設定します (プリセットを適用するとバイパスします)。</string>
     <string name="donate">寄付</string>
-    <string name="canta_donate_request">Canta にご満足いただけてますか？プライバシーを念頭に置き、自由な時間にビルドされています - 広告や追跡はありません。もし、お役に立てたのであれば開発のサポートをお願いします！</string>
     <string name="success">%1$sが成功しました！</string>
     <string name="hide_success_dialog">成功時のダイアログを非表示にする</string>
     <string name="hide_success_dialog_description">アンインストールと再インストール成功時のダイアログを非表示にします。</string>

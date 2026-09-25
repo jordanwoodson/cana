@@ -26,7 +26,7 @@ object PackageInstallerResult {
 
     // Receive on a separate thread so waiting never blocks delivery
     private val handler by lazy {
-        Handler(HandlerThread("CantaInstallerResult").apply { start() }.looper)
+        Handler(HandlerThread("CanaInstallerResult").apply { start() }.looper)
     }
 
     data class Result(val success: Boolean, val message: String?)

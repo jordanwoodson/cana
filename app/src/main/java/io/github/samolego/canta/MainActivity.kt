@@ -24,7 +24,7 @@ import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 const val SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api"
-const val APP_NAME = "Canta"
+const val APP_NAME = "Cana"
 const val packageName = BuildConfig.APPLICATION_ID
 
 class MainActivity : FragmentActivity() {

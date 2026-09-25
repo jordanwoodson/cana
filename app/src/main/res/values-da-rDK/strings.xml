@@ -36,7 +36,7 @@
     <string name="copy">Kopiér</string>
     <string name="app_settings">App-info</string>
     <string name="close">Luk</string>
-    <string name="canta_description">Canta is an open source uninstaller app that uses Shizuku to remove system and user apps.\nIt allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCanta would\'t be the same without their work.</string>
+    <string name="canta_description">Cana is an open source uninstaller app that uses Shizuku to remove system and user apps.\nIt allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCana would\'t be the same without their work.</string>
     <string name="search_apps">Søg i apps</string>
     <string name="auto_update_bloat_list">Auto-opdatér bloatware-liste</string>
     <string name="auto_update_bloat_list_description">Hent automatisk en ny version af app bloat info. Dette garanterer opdaterede badges og app-beskrivelser.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Importere forvalg</string>
     <string name="import_preset_description">Importér et forvalg fra udklipsholderen, eller indsæt JSON-tekst direkte.</string>
     <string name="clipboard">Udklipsholder</string>
-    <string name="import_preset_clipboard_description">Importér forvalg fra udklipsholder. Sørg for, at der er kopieret en gyldig Canta forvalgs-JSON.</string>
+    <string name="import_preset_clipboard_description">Importér forvalg fra udklipsholder. Sørg for, at der er kopieret en gyldig Cana forvalgs-JSON.</string>
     <string name="paste_preset_json">Indsæt forvalgs-JSON</string>
     <string name="paste_preset_json_here">Indsæt JSON-forvalg hér ...</string>
     <string name="enter_valid_json">Angiv gyldig JSON</string>
@@ -91,9 +91,9 @@
     <string name="text">Tekst</string>
     <string name="install_shizuku">Installér Shizuku-app</string>
     <string name="start_shizuku_service">Start Shizuku-tjeneste</string>
-    <string name="grant_shizuku_permission_to_canta">Tildel Canta-tilladelse i Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Tildel Cana-tilladelse i Shizuku</string>
     <string name="shizuku_required">Shizuku er obligatorisk</string>
-    <string name="shizuku_requirement_description">Canta bruger Shizuku til at afinstallere apps uden at kræve root-adgang. Shizuku giver en sikker måde at få adgang til systemniveau-SDK\'er.</string>
+    <string name="shizuku_requirement_description">Cana bruger Shizuku til at afinstallere apps uden at kræve root-adgang. Shizuku giver en sikker måde at få adgang til systemniveau-SDK\'er.</string>
     <string name="commits_url">Commits URL</string>
     <string name="commits_url_description">Hvorfra man får commit-info til opdateringer fra</string>
     <string name="reset_to_default">Nulstil til standard</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Tillad usikre valg</string>
     <string name="allow_unsafe_uninstalls_description">Hvorvidt apps markeret som usikre må vælges (anvendelse af forvalg omgår allerede dette).</string>
     <string name="donate">Donere</string>
-    <string name="canta_donate_request">Synes om Canta? Den er bygget i min fritid med fortrolighed i tankerne - ingen annoncer eller sporing. Finder du den nyttig, overvej venligst at støtte dens udvikling!</string>
     <string name="success">Udført %1$s!</string>
     <string name="hide_success_dialog">Skjul udført-dialog</string>
     <string name="hide_success_dialog_description">Skjuler udført-dialogen efter afinstallation/geninstallation.</string>

@@ -4,12 +4,12 @@
     <string name="start_shizuku_service">Start Shizuku service</string>
     <string
         name="grant_shizuku_permission_to_canta"
-    >Grant permission to Canta in Shizuku</string>
+    >Grant permission to Cana in Shizuku</string>
     <string name="shizuku_required">Shizuku Required</string>
     <string
         name="shizuku_requirement_description"
-    >Canta uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
-    <string name="app_name">نمونه</string>
+    >Cana uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
+    <string name="app_name">Cana</string>
     <string name="cancel">لغو کردن</string>
     <string name="ok">خوب</string>
     <string
@@ -84,9 +84,6 @@
         name="allow_unsafe_uninstalls_description"
     >Whether to allow selecting apps marked as unsafe (applying presets bypasses this already).</string>
     <string name="donate">Donate</string>
-    <string
-        name="canta_donate_request"
-    >Enjoying Canta? It\'s built in my free time with privacy in mind - no ads, no tracking. If you find it useful, please consider supporting its development!</string>
     <string name="success">Success %1$s!</string>
     <string name="hide_success_dialog">Hide success dialog</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

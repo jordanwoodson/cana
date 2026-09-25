@@ -36,7 +36,7 @@
     <string name="copy">কপি</string>
     <string name="app_settings">অ্যাপ ইনফো</string>
     <string name="close">বন্ধ</string>
-    <string name="canta_description">Canta একটি ওপেনসোর্স আনইনস্টলার অ্যাপ যা Shizuku অ্যাপ ব্যবহার করে সিস্টেম ও ইউজার অ্যাপ রিমুভ করে। এটি আপনার ডিভাইসকে আপনার ইচ্ছামতো ডিব্লোট করার সুযোগ দেয়। আর এতে পিসির প্রয়োজন হয় না। \n\n %s-কে বিশেষ ধন্যবাদ। \n তাদের অবদান ছাড়া Canta আগের মতো হতো না।</string>
+    <string name="canta_description">Cana একটি ওপেনসোর্স আনইনস্টলার অ্যাপ যা Shizuku অ্যাপ ব্যবহার করে সিস্টেম ও ইউজার অ্যাপ রিমুভ করে। এটি আপনার ডিভাইসকে আপনার ইচ্ছামতো ডিব্লোট করার সুযোগ দেয়। আর এতে পিসির প্রয়োজন হয় না। \n\n %s-কে বিশেষ ধন্যবাদ। \n তাদের অবদান ছাড়া Cana আগের মতো হতো না।</string>
     <string name="search_apps">অ্যাপ খুঁজুন</string>
     <string name="auto_update_bloat_list">ব্লোট লিস্ট অটো আপডেট</string>
     <string name="auto_update_bloat_list_description">অ্যাপ ব্লোট লিস্টের নতুন ভার্শন অটো আপডেট হবে। এটি আপ-টু-ডেট ব্যাজ ও অ্যাপ ডেস্ক্রিপশনের নিশ্চয়তা দেয়।</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">প্রিসেট ইমপোর্ট</string>
     <string name="import_preset_description">ক্লিপবোর্ড থেকে প্রিসেট ইমপোর্ট করুন বা সরাসরি JSON টেক্সট পেস্ট করুন।</string>
     <string name="clipboard">ক্লিপবোর্ড</string>
-    <string name="import_preset_clipboard_description">ক্লিপবোর্ড থেকে প্রিসেট ইমপোর্ট করুন। নিশ্চিত করুন যে আপনি একটি ভ্যালিড Canta প্রিসেট JSON কপি করেছেন।</string>
+    <string name="import_preset_clipboard_description">ক্লিপবোর্ড থেকে প্রিসেট ইমপোর্ট করুন। নিশ্চিত করুন যে আপনি একটি ভ্যালিড Cana প্রিসেট JSON কপি করেছেন।</string>
     <string name="paste_preset_json">প্রিসেট JSON পেস্ট করুন</string>
     <string name="paste_preset_json_here">এখানে প্রিসেট JSON পেস্ট করুন</string>
     <string name="enter_valid_json">ভ্যালিড JSON দিন</string>
@@ -91,9 +91,9 @@
     <string name="text">টেক্সট</string>
     <string name="install_shizuku">Shizuku অ্যাপ ইনস্টল করুন</string>
     <string name="start_shizuku_service">Shizuku সার্ভিস চালু করুন</string>
-    <string name="grant_shizuku_permission_to_canta">Shizuku-তে Canta-র পারমিশন দিন</string>
+    <string name="grant_shizuku_permission_to_canta">Shizuku-তে Cana-র পারমিশন দিন</string>
     <string name="shizuku_required">Shizuku লাগবে</string>
-    <string name="shizuku_requirement_description">Canta রুট অ্যাকসেস ছাড়া অ্যাপ আনইনস্টল করতে Shizuku ব্যবহার করে। Shizuku একটি নিরাপদ উপায়ে সিস্টেম-লেভেলের SDK-তে অ্যাকসেস দেয়।</string>
+    <string name="shizuku_requirement_description">Cana রুট অ্যাকসেস ছাড়া অ্যাপ আনইনস্টল করতে Shizuku ব্যবহার করে। Shizuku একটি নিরাপদ উপায়ে সিস্টেম-লেভেলের SDK-তে অ্যাকসেস দেয়।</string>
     <string name="commits_url">কমিট ইউ আর এল</string>
     <string name="commits_url_description">কমিট ইউ আর এল এর আপডেট ইন্ফো কথা থাকে পাবো</string>
     <string name="reset_to_default">ডিফল্টে রিসেট করুন</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">অনিরাপদ নির্বাচন অনুমোদন করুন</string>
     <string name="allow_unsafe_uninstalls_description">Whether to allow selecting apps marked as unsafe (applying presets bypasses this already).</string>
     <string name="donate">ডোনেট</string>
-    <string name="canta_donate_request">Csnta কি আপনার ভালো লাগছে? এটি আমি আমার অবসর সময়ে গোপনীয়তার কথা মাথায় রেখে তৈরি করেছি - কোনো বিজ্ঞাপন নেই, কোনো ট্র্যাকিং নেই। যদি এটি আপনার কাজে আসে, তবে এর উন্নয়নে সহায়তা করার কথা ভাববেন!</string>
     <string name="success">%1$s সফল হয়েছে!</string>
     <string name="hide_success_dialog">সফলতার ডায়ালগ লোকান</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

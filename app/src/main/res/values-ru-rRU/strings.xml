@@ -44,7 +44,7 @@
     <string name="copy">Скопировать</string>
     <string name="app_settings">Информация о приложении</string>
     <string name="close">Закрыть</string>
-    <string name="canta_description">Canta — это приложение-деинсталлятор с открытым исходным кодом, которое использует Shizuku для удаления системных и пользовательских приложений.\nОно позволяет вам очищать устройство по своему усмотрению, без необходимости использования ПК.\n\nОсобая благодарность %s.\nCanta была бы другой без их работы.</string>
+    <string name="canta_description">Cana — это приложение-деинсталлятор с открытым исходным кодом, которое использует Shizuku для удаления системных и пользовательских приложений.\nОно позволяет вам очищать устройство по своему усмотрению, без необходимости использования ПК.\n\nОсобая благодарность %s.\nCana была бы другой без их работы.</string>
     <string name="search_apps">Поиск приложений</string>
     <string name="auto_update_bloat_list">Автообновление списка</string>
     <string name="auto_update_bloat_list_description">Автоматически получайте новую версию списка. Это гарантирует актуальность значков и описаний приложений.</string>
@@ -67,7 +67,7 @@
     <string name="import_preset">Импорт шаблона</string>
     <string name="import_preset_description">Импортировать шаблон из буфера обмена или вставить текст JSON напрямую.</string>
     <string name="clipboard">Буфер обмена</string>
-    <string name="import_preset_clipboard_description">Импорт шаблона из буфера обмена. Убедитесь, что вы скопировали корректный шаблон Canta JSON.</string>
+    <string name="import_preset_clipboard_description">Импорт шаблона из буфера обмена. Убедитесь, что вы скопировали корректный шаблон Cana JSON.</string>
     <string name="paste_preset_json">Вставить шаблон JSON</string>
     <string name="paste_preset_json_here">Вставить шаблон JSON здесь ...</string>
     <string name="enter_valid_json">Введите корректный JSON</string>
@@ -99,9 +99,9 @@
     <string name="text">Текст</string>
     <string name="install_shizuku">Установить приложение Shizuku</string>
     <string name="start_shizuku_service">Запустить сервис Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">Предоставить разрешение Canta в Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Предоставить разрешение Cana в Shizuku</string>
     <string name="shizuku_required">Требуется Shizuku</string>
-    <string name="shizuku_requirement_description">Canta использует Shizuku для удаления приложений без необходимости получения прав суперпользователя. Shizuku обеспечивает безопасный доступ к SDK системного уровня.</string>
+    <string name="shizuku_requirement_description">Cana использует Shizuku для удаления приложений без необходимости получения прав суперпользователя. Shizuku обеспечивает безопасный доступ к SDK системного уровня.</string>
     <string name="commits_url">URL коммита</string>
     <string name="commits_url_description">Где получать информацию о коммитах</string>
     <string name="reset_to_default">Сбросить к стандартным</string>
@@ -112,7 +112,6 @@
     <string name="allow_unsafe_selections">Разрешить небезопасный выбор</string>
     <string name="allow_unsafe_uninstalls_description">Разрешить ли выбирать приложения, помеченные как небезопасные (шаблоны обходят эту возможность).</string>
     <string name="donate">Поддержать</string>
-    <string name="canta_donate_request">Нравится Canta? Я создал её в свободное время, заботясь о конфиденциальности — без рекламы и отслеживания. Если приложение вам полезно, поддержите его разработку!</string>
     <string name="success">Успешно %1$s!</string>
     <string name="hide_success_dialog">Скрыть диалоговое окно успешного завершения</string>
     <string name="hide_success_dialog_description">Скрыть диалоговое окно об успешном завершении удаления или переустановки.</string>

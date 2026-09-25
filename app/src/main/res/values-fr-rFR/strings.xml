@@ -36,7 +36,7 @@
     <string name="copy">Copier</string>
     <string name="app_settings">Infos sur l\'application</string>
     <string name="close">Fermer</string>
-    <string name="canta_description">Canta est une application de désinstallation open source qui utilise Shizuku pour supprimer les applications système et utilisateur. Elle vous permet d\'alléger votre appareil comme vous le souhaitez, sans avoir besoin d\'un PC.\n\nUn merci spécial à %s.\nCanta ne serait pas la même sans leur travail.</string>
+    <string name="canta_description">Cana est une application de désinstallation open source qui utilise Shizuku pour supprimer les applications système et utilisateur. Elle vous permet d\'alléger votre appareil comme vous le souhaitez, sans avoir besoin d\'un PC.\n\nUn merci spécial à %s.\nCana ne serait pas la même sans leur travail.</string>
     <string name="search_apps">Rechercher des applications</string>
     <string name="auto_update_bloat_list">Mise à jour automatique de la liste des applications inutiles</string>
     <string name="auto_update_bloat_list_description">Récupérer automatiquement la nouvelle version des informations sur les applications superflues. Cela garantit des badges et des descriptions d\'applications toujours à jour.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Importer un préréglage</string>
     <string name="import_preset_description">Importez un préréglage depuis le presse-papiers ou collez directement du texte JSON.</string>
     <string name="clipboard">Presse-papiers</string>
-    <string name="import_preset_clipboard_description">Importer le préréglage depuis le presse-papiers. Assurez-vous que vous avez copié un préréglage JSON Canta valide.</string>
+    <string name="import_preset_clipboard_description">Importer le préréglage depuis le presse-papiers. Assurez-vous que vous avez copié un préréglage JSON Cana valide.</string>
     <string name="paste_preset_json">Coller le préréglage JSON</string>
     <string name="paste_preset_json_here">Coller le préréglage JSON ici ...</string>
     <string name="enter_valid_json">Veuillez entrer un JSON valide</string>
@@ -91,9 +91,9 @@
     <string name="text">Texte</string>
     <string name="install_shizuku">Installer l\'application Shizuku</string>
     <string name="start_shizuku_service">Démarrer le service Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">Accorder la permission de Canta à Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Accorder la permission de Cana à Shizuku</string>
     <string name="shizuku_required">Shizuku requis</string>
-    <string name="shizuku_requirement_description">Canta utilise Shizuku pour désinstaller des applications sans accès root. Shizuku fournit un moyen sécurisé d\'accéder aux SDK au niveau du système.</string>
+    <string name="shizuku_requirement_description">Cana utilise Shizuku pour désinstaller des applications sans accès root. Shizuku fournit un moyen sécurisé d\'accéder aux SDK au niveau du système.</string>
     <string name="commits_url">URL des commits</string>
     <string name="commits_url_description">D\'où obtenir les informations de commit pour les mises à jour</string>
     <string name="reset_to_default">Rétablir les valeurs par défaut</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Autoriser les sélections dangereuses</string>
     <string name="allow_unsafe_uninstalls_description">Autoriser la sélection des applications marquées dangereuses (les préréglages ignorent déjà ce réglage).</string>
     <string name="donate">Faire un don</string>
-    <string name="canta_donate_request">Vous aimer Canta ? Je la développe sur mon temps libre, avec respect de la vie privée - sans publicité, sans suivi. Si vous la trouvez utile, pensez à soutenir son développement !</string>
     <string name="success">Succès %1$s!</string>
     <string name="hide_success_dialog">Masquer la boîte de dialogue de succès</string>
     <string name="hide_success_dialog_description">Masque la boîte de dialogue de succès après désinstallation / réinstallation.</string>

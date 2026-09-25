@@ -52,7 +52,7 @@
     <string name="copy">انسخ</string>
     <string name="app_settings">معلومات التطبيق</string>
     <string name="close">أغلق</string>
-    <string name="canta_description">Canta هو تطبيق إلغاء تثبيت مفتوح المصدر يستخدم Shizuku لإزالة تطبيقات النظام والمستخدم.\nإنه يسمح لك بإزالة البرامج الغير مرغوبة من جهازك كما يحلو لك، دون الحاجة إلى جهاز حاسوب.\n\nشكر خاص لـ %s.\nلن يكون Canta هو نفسه بدون عملهم.</string>
+    <string name="canta_description">Cana هو تطبيق إلغاء تثبيت مفتوح المصدر يستخدم Shizuku لإزالة تطبيقات النظام والمستخدم.\nإنه يسمح لك بإزالة البرامج الغير مرغوبة من جهازك كما يحلو لك، دون الحاجة إلى جهاز حاسوب.\n\nشكر خاص لـ %s.\nلن يكون Cana هو نفسه بدون عملهم.</string>
     <string name="search_apps">ابحث عن تطبيقات</string>
     <string name="auto_update_bloat_list">حدّث تلقائيًا قائمة البرامج غير المرغوبة</string>
     <string name="auto_update_bloat_list_description">جلب نسخة جديدة من معلومات التطبيق الغير مرغوب به. وهذا يضمن الشارات الحديثة والأوصاف التطبيقات.</string>
@@ -75,7 +75,7 @@
     <string name="import_preset">استيراد الإعداد المسبق</string>
     <string name="import_preset_description">استيراد مسبقًا من الحافظة أو لصق نص JSON مباشرة.</string>
     <string name="clipboard">الحافظة</string>
-    <string name="import_preset_clipboard_description">استيراد مسبقًا من الحافظة. تأكد من أنك قد قمت بنسخ ملف JSON صالح لإعداد مسبق من Canta.</string>
+    <string name="import_preset_clipboard_description">استيراد مسبقًا من الحافظة. تأكد من أنك قد قمت بنسخ ملف JSON صالح لإعداد مسبق من Cana.</string>
     <string name="paste_preset_json">لصق الإعداد المسبق JSON</string>
     <string name="paste_preset_json_here">لصق JSON مسبقًا هنا ...</string>
     <string name="enter_valid_json">الرجاء إدخال JSON صالح</string>
@@ -107,9 +107,9 @@
     <string name="text">نص</string>
     <string name="install_shizuku">قم بتثبيت تطبيق Shizuku</string>
     <string name="start_shizuku_service">ابدأ خدمة Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">منح الإذن لـ Canta في Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">منح الإذن لـ Cana في Shizuku</string>
     <string name="shizuku_required">Shizuku مطلوب</string>
-    <string name="shizuku_requirement_description">يستخدم Canta برنامج Shizuku لإلغاء تثبيت التطبيقات دون الحاجة إلى صلاحيات الجذر. يوفر Shizuku طريقة آمنة للوصول إلى حزم تطوير البرامج (SDKs) على مستوى النظام.</string>
+    <string name="shizuku_requirement_description">يستخدم Cana برنامج Shizuku لإلغاء تثبيت التطبيقات دون الحاجة إلى صلاحيات الجذر. يوفر Shizuku طريقة آمنة للوصول إلى حزم تطوير البرامج (SDKs) على مستوى النظام.</string>
     <string name="commits_url">رابط الإيداعات</string>
     <string name="commits_url_description">أين يمكن الحصول على معلومات الإداع للحصول على التحديثات من</string>
     <string name="reset_to_default">صفّر إلى المبدئي</string>
@@ -120,7 +120,6 @@
     <string name="allow_unsafe_selections">اسمح بالاختيارات غير الآمنة</string>
     <string name="allow_unsafe_uninstalls_description">ما إذا كان يسمح باختيار التطبيقات المعلَّمة كتطبيقات غير آمنة (تطبيق الإعدادات المسبقة يتجاوز هذا بالفعل).</string>
     <string name="donate">تبرع</string>
-    <string name="canta_donate_request">هل تستمتع Canta؟ إنها مبنية في وقت فراغي مع مراعاة الخصوصية - لا إعلانات، لا تتبع. إذا وجدتها مفيدة، فكر في دعم تطويره!</string>
     <string name="success">نجح %1$s!</string>
     <string name="hide_success_dialog">أخفِ مربع الحوار الناجح</string>
     <string name="hide_success_dialog_description">أخفِ مربع الحوار الناجح بعد إلغاء التثبيت/إعادة التثبيت.</string>

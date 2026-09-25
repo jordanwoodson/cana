@@ -32,7 +32,7 @@
     <string name="copy">Sao chép</string>
     <string name="app_settings">Thông tin ứng dụng</string>
     <string name="close">Đóng</string>
-    <string name="canta_description">Canta is an open source uninstaller app that uses Shizuku to remove system and user apps.\nIt allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCanta would\'t be the same without their work.</string>
+    <string name="canta_description">Cana is an open source uninstaller app that uses Shizuku to remove system and user apps.\nIt allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCana would\'t be the same without their work.</string>
     <string name="search_apps">Tìm kiếm ứng dụng</string>
     <string name="auto_update_bloat_list">Tự động cập nhật danh sách ứng dụng rác</string>
     <string name="auto_update_bloat_list_description">Tự động lấy phiên bản mới nhất của thông tin ứng dụng rác tệ hại. Điều này đảm bảo huy hiệu thông tin mô tả ứng dụng được cập nhật. </string>
@@ -55,7 +55,7 @@
     <string name="import_preset">Nhập cấu hình sẵn</string>
     <string name="import_preset_description">Nhập cấu hình từ bảng tạm hoặc dán trực tiếp văn bản JSON.</string>
     <string name="clipboard">Bảng tạm</string>
-    <string name="import_preset_clipboard_description">Nhập cấu hình từ bảng tạm. Hãy đảm bảo rằng bạn đã sao chép đúng JSON từ cấu hình của Canta.</string>
+    <string name="import_preset_clipboard_description">Nhập cấu hình từ bảng tạm. Hãy đảm bảo rằng bạn đã sao chép đúng JSON từ cấu hình của Cana.</string>
     <string name="paste_preset_json">Dán JSON cấu hình</string>
     <string name="paste_preset_json_here">Dán JSON cấu hình tại đây ...</string>
     <string name="enter_valid_json">Vui lòng nhập JSON hợp lệ</string>
@@ -87,9 +87,9 @@
     <string name="text">Văn bản</string>
     <string name="install_shizuku">Cài đặt Shizuku</string>
     <string name="start_shizuku_service">Khởi chạy dịch vụ Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">Cấp quyền cho Canta trong Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Cấp quyền cho Cana trong Shizuku</string>
     <string name="shizuku_required">Yêu cầu Shizuku</string>
-    <string name="shizuku_requirement_description">Canta sử dụng Shizuku để thực hiện gỡ cài đặt ứng dụng mà không cần root thiết bị. Shizuku đóng vai trò cầu nối an toàn cho phép truy cập các SDK cấp hệ thống.</string>
+    <string name="shizuku_requirement_description">Cana sử dụng Shizuku để thực hiện gỡ cài đặt ứng dụng mà không cần root thiết bị. Shizuku đóng vai trò cầu nối an toàn cho phép truy cập các SDK cấp hệ thống.</string>
     <string name="commits_url">Liên kết Commit</string>
     <string name="commits_url_description">Nguồn commit cho các bản cập nhật</string>
     <string name="reset_to_default">Đặt về mặc định</string>
@@ -100,7 +100,6 @@
     <string name="allow_unsafe_selections">Cho phép chọn nhãn Unsafe</string>
     <string name="allow_unsafe_uninstalls_description">Cho phép chọn các ứng dụng được đánh dấu là không an toàn (khi áp dụng cấu hình sẵn sẽ tự động bỏ qua tùy chọn này).</string>
     <string name="donate">Ủng hộ</string>
-    <string name="canta_donate_request">Thích Canta? Ứng dụng này tôi viết trong thời gian rảnh, luôn đặt quyền riêng tư lên hàng đầu — không quảng cáo, không theo dõi người dùng. Nếu bạn thấy nó hữu ích, hãy ủng hộ tôi để có động lực tiếp tục phát triển nhé!</string>
     <string name="success">Thành công %1$s!</string>
     <string name="hide_success_dialog">Ẩn hộp thoại thành công</string>
     <string name="hide_success_dialog_description">Ẩn hộp thoại thành công mỗi khi gỡ hoặc cài đặt lại ứng dụng.</string>

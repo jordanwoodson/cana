@@ -180,7 +180,7 @@ fun CantaAppTileDemo() {
     AppTile(
             appInfo =
                     AppInfo(
-                            "Canta",
+                            "Cana",
                             packageName = "io.github.samolego.canta",
                             isSystemApp = false,
                             isDisabled = false,
@@ -190,7 +190,7 @@ fun CantaAppTileDemo() {
                             bloatData =
                                     BloatData(
                                             installData = InstallData.OEM,
-                                            description = "Canta is not a system app",
+                                            description = "Cana is not a system app",
                                             removal = RemovalRecommendation.RECOMMENDED,
                                     ),
                     ),
@@ -207,7 +207,7 @@ fun LongTileDemo() {
     AppTile(
             appInfo =
                     AppInfo(
-                            "Canta",
+                            "Cana",
                             packageName =
                                     "very.long.package.name.that.should.overflow.and.maybe.it.will.overflow.even.2.lines",
                             isSystemApp = true,
@@ -218,7 +218,7 @@ fun LongTileDemo() {
                             bloatData =
                                     BloatData(
                                             installData = InstallData.OEM,
-                                            description = "Canta is a system app",
+                                            description = "Cana is a system app",
                                             removal = RemovalRecommendation.RECOMMENDED,
                                     ),
                     ),

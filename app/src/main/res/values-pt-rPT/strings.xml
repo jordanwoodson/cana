@@ -36,7 +36,7 @@
     <string name="copy">Copiar</string>
     <string name="app_settings">Informações do aplicativo</string>
     <string name="close">Fechar</string>
-    <string name="canta_description">Canta é um aplicativo desinstalador de código aberto que usa o Shizuku para remover aplicativos do sistema e do utilizador. Ele permite que desbloqueie o seu dispositivo como quiser, sem a necessidade de um PC.\n\nAgradecimentos especiais a %s.\nO Canta não seria o mesmo sem o trabalho deles.</string>
+    <string name="canta_description">Cana é um aplicativo desinstalador de código aberto que usa o Shizuku para remover aplicativos do sistema e do utilizador. Ele permite que desbloqueie o seu dispositivo como quiser, sem a necessidade de um PC.\n\nAgradecimentos especiais a %s.\nO Cana não seria o mesmo sem o trabalho deles.</string>
     <string name="search_apps">Procurar aplicativos</string>
     <string name="auto_update_bloat_list">Atualizar automaticamente a lista de bloatware</string>
     <string name="auto_update_bloat_list_description">Procura automáticamente novas atualizações de bloatware do aplicativo. Isso garante emblemas e descrições do aplicativo atualizados.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Importar predefinição</string>
     <string name="import_preset_description">Importar uma predefinição da área de transferência ou colar texto JSON diretamente.</string>
     <string name="clipboard">Área de transferência</string>
-    <string name="import_preset_clipboard_description">Importar a predefinição da área de transferência. Certifique-se de ter copiado um JSON de predefinição de Canta válido.</string>
+    <string name="import_preset_clipboard_description">Importar a predefinição da área de transferência. Certifique-se de ter copiado um JSON de predefinição de Cana válido.</string>
     <string name="paste_preset_json">Colar predefinição JSON</string>
     <string name="paste_preset_json_here">Colar predefinição JSON aqui...</string>
     <string name="enter_valid_json">Por favor, introduza um JSON válido</string>
@@ -91,9 +91,9 @@
     <string name="text">Texto</string>
     <string name="install_shizuku">Instalar o aplicativo Shizuko</string>
     <string name="start_shizuku_service">Iniciar shizuko</string>
-    <string name="grant_shizuku_permission_to_canta">Garantir permissão do Canta no shizuko</string>
+    <string name="grant_shizuku_permission_to_canta">Garantir permissão do Cana no shizuko</string>
     <string name="shizuku_required">Necessário shizuko</string>
-    <string name="shizuku_requirement_description">Canta utilizao Shizuku para desinstalar aplicativos sem necessitar de acesso root. Shizuku fornece uma maneira segura de acederr SDKs no sistema.</string>
+    <string name="shizuku_requirement_description">Cana utilizao Shizuku para desinstalar aplicativos sem necessitar de acesso root. Shizuku fornece uma maneira segura de acederr SDKs no sistema.</string>
     <string name="commits_url">URL de submissões</string>
     <string name="commits_url_description">Onde obter informações de commits de atualizações de</string>
     <string name="reset_to_default">Repor definições</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Permitir selecionar inseguras</string>
     <string name="allow_unsafe_uninstalls_description">Se permitir a seleção de aplicativos marcados como inseguros (aplicar predefinições ignora isso já).</string>
     <string name="donate">Doar</string>
-    <string name="canta_donate_request">Gosta do Canta? Ele foi construído no meu tempo livre e com a privacidade em mente - sem anúncios e sem rastreamento. Se acha útil, considere apoiar o seu desenvolvimento!</string>
     <string name="success">Sucesso%1$s!</string>
     <string name="hide_success_dialog">Não mostrar diálogo de confirmação</string>
     <string name="hide_success_dialog_description">Oculta a mensagem de sucesso após desinstalar / reinstalar.</string>

@@ -36,7 +36,7 @@
     <string name="copy">Copiar</string>
     <string name="app_settings">Informações do aplicativo</string>
     <string name="close">Fechar</string>
-    <string name="canta_description">Canta é um aplicativo desinstalador de código aberto que usa o Shizuku para remover aplicativos do sistema e do usuário. Ele permite que você faça debloat do seu dispositivo como quiser, sem a necessidade de um PC.\n\nAgradecimentos especiais a %s.\nO Canta não seria o mesmo sem o trabalho deles.</string>
+    <string name="canta_description">Cana é um aplicativo desinstalador de código aberto que usa o Shizuku para remover aplicativos do sistema e do usuário. Ele permite que você faça debloat do seu dispositivo como quiser, sem a necessidade de um PC.\n\nAgradecimentos especiais a %s.\nO Cana não seria o mesmo sem o trabalho deles.</string>
     <string name="search_apps">Procurar aplicativos</string>
     <string name="auto_update_bloat_list">Atualizar automaticamente a lista de bloat</string>
     <string name="auto_update_bloat_list_description">Buscar automaticamente novas versões de informações sobre bloat do aplicativo. Isso garante emblemas e descrições do aplicativo atualizados.</string>
@@ -91,9 +91,9 @@
     <string name="text">Texto</string>
     <string name="install_shizuku">Instalar aplicativo Shizuku</string>
     <string name="start_shizuku_service">Iniciar serviço Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">Conceder permissão para Canta no Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Conceder permissão para Cana no Shizuku</string>
     <string name="shizuku_required">Shizuku Necessário</string>
-    <string name="shizuku_requirement_description">O Canta usa o Shizuku para desinstalar aplicativos sem precisar de acesso root. O Shizuku oferece uma maneira segura de acessar SDKs em nível de sistema.</string>
+    <string name="shizuku_requirement_description">O Cana usa o Shizuku para desinstalar aplicativos sem precisar de acesso root. O Shizuku oferece uma maneira segura de acessar SDKs em nível de sistema.</string>
     <string name="commits_url">URL de commits</string>
     <string name="commits_url_description">Onde obter informações de commit de atualizações de</string>
     <string name="reset_to_default">Restaurar para as predefinições</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Permitir seleções não seguras</string>
     <string name="allow_unsafe_uninstalls_description">Se permitir a seleção de aplicativos marcados como inseguros (aplicar predefinições ignora isso já).</string>
     <string name="donate">Doar</string>
-    <string name="canta_donate_request">Está gostando do Canta? Ele foi criado no meu tempo livre com a privacidade em mente - sem anúncios, sem rastreamento. Se você achar útil, considere apoiar seu desenvolvimento!</string>
     <string name="success">Sucesso %1$s!</string>
     <string name="hide_success_dialog">Ocultar o ‘pop-up\' de sucesso</string>
     <string name="hide_success_dialog_description">Oculta o ‘pop-up\' de sucesso após desinstalar / reinstalar.</string>

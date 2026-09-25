@@ -259,12 +259,12 @@ fun SettingsScreen(
 
                 // App homepage
                 Text(
-                    text = "https://samolego.github.io/Canta",
+                    text = "https://github.com/jordanwoodson/cana",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.clickable {
-                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://samolego.github.io/Canta"))
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jordanwoodson/cana"))
                         context.startActivity(browserIntent)
                     }
                 )
