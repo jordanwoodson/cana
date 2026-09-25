@@ -13,4 +13,8 @@ message AppSettings {
   bool allow_unsafe_uninstalls = 7;
   bool hide_success_dialog = 8;
   bool auth_enabled = 9;
+  string bloat_etag = 10;
+  int64 bloat_last_checked_ms = 11;
+  bool bloat_unmetered_only = 12;
+  string bloat_cache_url = 13;
 }

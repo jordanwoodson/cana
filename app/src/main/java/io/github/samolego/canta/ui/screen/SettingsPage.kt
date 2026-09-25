@@ -55,7 +55,6 @@ import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SettingsTextItem
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
-import io.github.samolego.canta.util.DEFAULT_BLOAT_COMMITS_URL
 import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
 import io.github.samolego.canta.util.showBiometricPrompt
 
@@ -68,12 +67,12 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val autoUpdateBloatList by settingsViewModel.autoUpdateBloatList.collectAsStateWithLifecycle()
+    val unmeteredOnly by settingsViewModel.bloatUnmeteredOnly.collectAsStateWithLifecycle()
     val confirmBeforeUninstall by
             settingsViewModel.confirmBeforeUninstall.collectAsStateWithLifecycle()
 
     var advancedSettingsExpanded by remember { mutableStateOf(false) }
     var bloatListUrl by remember { mutableStateOf(settingsViewModel.bloatListUrl.value.let { if (it.isEmpty()) DEFAULT_BLOAT_URL else it }) }
-    var commitsUrl by remember { mutableStateOf(settingsViewModel.commitsUrl.value.let { if (it.isEmpty()) DEFAULT_BLOAT_COMMITS_URL else it }) }
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
     val hideSuccessDialog by settingsViewModel.hideSuccessDialog.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
@@ -111,6 +110,15 @@ fun SettingsScreen(
                 onCheckedChange = {
                     settingsViewModel.saveAutoUpdateBloatList(it)
                 }
+            )
+
+            SettingsItem(
+                title = stringResource(R.string.bloat_unmetered_only),
+                description = stringResource(R.string.bloat_unmetered_only_description),
+                icon = Icons.Default.Update,
+                isSwitch = true,
+                checked = unmeteredOnly,
+                onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
             )
 
             // Confirm before uninstall
@@ -221,18 +229,6 @@ fun SettingsScreen(
                             },
                     )
 
-                    // Commits URL
-                    SettingsTextItem(
-                            title = stringResource(R.string.commits_url),
-                            description = stringResource(R.string.commits_url_description),
-                            icon = Icons.Default.Link,
-                            keyboardType = KeyboardType.Uri,
-                            value = commitsUrl,
-                            onValueChange = {
-                                commitsUrl = it
-                                settingsViewModel.saveCommitsUrl(it)
-                            },
-                    )
                 }
             }
 

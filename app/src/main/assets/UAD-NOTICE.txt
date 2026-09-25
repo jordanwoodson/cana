@@ -1,0 +1,11 @@
+Universal Android Debloater Next Generation package list
+Copyright the Universal Debloater Alliance and contributors.
+
+Source repository:
+https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation
+Revision: 5446f49909cda24cbaa90c5a48a010b3d13aa5c7
+File: resources/assets/uad_lists.json
+Retrieved: 2026-09-25. Bundled without modifications.
+
+Distributed under GNU GPL version 3; see UAD-LICENSE.txt.
+The data is a separate asset. Cana's application source retains its LGPL-3.0 license.

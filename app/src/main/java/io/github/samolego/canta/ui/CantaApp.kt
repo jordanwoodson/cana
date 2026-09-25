@@ -510,6 +510,7 @@ private fun MainContent(
                             appListViewModel.loadInstalled(
                                 packageManager = context.packageManager,
                                 context = context,
+                                forceRefresh = true,
                             )
                             isRefreshing = false
                         }
