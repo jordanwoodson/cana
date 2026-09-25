@@ -6,7 +6,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - 2026-09-25: inspected clean repository; no roadmap features implemented at start. Created `roadmap` branch from master.
 - Emulator launched as unified exec session `42132`, serial `emulator-5554`; cold boot in progress. ADB initially reports offline. No phone commands executed.
-- Phase 0 implemented in six independent commits. Phase 1 implementation and core emulator checks pass; core settings UI verified; checking additional work-profile reset and interrupted list loading. Phases 2–7 and release remain pending.
+- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phase 2 is next. Phases 2–7 and release remain pending.
 
 ## Interface preflight
 
@@ -41,8 +41,8 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 ### Remaining verification
 
-- Phase 0: category/settings interaction checks remain; offline first launch now visually verified in `/tmp/cana-phase0-ready.png`. Actual reset and profile isolation verified by Phase 1 instrumentation below.
-- Phase 1: interrupted list-load recovery check remains. Phases 2–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
+- Phase 0: offline first launch, category/menu interaction, persisted update settings, actual reset and both-profile isolation verified.
+- Phases 0–1 implementation and listed acceptance checks pass; Phases 2–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
 
 ### Phase 1
 
@@ -62,3 +62,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - Expanded actual factory-reset test now passes for both user 0 and user 10, verifying the other profile remains installed each time: `/tmp/cana-phase1-reset-both-profiles.log`, 1/1 PASS, 32.747s.
 - Decoded emulator settings proto confirms auto-update false (default omitted) and `bloat_unmetered_only: true` after UI toggles; preferences persist.
+
+- `8c5ea38` fixes interrupted badge loading: dedicated emulator test reproduced stale metadata after cancellation (RED), then passed after explicit load-completeness tracking (GREEN, 5.021s). Upstream candidate.
+- Category menu Compose test: all five categories visible through scrolling, AOSP selectable and reflected in menu, 1/1 PASS (`/tmp/cana-phase0-category-ui.log`, 22.406s).
+- Phase 1 implementation commit: `1e5954c`. JVM suite remains 27/27, latest debug + instrumentation builds pass.
