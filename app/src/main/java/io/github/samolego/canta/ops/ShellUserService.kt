@@ -8,6 +8,16 @@ import kotlin.system.exitProcess
 class ShellUserService : IShellService.Stub() {
     @Synchronized
     override fun exec(argv: Array<String>, timeoutMs: Long): ShellResult {
+        if (argv.firstOrNull() == "cana-privacy") {
+            return try {
+                val path = PrivacyPlatform.packageInfo("io.github.jordanwoodson.cana", android.os.Process.myUid() / 100_000)
+                    .applicationInfo!!.sourceDir
+                val output = ProcessRunner.exec(listOf("/system/bin/app_process", "/system/bin",
+                    "io.github.samolego.canta.ops.PrivacyRecovery") + argv.drop(1), timeoutMs,
+                    mapOf("CLASSPATH" to path))
+                ShellResult(output.exitCode, output.stdout, output.stderr)
+            } catch (e: Exception) { ShellResult(125, "", (e.cause ?: e).message ?: "Privacy interface unavailable") }
+        }
         // Call fixed platform tools directly; user-supplied arguments never enter a shell parser.
         if (argv.isEmpty() || argv[0] !in allowedCommands) {
             return ShellResult(126, "", "Unsupported command")

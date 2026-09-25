@@ -10,6 +10,15 @@ message CantaPreset {
   repeated string apps = 4;
   string version = 5;
   string uuid = 6;
+  repeated PresetLockdown lockdown = 7;
+}
+
+message PresetLockdown {
+  string package_name = 1;
+  bool revoke_permissions = 2;
+  bool restrict_background = 3;
+  bool deny_metered = 4;
+  bool block_network = 5;
 }
 
 message PresetsList {

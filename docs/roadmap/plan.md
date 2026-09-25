@@ -88,10 +88,10 @@ Files: PackageOps/action UI, new component repository/dialog, tracker signature 
 
 Files: new privacy repository/panel, desired-state proto/store, boot/binder receiver, preset proto extensions.
 
-- [ ] Probe Android 15 permission revoke + user-fixed, appops/background standby, uid netpolicy and connectivity chain support before UI.
-- [ ] Show actual per-profile permission/background/data/network state and one-tap restoration of captured prior values.
-- [ ] Persist desired network blocks, reapply after boot when Shizuku binder arrives, show desired/actual mismatch. Do not fake support on incompatible devices.
-- [ ] Extend presets with lockdown actions; test uid = userId*100000+appId and restore policies. Emulator verifies selected-profile effects, revert, reboot and binder timing. Commit phase.
+- [x] Probe Android 15 permission revoke + user-fixed, appops/background standby, uid netpolicy and connectivity chain support before UI.
+- [x] Show actual per-profile permission/background/data/network state and one-tap restoration of captured prior values.
+- [x] Persist desired network blocks, reapply after boot when Shizuku binder arrives, show desired/actual mismatch. Do not fake support on incompatible devices.
+- [x] Extend presets with lockdown actions; test uid = userId*100000+appId and restore policies. Emulator verifies selected-profile effects, revert, reboot and binder timing. Commit phase.
 
 ### Task 8: Phase 6 management
 

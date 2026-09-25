@@ -41,6 +41,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +71,7 @@ fun PresetsPage(
     appListViewModel: AppListViewModel,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     var currentDialog by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
 
@@ -151,7 +154,15 @@ fun PresetsPage(
                                         )
                                     }
                                 },
-                                onApply = { onNavigateBack(preset) },
+                                onApply = {
+                                    val user = appListViewModel.selectedUserId
+                                    currentDialog = {
+                                        io.github.samolego.canta.ui.dialog.preset.PresetApplyDialog(preset, user) {
+                                            currentDialog = null
+                                            scope.launch { appListViewModel.loadInstalled(context.packageManager, context) }
+                                        }
+                                    }
+                                },
                                 onDelete = {
                                     presetViewModel.deletePreset(
                                             preset = preset,
@@ -354,7 +365,7 @@ private fun PresetCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                                text = pluralStringResource(R.plurals.num_selected_apps, preset.apps.size, preset.apps.size),
+                                text = pluralStringResource(R.plurals.num_selected_apps, preset.apps.size + preset.lockdown.size, preset.apps.size + preset.lockdown.size),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
