@@ -206,7 +206,13 @@ fun AppList(
                             .fillMaxWidth()
                             .fillMaxHeight(),
                         contentAlignment = Alignment.Center
-                ) { Text(stringResource(R.string.no_apps_found)) }
+                ) {
+                    Text(
+                        appListModel.loadError?.let { stringResource(R.string.apps_load_failed, it) }
+                            ?: stringResource(R.string.no_apps_found),
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
             }
         }
     }

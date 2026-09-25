@@ -24,6 +24,65 @@ Powered by [Shizuku](https://shizuku.rikka.app/) ([Android 16 fork](https://gith
 
 </div>
 
+> [!Note]
+> **This is a fork: Canta Profiles.** It's the same app, but you can pick which user
+> profile it works on (personal, work, clone, private space, secondary users), so you can
+> debloat system apps inside a **work profile**. See [Profiles fork](#profiles-fork) below.
+
+## Profiles fork
+
+Upstream Canta only sees and uninstalls apps in the profile it's installed in, and with Shizuku
+running over adb it always uninstalls for user 0. This fork adds a profile switcher (the person /
+briefcase icon in the top bar), which lists every user on the device through Shizuku. Picking one
+loads that profile's apps, and uninstall / reinstall then act on that profile only
+(`pm uninstall --user <id>` / `pm install-existing --user <id>` semantics).
+
+Other differences from upstream:
+
+* Application id is `io.github.samolego.canta.profiles`, so it installs next to regular Canta.
+* Uninstall / reinstall wait for the real result from Android. Failures (e.g. blocked by the
+  work profile's admin) are reported in a toast with the reason in *Logs*, instead of the app
+  being marked as uninstalled.
+* On Canta's own profile, uninstalling a *non-system* app still removes it for all users, like
+  upstream. On any other profile it only removes it from that profile.
+
+### Using it with adb over Tailscale
+
+Canta needs [Shizuku](https://shizuku.rikka.app/) running, and Shizuku gets its shell (adb)
+privileges from an adb connection. With Tailscale on both the phone and your computer:
+
+1. Enable *Developer options → USB debugging* on the phone and connect once over USB, or pair
+   with *Wireless debugging*.
+2. Make adbd listen on TCP (resets on reboot): `adb tcpip 5555`
+3. Connect over Tailscale: `adb connect <phone-tailscale-ip>:5555`
+4. Start Shizuku. The exact command is shown in the Shizuku app under *Start via connected
+   computer*, usually:
+   `adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh`
+5. Open Canta Profiles, tap the profile icon, grant the Shizuku permission and pick
+   *Work profile*.
+
+The adb equivalents, handy for checking what Canta did:
+
+```sh
+adb shell pm list users                                  # find the work profile id (usually 10)
+adb shell pm list packages --user 10 -s                  # system apps in the work profile
+adb shell pm uninstall --user 10 <package>               # what Canta does on uninstall
+adb shell cmd package install-existing --user 10 <package>  # what Canta does on reinstall
+```
+
+### Limits set by the work profile admin
+
+These are enforced by Android itself, and no app can bypass them without root. The profile
+switcher warns about both:
+
+* **DISALLOW_DEBUGGING_FEATURES**: Android refuses every shell / adb request that modifies the
+  profile (`Shell does not have permission to access user 10`). Shizuku over adb can't help
+  here. Shizuku started with root isn't affected.
+* **DISALLOW_UNINSTALL_APPS**: uninstalling in that profile fails with
+  `DELETE_FAILED_USER_RESTRICTED`.
+
+---
+
 > [!Warning]
 > **DISCLAIMER:** ⛔ Use at your own risk. I am not responsible for any data loss or damage caused by this app ⛔.
 

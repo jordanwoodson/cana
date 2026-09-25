@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SwitchAccount
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,11 +37,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import io.github.samolego.canta.APP_NAME
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.menu.FiltersMenu
 import io.github.samolego.canta.ui.menu.MoreOptionsMenu
+import io.github.samolego.canta.ui.menu.ProfilesMenu
+import io.github.samolego.canta.ui.menu.displayName
+import io.github.samolego.canta.ui.menu.icon
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
+import io.github.samolego.canta.util.apps.UserProfile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,6 +54,10 @@ fun CantaTopBar(
         openBadgesInfoDialog: () -> Unit,
         navigateToPage: (route: String) -> Unit,
         appListViewModel: AppListViewModel,
+        showProfilesMenu: Boolean,
+        onProfilesClick: () -> Unit,
+        onProfileSelected: (UserProfile) -> Unit,
+        onDismissProfilesMenu: () -> Unit,
 ) {
     var showMoreOptionsMenu by remember { mutableStateOf(false) }
     var showFiltersMenu by remember { mutableStateOf(false) }
@@ -62,7 +73,24 @@ fun CantaTopBar(
                             visible = !searchActive,
                             enter = fadeIn(),
                             exit = fadeOut()
-                    ) { Text(APP_NAME) }
+                    ) {
+                        Column {
+                            Text(APP_NAME)
+                            // Show which profile is being worked on once one was picked
+                            appListViewModel.selectedProfile?.let { profile ->
+                                Text(
+                                    stringResource(
+                                        R.string.profile_subtitle,
+                                        profile.displayName(),
+                                        profile.id
+                                    ),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
 
                     // Search bar - only visible when search is active
                     AnimatedVisibility(visible = searchActive, enter = fadeIn(), exit = fadeOut()) {
@@ -131,6 +159,12 @@ fun CantaTopBar(
                 )
 
                 IconClickButton(
+                        onClick = onProfilesClick,
+                        icon = appListViewModel.selectedProfile?.icon() ?: Icons.Default.SwitchAccount,
+                        contentDescription = stringResource(R.string.switch_profile),
+                )
+
+                IconClickButton(
                         onClick = { showFiltersMenu = !showFiltersMenu },
                         icon = Icons.Default.FilterAlt,
                         contentDescription = "Filter"
@@ -140,6 +174,14 @@ fun CantaTopBar(
                         onClick = { showMoreOptionsMenu = !showMoreOptionsMenu },
                         icon = Icons.Default.MoreVert,
                         contentDescription = "More options",
+                )
+
+                ProfilesMenu(
+                        showMenu = showProfilesMenu,
+                        profiles = appListViewModel.users,
+                        selectedUserId = appListViewModel.selectedUserId,
+                        onSelect = onProfileSelected,
+                        onDismiss = onDismissProfilesMenu,
                 )
 
                 FiltersMenu(

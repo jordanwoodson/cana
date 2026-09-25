@@ -1,9 +1,8 @@
 package io.github.samolego.canta
 
-import android.app.PendingIntent
-import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.IPackageInstaller
+import android.content.pm.PackageInfo
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.os.Build
@@ -19,13 +18,14 @@ import io.github.samolego.canta.extension.getInfoForPackage
 import io.github.samolego.canta.ui.CantaApp
 import io.github.samolego.canta.ui.theme.CantaTheme
 import io.github.samolego.canta.util.LogUtils
+import io.github.samolego.canta.util.PackageInstallerResult
+import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
 import org.lsposed.hiddenapibypass.HiddenApiBypass
-import rikka.shizuku.Shizuku
 
 const val SHIZUKU_PACKAGE_NAME = "moe.shizuku.privileged.api"
 const val APP_NAME = "Canta"
-const val packageName = "io.github.samolego.canta"
+const val packageName = BuildConfig.APPLICATION_ID
 
 class MainActivity : FragmentActivity() {
 
@@ -42,13 +42,13 @@ class MainActivity : FragmentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     CantaApp(
-                        uninstallApp = { packageName, resetToFactory ->
-                            uninstallApp(packageName, resetToFactory)
+                        uninstallApp = { packageName, userId, resetToFactory ->
+                            uninstallApp(packageName, userId, resetToFactory)
                         },
-                        canResetAppToFactory = { packageName ->
-                            checkIfCanResetToFactory(packageName)
+                        canResetAppToFactory = { packageName, userId ->
+                            checkIfCanResetToFactory(packageName, userId)
                         },
-                        reinstallApp = { reinstallApp(it) },
+                        reinstallApp = { packageName, userId -> reinstallApp(packageName, userId) },
                         closeApp = { finishAndRemoveTask() },
                     )
                 }
@@ -57,12 +57,28 @@ class MainActivity : FragmentActivity() {
     }
 
     /**
+     * Gets package info of an app installed for [userId], which may be another profile.
+     */
+    private fun getPackageInfoForUser(packageName: String, userId: Int): PackageInfo? {
+        if (userId == UserProfile.currentUserId) {
+            return packageManager.getInfoForPackage(packageName)
+        }
+        return try {
+            ShizukuPackageInstallerUtils.getPackageInfo(packageName, 0, userId)
+        } catch (e: Exception) {
+            LogUtils.e(APP_NAME, "Failed to get package info of '$packageName' for user $userId", e)
+            null
+        }
+    }
+
+    /**
      * Checks if an app can be reset to factory version.
      * @param packageName package name of the app to check
+     * @param userId user / profile the app is installed in
      * @return true if the app is a system app with updates
      */
-    private fun checkIfCanResetToFactory(packageName: String): Boolean {
-        val appInfo = packageManager.getInfoForPackage(packageName)?.applicationInfo ?: return false
+    private fun checkIfCanResetToFactory(packageName: String, userId: Int): Boolean {
+        val appInfo = getPackageInfoForUser(packageName, userId)?.applicationInfo ?: return false
         val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
         val hasUpdates = (appInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
         return isSystem && hasUpdates
@@ -71,10 +87,15 @@ class MainActivity : FragmentActivity() {
     /**
      * Uninstalls app using Shizuku.
      * @param packageName package name of the app to uninstall
+     * @param userId user / profile to uninstall the app from
      * @param resetToFactory whether to reset system app to factory version before uninstall
      */
-    private fun uninstallApp(packageName: String, resetToFactory: Boolean = false): Boolean {
-        val packageInfo = packageManager.getInfoForPackage(packageName) ?: return false
+    private fun uninstallApp(
+        packageName: String,
+        userId: Int,
+        resetToFactory: Boolean = false,
+    ): Boolean {
+        val packageInfo = getPackageInfoForUser(packageName, userId) ?: return false
         val isSystem = (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) != 0
         val hasUpdates =
             (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
@@ -82,20 +103,31 @@ class MainActivity : FragmentActivity() {
         val shouldReset = resetToFactory && isSystem && hasUpdates
         LogUtils.i(
             APP_NAME,
-            "Uninstalling '$packageName' [system: $isSystem, hasUpdates: $hasUpdates, resetFirst: $shouldReset]"
+            "Uninstalling '$packageName' for user $userId [system: $isSystem, hasUpdates: $hasUpdates, resetFirst: $shouldReset]"
         )
-        val broadcastIntent = Intent("io.github.samolego.canta.UNINSTALL_RESULT_ACTION")
-        val intent = PendingIntent.getBroadcast(
-            applicationContext,
-            0,
-            broadcastIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val packageInstaller = getPackageInstaller()
+        val packageInstaller = getPackageInstaller(userId)
 
         // 0x00000004 = PackageManager.DELETE_SYSTEM_APP
         // 0x00000002 = PackageManager.DELETE_ALL_USERS
-        val flags = if (isSystem) 0x00000004 else 0x00000002
+        // DELETE_ALL_USERS would remove the app from every profile, so only use it when
+        // working on Canta's own profile, like upstream Canta does.
+        val flags = when {
+            isSystem -> 0x00000004
+            userId == UserProfile.currentUserId -> 0x00000002
+            else -> 0
+        }
+        val uninstall = {
+            PackageInstallerResult.await(applicationContext) { intentSender ->
+                HiddenApiBypass.invoke(
+                    PackageInstaller::class.java,
+                    packageInstaller,
+                    "uninstall",
+                    packageName,
+                    flags,
+                    intentSender
+                )
+            }
+        }
 
         if (shouldReset) {
             try {
@@ -104,21 +136,17 @@ class MainActivity : FragmentActivity() {
                     "Attempting to reset system app '$packageName' before uninstalling"
                 )
 
-
-                HiddenApiBypass.invoke(
-                    PackageInstaller::class.java,
-                    packageInstaller,
-                    "uninstall",
-                    packageName,
-                    flags,
-                    intent.intentSender
-                )
+                val reset = uninstall()
+                if (!reset.success) {
+                    throw IllegalStateException(reset.message)
+                }
 
                 LogUtils.i(APP_NAME, "Successfully reset system app '$packageName'")
 
                 try {
+                    // Nothing left to uninstall if the reset already removed it for this user
                     val updatedPackageInfo =
-                        packageManager.getInfoForPackage(packageName) ?: return false
+                        getPackageInfoForUser(packageName, userId) ?: return true
                     val stillHasUpdates =
                         (updatedPackageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
                     LogUtils.i(APP_NAME, "After reset: Package still has updates: $stillHasUpdates")
@@ -135,17 +163,16 @@ class MainActivity : FragmentActivity() {
 
 
         return try {
-            HiddenApiBypass.invoke(
-                PackageInstaller::class.java,
-                packageInstaller,
-                "uninstall",
-                packageName,
-                flags,
-                intent.intentSender
-            )
-            true
+            val result = uninstall()
+            if (!result.success) {
+                LogUtils.e(
+                    APP_NAME,
+                    "Failed to uninstall '$packageName' for user $userId: ${result.message}"
+                )
+            }
+            result.success
         } catch (e: Exception) {
-            LogUtils.e(APP_NAME, "Failed to uninstall '$packageName'")
+            LogUtils.e(APP_NAME, "Failed to uninstall '$packageName' for user $userId")
             LogUtils.e(APP_NAME, "Error: ${e.message}")
             e.printStackTrace()
             false
@@ -156,48 +183,47 @@ class MainActivity : FragmentActivity() {
      * Reinstalls app using Shizuku. See <a
      * href="https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/services/core/java/com/android/server/pm/PackageManagerShellCommand.java;drc=bcb2b436bde55ee40050400783a9c083e77ce2fe;l=1408>PackageManagerShellCommand.java</a>
      * @param packageName package name of the app to reinstall (must preinstalled on the phone)
+     * @param userId user / profile to reinstall the app for
      */
-    private fun reinstallApp(packageName: String): Boolean {
+    private fun reinstallApp(packageName: String, userId: Int): Boolean {
         val installReason = PackageManager.INSTALL_REASON_UNKNOWN
-        val broadcastIntent = Intent("io.github.samolego.canta.INSTALL_RESULT_ACTION")
-        val intent =
-            PendingIntent.getBroadcast(
-                applicationContext,
-                0,
-                broadcastIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
 
-        LogUtils.i(APP_NAME, "Reinstalling '$packageName'")
+        LogUtils.i(APP_NAME, "Reinstalling '$packageName' for user $userId")
 
         // PackageManager.INSTALL_ALL_WHITELIST_RESTRICTED_PERMISSIONS
         val installFlags = 0x00400000
 
         return try {
-            HiddenApiBypass.invoke(
-                IPackageInstaller::class.java,
-                ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller(),
-                "installExistingPackage",
-                packageName,
-                installFlags,
-                installReason,
-                intent.intentSender,
-                0,
-                null
-            )
-            true
+            val result = PackageInstallerResult.await(applicationContext) { intentSender ->
+                HiddenApiBypass.invoke(
+                    IPackageInstaller::class.java,
+                    ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller(),
+                    "installExistingPackage",
+                    packageName,
+                    installFlags,
+                    installReason,
+                    intentSender,
+                    userId,
+                    null
+                )
+            }
+            if (!result.success) {
+                LogUtils.e(
+                    APP_NAME,
+                    "Failed to reinstall '$packageName' for user $userId: ${result.message}"
+                )
+            }
+            result.success
         } catch (e: Exception) {
-            LogUtils.e(APP_NAME, "Failed to reinstall '$packageName'")
+            LogUtils.e(APP_NAME, "Failed to reinstall '$packageName' for user $userId")
             LogUtils.e(APP_NAME, "Error: ${e.message}")
             e.printStackTrace()
             false
         }
     }
 
-    private fun getPackageInstaller(): PackageInstaller {
+    private fun getPackageInstaller(userId: Int): PackageInstaller {
         val iPackageInstaller = ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller()
-        val root = Shizuku.getUid() == 0
-        val userId = if (root) android.os.Process.myUserHandle().hashCode() else 0
 
         // The reason for use "com.android.shell" as installer package under adb is that
         // getMySessions will check installer package's owner

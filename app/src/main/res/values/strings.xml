@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <string name="app_name" translatable="false">Canta</string>
+    <string name="app_name" translatable="false">Canta Profiles</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string
@@ -14,6 +14,23 @@
     <string name="reinstall">ReInstall</string>
     <string name="only_system">Only system</string>
     <string name="no_apps_found">No apps found</string>
+    <string name="apps_load_failed">Couldn\'t load apps of this profile:\n%1$s</string>
+    <string name="switch_profile">Switch profile</string>
+    <string name="profile_subtitle">%1$s (user %2$d)</string>
+    <string name="profile_personal">Personal</string>
+    <string name="profile_work">Work profile</string>
+    <string name="profile_clone">Clone profile</string>
+    <string name="profile_private">Private space</string>
+    <string name="profile_user">User</string>
+    <string name="profile_other">Profile</string>
+    <string name="user_id">User ID %1$d</string>
+    <string name="profile_blocks_shell">Admin disallows debugging here, Shizuku over adb can\'t modify this profile</string>
+    <string name="profile_blocks_uninstall">Admin blocks uninstalling apps here</string>
+    <string name="profiles_load_failed">Couldn\'t list profiles, check Shizuku and the logs</string>
+    <plurals name="apps_failed_see_logs">
+        <item quantity="one">%d app failed, see logs for the reason</item>
+        <item quantity="other">%d apps failed, see logs for the reason</item>
+    </plurals>
     <string name="loading_apps">Loading apps</string>
     <string name="badge_info">Badge info</string>
     <string name="got_it">Got it</string>
