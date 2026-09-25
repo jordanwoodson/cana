@@ -25,6 +25,7 @@ class Filter(
         val user = Filter(name = "User", shouldShow = { app -> !app.isSystemApp })
         val leftoverUpdates = Filter("Leftover updates", { it.isUninstalled && it.isUpdatedSystemApp },
             nameRes = R.string.leftover_updates)
+        val unused = Filter("Unused for 90 days", { !it.isUninstalled && io.github.samolego.canta.ops.ManagementPolicy.unused90Days(it.lastUsed, it.firstInstallTime, System.currentTimeMillis()) }, nameRes = R.string.unused_90_days)
 
         /**
          * List of available filters.
@@ -56,6 +57,7 @@ class Filter(
             val disabled = Filter(name = "Disabled", shouldShow = { app -> app.isDisabled })
             removalFilters.add(3, disabled)
             removalFilters.add(4, leftoverUpdates)
+            removalFilters.add(5, unused)
 
             val categoryNames = mapOf(
                 InstallData.GOOGLE to R.string.category_google,

@@ -11,6 +11,7 @@ message CantaPreset {
   string version = 5;
   string uuid = 6;
   repeated PresetLockdown lockdown = 7;
+  optional string profile_kind = 8;
 }
 
 message PresetLockdown {

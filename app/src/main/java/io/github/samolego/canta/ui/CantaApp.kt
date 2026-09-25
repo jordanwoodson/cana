@@ -128,6 +128,9 @@ fun CantaApp(
         composable(route = Screen.Logs.route) {
             LogsPage(onNavigateBack = { navController.navigateUp() })
         }
+        composable(route = Screen.History.route) {
+            io.github.samolego.canta.ui.screen.HistoryPage(onNavigateBack = { navController.navigateUp() })
+        }
         composable(route = Screen.Settings.route) {
             SettingsScreen(
                 onNavigateBack = { navController.navigateUp() },
@@ -308,6 +311,7 @@ private fun MainContent(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
+            io.github.samolego.canta.ui.component.OtaBanner()
             TabRow(
                 selectedTabIndex = selectedAppsType.ordinal,
                 contentColor = MaterialTheme.colorScheme.primary,

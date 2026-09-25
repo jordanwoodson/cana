@@ -54,6 +54,7 @@ class PresetsViewModel : ViewModel() {
         description: String,
         apps: Set<String>,
         privacyUserId: Int? = null,
+        profileKind: String? = null,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
@@ -63,7 +64,7 @@ class PresetsViewModel : ViewModel() {
             try {
                 val lockdown = privacyUserId?.let { io.github.samolego.canta.ops.CanaServices.getInstance().presets.captureLockdown(it) }.orEmpty()
                 val preset = presetStore.createPresetFromUninstalledApps(apps, name, description)
-                    .copy(lockdown = lockdown.filterNot { it.packageName in apps })
+                    .copy(lockdown = lockdown.filterNot { it.packageName in apps }, profileKind = profileKind)
                 if (presetStore.savePreset(preset)) onSuccess() else onError()
             } catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) { LogUtils.e(TAG, "Cannot capture or save preset", e); onError() }
@@ -135,6 +136,7 @@ class PresetsViewModel : ViewModel() {
         oldPreset: CantaPresetData,
         newName: String,
         newDescription: String,
+        profileKind: String? = oldPreset.profileKind,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
@@ -143,6 +145,7 @@ class PresetsViewModel : ViewModel() {
                 oldPreset.copy(
                     name = newName,
                     description = newDescription,
+                    profileKind = profileKind,
                     apps = oldPreset.apps
                 )
 

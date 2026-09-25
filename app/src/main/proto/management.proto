@@ -1,0 +1,21 @@
+syntax = "proto3";
+option java_package = "io.github.samolego.canta.data.proto";
+option java_multiple_files = true;
+
+message ProfileInventory {
+  int32 user_id = 1;
+  string fingerprint = 2;
+  repeated string installed = 3;
+  repeated string system_packages = 4;
+}
+message OtaPackageChange {
+  int32 user_id = 1;
+  string package_name = 2;
+  bool returned = 3;
+  string fingerprint = 4;
+}
+message ManagementState {
+  repeated ProfileInventory profiles = 1;
+  repeated OtaPackageChange pending = 2;
+  string notified_changes = 3;
+}

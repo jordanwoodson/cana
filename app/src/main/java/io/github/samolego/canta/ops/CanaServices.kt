@@ -6,6 +6,8 @@ import io.github.samolego.canta.data.HistoryStore
 import io.github.samolego.canta.data.historyDataStore
 import io.github.samolego.canta.data.PrivacyStore
 import io.github.samolego.canta.data.privacyDataStore
+import io.github.samolego.canta.data.ManagementStore
+import io.github.samolego.canta.data.managementDataStore
 import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.TrackerRepository
 import kotlinx.coroutines.CancellationException
@@ -24,6 +26,9 @@ class CanaServices private constructor(context: Context) {
     val journal = OperationJournal(context.applicationContext, history)
     val privacy = PrivacyOps(context.applicationContext, shell, history, desiredPrivacy, safety, journal)
     val presets = PresetOps(packageOps, privacy, history)
+    val undo = UndoCoordinator(history, packageOps, privacy)
+    val management = ManagementStore(appContext.managementDataStore)
+    val ota = OtaRepository(appContext, management, history)
 
     init {
         Shizuku.addBinderReceivedListenerSticky { ensureGrants() }
@@ -37,6 +42,9 @@ class CanaServices private constructor(context: Context) {
     }
 
     suspend fun reconcileNow() {
+        try { ota.check() }
+        catch (e: CancellationException) { throw e }
+        catch (e: Exception) { LogUtils.e("CanaServices", "Could not check system update changes", e) }
         try {
             if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
                 selfGrants.grantMissing()

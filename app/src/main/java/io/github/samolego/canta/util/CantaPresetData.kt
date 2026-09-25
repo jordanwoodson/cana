@@ -12,6 +12,7 @@ data class CantaPresetData(
     val version: String = "1.0",
     val uuid: String = "",
     val lockdown: List<LockdownSettings> = emptyList(),
+    val profileKind: String? = null,
 ) : Parcelable
 
 @Parcelize
