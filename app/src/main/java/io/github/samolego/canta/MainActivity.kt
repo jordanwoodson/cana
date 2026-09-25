@@ -19,6 +19,7 @@ import io.github.samolego.canta.ui.CantaApp
 import io.github.samolego.canta.ui.theme.CantaTheme
 import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.PackageInstallerResult
+import io.github.samolego.canta.util.UninstallSequence
 import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
 import org.lsposed.hiddenapibypass.HiddenApiBypass
@@ -59,12 +60,16 @@ class MainActivity : FragmentActivity() {
     /**
      * Gets package info of an app installed for [userId], which may be another profile.
      */
-    private fun getPackageInfoForUser(packageName: String, userId: Int): PackageInfo? {
+    private fun getPackageInfoForUser(
+        packageName: String,
+        userId: Int,
+        flags: Int = PackageManager.GET_META_DATA,
+    ): PackageInfo? {
         if (userId == UserProfile.currentUserId) {
-            return packageManager.getInfoForPackage(packageName)
+            return packageManager.getInfoForPackage(packageName, flags)
         }
         return try {
-            ShizukuPackageInstallerUtils.getPackageInfo(packageName, 0, userId)
+            ShizukuPackageInstallerUtils.getPackageInfo(packageName, flags, userId)
         } catch (e: Exception) {
             LogUtils.e(APP_NAME, "Failed to get package info of '$packageName' for user $userId", e)
             null
@@ -116,54 +121,32 @@ class MainActivity : FragmentActivity() {
             userId == UserProfile.currentUserId -> 0x00000002
             else -> 0
         }
-        val uninstall = {
+        val uninstall = { deleteFlags: Int ->
+            LogUtils.i(APP_NAME, "Uninstall '$packageName' user $userId flags $deleteFlags")
             PackageInstallerResult.await(applicationContext) { intentSender ->
                 HiddenApiBypass.invoke(
                     PackageInstaller::class.java,
                     packageInstaller,
                     "uninstall",
                     packageName,
-                    flags,
+                    deleteFlags,
                     intentSender
                 )
             }
         }
 
-        if (shouldReset) {
-            try {
-                LogUtils.i(
-                    APP_NAME,
-                    "Attempting to reset system app '$packageName' before uninstalling"
-                )
-
-                val reset = uninstall()
-                if (!reset.success) {
-                    throw IllegalStateException(reset.message)
-                }
-
-                LogUtils.i(APP_NAME, "Successfully reset system app '$packageName'")
-
-                try {
-                    // Nothing left to uninstall if the reset already removed it for this user
-                    val updatedPackageInfo =
-                        getPackageInfoForUser(packageName, userId) ?: return true
-                    val stillHasUpdates =
-                        (updatedPackageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
-                    LogUtils.i(APP_NAME, "After reset: Package still has updates: $stillHasUpdates")
-                } catch (e: Exception) {
-                    LogUtils.e(APP_NAME, "Failed to check update status after reset: ${e.message}")
-                }
-
-            } catch (e: Exception) {
-                LogUtils.e(APP_NAME, "Failed to reset system app: ${e.message}")
-                LogUtils.w(APP_NAME, "Falling back to user uninstall")
-            }
-        }
-
-
-
         return try {
-            val result = uninstall()
+            val result = UninstallSequence.execute(
+                resetFirst = shouldReset,
+                uninstallFlags = flags,
+                hasUpdates = {
+                    getPackageInfoForUser(packageName, userId, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                        ?.applicationInfo?.let {
+                            it.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
+                        }
+                },
+                uninstall = uninstall,
+            )
             if (!result.success) {
                 LogUtils.e(
                     APP_NAME,

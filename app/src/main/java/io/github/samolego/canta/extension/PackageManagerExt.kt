@@ -76,17 +76,18 @@ private fun PackageManager.getPackages(flags: Int): List<PackageInfo> {
 
 fun PackageManager.getInfoForPackage(
     packageName: String,
+    flags: Int = PackageManager.GET_META_DATA,
 ): PackageInfo? {
     return try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             this.getPackageInfo(
                 packageName,
-                PackageManager.PackageInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                PackageManager.PackageInfoFlags.of(flags.toLong())
             )
         } else {
             this.getPackageInfo(
                 packageName,
-                PackageManager.GET_META_DATA
+                flags
             )
         }
     } catch (e: NameNotFoundException) {
