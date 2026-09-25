@@ -63,7 +63,8 @@ fun FiltersMenu(
 
         // Filter submenu trigger
         FilterChip(
-                text = appListViewModel.selectedFilter.name,
+                text = appListViewModel.selectedFilter.nameRes?.let { stringResource(it) }
+                    ?: appListViewModel.selectedFilter.name,
                 isSelected = filtersMenu,
                 onClick = { filtersMenu = !filtersMenu },
                 trailingContent = {
@@ -78,7 +79,7 @@ fun FiltersMenu(
         if (filtersMenu) {
             Filter.availableFilters.forEach { filter ->
                 FilterChip(
-                        text = filter.name,
+                        text = filter.nameRes?.let { stringResource(it) } ?: filter.name,
                         isSelected = appListViewModel.selectedFilter == filter,
                         onClick = {
                             appListViewModel.selectedFilter = filter

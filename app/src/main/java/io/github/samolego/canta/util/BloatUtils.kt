@@ -84,14 +84,29 @@ data class BloatData(
     internal val installData: InstallData?,
     internal val description: String?,
     internal val removal: RemovalRecommendation?,
+    val dependencies: List<String> = emptyList(),
+    val neededBy: List<String> = emptyList(),
+    val labels: List<String> = emptyList(),
+    val suggestions: String? = null,
 ) : Parcelable {
     companion object {
         fun fromJson(json: JSONObject): BloatData {
-            val installData = InstallData.byNameIgnoreCaseOrNull(json.getString("list"))
-            val description = json.getString("description")
-            val removal = RemovalRecommendation.byNameIgnoreCaseOrNull(json.getString("removal"))
+            return BloatData(
+                installData = InstallData.byNameIgnoreCaseOrNull(json.optString("list")),
+                description = json.opt("description") as? String,
+                removal = RemovalRecommendation.byNameIgnoreCaseOrNull(json.optString("removal")),
+                dependencies = json.stringList("dependencies"),
+                neededBy = json.stringList("neededBy"),
+                labels = json.stringList("labels"),
+                suggestions = (json.opt("suggestions") as? String)?.takeIf { it.isNotBlank() },
+            )
+        }
 
-            return BloatData(installData, description, removal)
+        private fun JSONObject.stringList(key: String): List<String> {
+            val array = optJSONArray(key) ?: return emptyList()
+            return (0 until array.length()).mapNotNull {
+                (array.opt(it) as? String)?.takeIf(String::isNotBlank)
+            }
         }
     }
 }
@@ -142,7 +157,10 @@ enum class RemovalRecommendation(
  */
 enum class InstallData {
     OEM,
-    CARRIER;
+    CARRIER,
+    GOOGLE,
+    AOSP,
+    MISC;
 
     companion object {
         fun byNameIgnoreCaseOrNull(input: String): InstallData? {

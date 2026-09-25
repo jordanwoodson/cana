@@ -173,4 +173,9 @@
     <string name="require_auth_setting_desc">Require authentication for uninstalling or reinstalling apps.</string>
     <string name="require_auth_setting">Require authentication</string>
     <string name="enable_usb_debugging">(Optional) Enable USB debugging</string>
+    <string name="category_google">Google</string>
+    <string name="category_oem">OEM</string>
+    <string name="category_carrier">Carrier</string>
+    <string name="category_aosp">AOSP</string>
+    <string name="category_misc">Misc</string>
 </resources>

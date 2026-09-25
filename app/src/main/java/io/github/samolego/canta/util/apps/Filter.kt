@@ -1,6 +1,8 @@
 package io.github.samolego.canta.util.apps
 
 import io.github.samolego.canta.util.RemovalRecommendation
+import io.github.samolego.canta.util.InstallData
+import io.github.samolego.canta.R
 import java.util.Locale
 
 /**
@@ -11,7 +13,8 @@ import java.util.Locale
 class Filter(
     val name: String,
     val shouldShow: (AppInfo) -> Boolean,
-    val removalRecommendation: RemovalRecommendation? = null
+    val removalRecommendation: RemovalRecommendation? = null,
+    val nameRes: Int? = null,
 ) {
     companion object {
         /**
@@ -50,6 +53,21 @@ class Filter(
             // Apps that are disabled
             val disabled = Filter(name = "Disabled", shouldShow = { app -> app.isDisabled })
             removalFilters.add(3, disabled)
+
+            val categoryNames = mapOf(
+                InstallData.GOOGLE to R.string.category_google,
+                InstallData.OEM to R.string.category_oem,
+                InstallData.CARRIER to R.string.category_carrier,
+                InstallData.AOSP to R.string.category_aosp,
+                InstallData.MISC to R.string.category_misc,
+            )
+            categoryNames.forEach { (category, label) ->
+                removalFilters.add(Filter(
+                    name = category.name,
+                    nameRes = label,
+                    shouldShow = { app -> app.bloatData?.installData == category },
+                ))
+            }
 
             availableFilters = removalFilters
         }
