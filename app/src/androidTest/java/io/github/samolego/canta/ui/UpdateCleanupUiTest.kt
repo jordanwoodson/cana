@@ -38,7 +38,7 @@ class UpdateCleanupUiTest {
             val request = PackageActionRequest(PackageAction.REMOVE_UPDATES, 10, listOf(app))
             var consent: Set<Int>? = null
             compose.setContent {
-                CantaTheme { PackageActionConfirmation(request, AppListViewModel(), true, {}, { included, _, approvals ->
+                CantaTheme { PackageActionConfirmation(request, AppListViewModel(), true, {}, { included, _, approvals, _ ->
                     assertEquals(setOf(name), included)
                     consent = approvals[name]
                 }) }

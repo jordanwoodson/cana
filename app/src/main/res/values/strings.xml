@@ -217,4 +217,16 @@
     <string name="import_action">Import</string>
     <string name="create_action">Create</string>
     <string name="uninstall_confirmation">Uninstall %1$d apps for this profile?</string>
+    <string name="safety_protected">%1$s is essential and cannot be changed by Cana.</string>
+    <string name="safety_profile_restricted">This profile restricts app removal or debugging.</string>
+    <string name="safety_query_failed">Safety checks could not finish: %1$s</string>
+    <string name="safety_confirmation_required">Review and explicitly confirm the current safety warnings for %1$s.</string>
+    <string name="safety_role">Current %1$s role holder. Choose a replacement before removal.</string>
+    <string name="safety_keyboard">Current or enabled keyboard: %1$s. Keep another working keyboard.</string>
+    <string name="safety_admin">Active device administrator: %1$s. Device management may stop working.</string>
+    <string name="safety_dependent">Installed app %1$s depends on this package according to UAD.</string>
+    <string name="safety_acknowledge">I understand these warnings and want to continue.</string>
+    <string name="restore_export">Export recovery script</string>
+    <string name="restore_export_saved">Recovery script saved. Review its manual steps before running it over adb.</string>
+    <string name="restore_export_failed">Could not export recovery script: %1$s</string>
 </resources>

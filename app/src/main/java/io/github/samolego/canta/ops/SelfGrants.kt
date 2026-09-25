@@ -18,6 +18,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import org.json.JSONObject
 
 data class GrantStatus(val secureSettings: Boolean, val usageStats: Boolean)
 
@@ -56,7 +57,14 @@ class SelfGrants(context: Context, private val shell: ShellRunner, private val h
                 try {
                     history.append(OperationRecord.newBuilder().setId(id).setBatchId(batch)
                         .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(context.packageName)
-                        .setAction(action).setPreviousState("{\"granted\":false}").build())
+                        .setAction(action).setPreviousState(JSONObject().put("granted", false).apply {
+                            if (action == "self_grant_usage_stats") {
+                                @Suppress("DEPRECATION")
+                                val mode = context.getSystemService(AppOpsManager::class.java)
+                                    .checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName)
+                                put("appOpMode", when (mode) { 0 -> "allow"; 1 -> "ignore"; 2 -> "deny"; 4 -> "foreground"; else -> "default" })
+                            }
+                        }.toString()).build())
                     val result = shell.exec(argv)
                     val after = status()
                     val granted = if (action == "self_grant_secure_settings") after.secureSettings else after.usageStats

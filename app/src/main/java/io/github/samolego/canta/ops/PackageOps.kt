@@ -27,7 +27,7 @@ import java.util.UUID
 import java.io.File
 
 /** All mutations capture an explicit user and journal their before/after state. */
-class PackageOps(context: Context, private val history: HistoryStore) {
+class PackageOps(context: Context, private val history: HistoryStore, private val safety: SafetyInspector) {
     private val context = context.applicationContext
     private val mutationMutex = Mutex()
 
@@ -70,7 +70,9 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         resetToFactory: Boolean = false,
         batchId: String = UUID.randomUUID().toString(),
         approvedDowngradeUsers: Set<Int> = emptySet(),
+        approvedWarnings: Set<String> = emptySet(),
     ): OperationResult = recorded(packageName, userId, "uninstall", batchId) { before ->
+        safety.requireAllowed(packageName, userId, approvedWarnings)
         val info = before?.applicationInfo ?: error(context.getString(R.string.operation_package_missing))
         check(info.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
             context.getString(R.string.operation_already_uninstalled)
@@ -124,6 +126,11 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         val app = before?.applicationInfo ?: error(context.getString(R.string.operation_package_missing))
         val updated = app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
         if (!updated) return@recorded OperationResult(true, context.getString(R.string.no_leftover_updates), skipped = true)
+        // Cleanup may temporarily install the package; never do this to essential packages.
+        val protection = safety.inspect(listOf(packageName), userId).getValue(packageName)
+        check(!protection.protected && protection.error == null) {
+            protection.error ?: context.getString(R.string.safety_protected, packageName)
+        }
         val impact = inspectUpdatesNow(packageName, userId)
         check(impact.otherInstalledProfiles.all { it.id in approvedDowngradeUsers }) {
             context.getString(R.string.update_profiles_changed)
@@ -185,7 +192,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         userId: Int,
         action: String,
         batchId: String,
-        operation: (PackageInfo?) -> OperationResult,
+        operation: suspend (PackageInfo?) -> OperationResult,
     ): OperationResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
         LogUtils.i("PackageOps", "$action $packageName user=$userId batch=$batchId")
         val id = UUID.randomUUID().toString()
@@ -194,11 +201,14 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         var preflightError: Throwable? = null
         try {
             require(userId >= 0 && packageName.isNotBlank())
+            if (action != "reinstall") check(packageName !in safety.alwaysProtected) {
+                context.getString(R.string.safety_protected, packageName)
+            }
             check(Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
                 context.getString(R.string.operation_shizuku_unavailable)
             }
             before = getPackageInfo(packageName, userId)
-            previousState = snapshot(before)
+            previousState = snapshot(before, userId)
         } catch (e: Exception) { preflightError = e }
         try {
             history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
@@ -217,7 +227,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
                 LogUtils.e("PackageOps", "$action failed for $packageName user=$userId", e.cause ?: e)
                 OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
             }
-            val after = try { snapshot(getPackageInfo(packageName, userId)) } catch (_: Exception) { "{}" }
+            val after = try { snapshot(getPackageInfo(packageName, userId), userId) } catch (_: Exception) { "{}" }
             val changed = previousState != "{}" && after != "{}" && previousState != after
             val result = outcome.copy(changed = changed)
             try {
@@ -232,11 +242,14 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         }
     } }
 
-    private fun snapshot(info: PackageInfo?): String = JSONObject().apply {
+    private fun snapshot(info: PackageInfo?, userId: Int): String = JSONObject().apply {
         val app = info?.applicationInfo
         put("installed", app != null && app.flags and ApplicationInfo.FLAG_INSTALLED != 0)
         put("updatedSystemApp", app != null && app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0)
         put("enabled", app?.enabled ?: false)
+        put("systemApp", app != null && app.flags and ApplicationInfo.FLAG_SYSTEM != 0)
+        put("suspended", app != null && app.flags and ApplicationInfo.FLAG_SUSPENDED != 0)
+        if (info != null) put("enabledSetting", ShizukuPackageInstallerUtils.applicationEnabledSetting(info.packageName, userId))
         put("sourceDir", app?.sourceDir.orEmpty())
         put("versionCode", info?.longVersionCode ?: 0)
     }.toString()
