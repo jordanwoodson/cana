@@ -78,7 +78,7 @@ jobs:
         run: |
           gh release create "v${{ env.VERSION_NAME }}" \
             --draft \
-            --title "Canta ${{ env.VERSION_NAME }}" \
+            --title "Cana ${{ env.VERSION_NAME }}" \
             --notes "" \
             --target "$GITHUB_SHA"
 

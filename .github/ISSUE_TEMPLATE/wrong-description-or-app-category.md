@@ -1,13 +1,13 @@
 ---
 name: Wrong app description / classification
-about: App in Canta is categorized wrongly
+about: App in Cana is categorized wrongly
 title: "[App Description]"
 
 ---
 
 ⚠️ **Wrong app description or category?**
 
-Canta pulls all app descriptions and categories from the [Universal Android Debloater](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/) project.
+Cana pulls all app descriptions and categories from the [Universal Android Debloater](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/) project.
 
 
 **Please do NOT open an issue here for that**

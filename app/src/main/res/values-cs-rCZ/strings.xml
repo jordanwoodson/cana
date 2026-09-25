@@ -44,7 +44,7 @@
     <string name="copy">Zkopírovat</string>
     <string name="app_settings">Informace o aplikací</string>
     <string name="close">Zavřít</string>
-    <string name="canta_description">Canta je open source odinstalační aplikace, která používá Shizuku k odstranění systémových a uživatelských aplikací.\nUmožňuje vám debloatovat zařízení podle vašeho přání, bez nutnosti použití počítače.\n\nSpeciální poděkování patří %s.\nCanta by bez jejich práce nebyla tím čím je.</string>
+    <string name="canta_description">Cana je open source odinstalační aplikace, která používá Shizuku k odstranění systémových a uživatelských aplikací.\nUmožňuje vám debloatovat zařízení podle vašeho přání, bez nutnosti použití počítače.\n\nSpeciální poděkování patří %s.\nCana by bez jejich práce nebyla tím čím je.</string>
     <string name="search_apps">Vyhledat aplikace</string>
     <string name="auto_update_bloat_list">Automatická aktualizace bloat seznamu</string>
     <string name="auto_update_bloat_list_description">Automaticky stáhni novou verzi informací o bloat aplikacích To zaručí aktuální odznaky a popisy aplikací.</string>
@@ -67,7 +67,7 @@
     <string name="import_preset">Importovat předvolbu</string>
     <string name="import_preset_description">Importovat předvolbu ze schránky nebo vložit přímo JSON text.</string>
     <string name="clipboard">Schránka</string>
-    <string name="import_preset_clipboard_description">Importovat předvolbu ze schránky. Ujistěte se, že jste zkopírovali platnou Canta předvolbu JSON.</string>
+    <string name="import_preset_clipboard_description">Importovat předvolbu ze schránky. Ujistěte se, že jste zkopírovali platnou Cana předvolbu JSON.</string>
     <string name="paste_preset_json">Vložit předvolbu JSON</string>
     <string name="paste_preset_json_here">Vložit předvolbu JSON zde ...</string>
     <string name="enter_valid_json">Zadejte prosím platný JSON</string>
@@ -99,9 +99,9 @@
     <string name="text">Text</string>
     <string name="install_shizuku">Nainstalovat aplikaci Shizuku</string>
     <string name="start_shizuku_service">Spustit službu Shizuku</string>
-    <string name="grant_shizuku_permission_to_canta">Udělit oprávnění Canta v Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Udělit oprávnění Cana v Shizuku</string>
     <string name="shizuku_required">Vyžaduje Shizuku</string>
-    <string name="shizuku_requirement_description">Canta používá Shizuku k odinstalaci aplikací bez nutnosti root přístupu. Shizuku poskytuje bezpečný způsob přístupu k SDK.</string>
+    <string name="shizuku_requirement_description">Cana používá Shizuku k odinstalaci aplikací bez nutnosti root přístupu. Shizuku poskytuje bezpečný způsob přístupu k SDK.</string>
     <string name="commits_url">Commits URL</string>
     <string name="commits_url_description">Where to get commit info for updates from</string>
     <string name="reset_to_default">Reset to default</string>
@@ -112,7 +112,6 @@
     <string name="allow_unsafe_selections">Allow unsafe selections</string>
     <string name="allow_unsafe_uninstalls_description">Whether to allow selecting apps marked as unsafe (applying presets bypasses this already).</string>
     <string name="donate">Donate</string>
-    <string name="canta_donate_request">Enjoying Canta? It\'s built in my free time with privacy in mind - no ads, no tracking. If you find it useful, please consider supporting its development!</string>
     <string name="success">Success %1$s!</string>
     <string name="hide_success_dialog">Hide success dialog</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

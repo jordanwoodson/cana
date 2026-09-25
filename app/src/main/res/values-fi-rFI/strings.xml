@@ -36,7 +36,7 @@
     <string name="copy">Kopioi</string>
     <string name="app_settings">Sovelluksen tiedot</string>
     <string name="close">Sulje</string>
-    <string name="canta_description">Canta on avoimen lähdekoodin asennusten poistosovellus, joka käyttää Shizukua järjestelmä- ja käyttäjäsovellusten poistamiseen. Sen avulla voit debloatata laitteesi haluamallasi tavalla, tietokonetta ei tarvita.\n\nErikoiskiitos %s.\nCanta ei olisi sama ilman heidän työtään.</string>
+    <string name="canta_description">Cana on avoimen lähdekoodin asennusten poistosovellus, joka käyttää Shizukua järjestelmä- ja käyttäjäsovellusten poistamiseen. Sen avulla voit debloatata laitteesi haluamallasi tavalla, tietokonetta ei tarvita.\n\nErikoiskiitos %s.\nCana ei olisi sama ilman heidän työtään.</string>
     <string name="search_apps">Etsi sovelluksia</string>
     <string name="auto_update_bloat_list">Automaattisesti päivitä bloat listaa</string>
     <string name="auto_update_bloat_list_description">Hae automaattisesti uusi versio sovelluksen bloat tiedoista. Tämä takaa ajan tasalla olevat tunnukset ja sovelluksen kuvaukset.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Tuo esiasetus</string>
     <string name="import_preset_description">Tuo esiasetus leikepöydältä tai liitä JSON teksti suoraan.</string>
     <string name="clipboard">Leikepöytä</string>
-    <string name="import_preset_clipboard_description">Tuo esiasetus leikepöydältä. Varmista, että olet kopioinut kelvollisen Cantan esiasetuksen JSON.</string>
+    <string name="import_preset_clipboard_description">Tuo esiasetus leikepöydältä. Varmista, että olet kopioinut kelvollisen Canan esiasetuksen JSON.</string>
     <string name="paste_preset_json">Liitä esiasetus JSON</string>
     <string name="paste_preset_json_here">Liitä JSON esiasetus tähän...</string>
     <string name="enter_valid_json">Syötä kelvollinen JSON</string>
@@ -91,9 +91,9 @@
     <string name="text">Teksti</string>
     <string name="install_shizuku">Asenna Shizuku-sovellus</string>
     <string name="start_shizuku_service">Käynnistä Shizuku-palvelu</string>
-    <string name="grant_shizuku_permission_to_canta">Myönnä lupa Cantalle Shizukussa</string>
+    <string name="grant_shizuku_permission_to_canta">Myönnä lupa Canalle Shizukussa</string>
     <string name="shizuku_required">Shizuku on pakollinen</string>
-    <string name="shizuku_requirement_description">Canta käyttää Shizukua poistaakseen sovelluksia ilman root-käyttöoikeutta. Shizuku tarjoaa turvallisen tavan käyttää järjestelmätason SDK:ta.</string>
+    <string name="shizuku_requirement_description">Cana käyttää Shizukua poistaakseen sovelluksia ilman root-käyttöoikeutta. Shizuku tarjoaa turvallisen tavan käyttää järjestelmätason SDK:ta.</string>
     <string name="commits_url">Commitin URL</string>
     <string name="commits_url_description">Mistä saada commitin tieto päivityksiin</string>
     <string name="reset_to_default">Palauta oletusasetukset</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Salli vaaralliset valinnat</string>
     <string name="allow_unsafe_uninstalls_description">Sallitaanko vaarallisiksi merkittyjen sovellusten valitseminen (esiasetusten käyttöönotto ohittaa tämän jo).</string>
     <string name="donate">Lahjoita</string>
-    <string name="canta_donate_request">Nautitko Cantasta? Se on rakennettu vapaa-aikaa yksityisyyden mielessä - ei mainoksia, ei seurantaa. Jos löydät sen hyödylliseksi, harkitse sen kehityksen tukemista!</string>
     <string name="success">Onnistui %1$s!</string>
     <string name="hide_success_dialog">Piilota onnistumisikkuna</string>
     <string name="hide_success_dialog_description">Piilottaa onnistumisikkunan poiston / uudelleenasennuksen jälkeen.</string>

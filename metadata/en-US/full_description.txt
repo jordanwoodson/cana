@@ -1,8 +1,8 @@
-Canta allows you to uninstall <b>any(*)</b> app
+Cana allows you to uninstall <b>any(*)</b> app
 from your device, even if you don't have root access.
 
 You'll need to install Shizuku (https://shizuku.rikka.app/download/)
-and activate it (https://shizuku.rikka.app/guide/setup/) before using Canta.
+and activate it (https://shizuku.rikka.app/guide/setup/) before using Cana.
 
 Uses <a href="https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation">universal debloat list</a> for badges.
 Please read the guide on how <a href="https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/wiki/FAQ#how-are-the-recommendations-chosen">recommendations are chosen</a>.

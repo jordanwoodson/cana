@@ -32,7 +32,7 @@
     <string name="copy">複製</string>
     <string name="app_settings">應用程式資訊</string>
     <string name="close">關閉</string>
-    <string name="canta_description">Canta 是一個用於卸載應用的開源應用，它可憑藉 Shizuku 刪除系統和用戶應用程序。讓您無需電腦，隨心所欲地爲設備減負。\n\n特別感謝 %s。\n沒有他們的協助，Canta 就不會是現在這樣。</string>
+    <string name="canta_description">Cana 是一個用於卸載應用的開源應用，它可憑藉 Shizuku 刪除系統和用戶應用程序。讓您無需電腦，隨心所欲地爲設備減負。\n\n特別感謝 %s。\n沒有他們的協助，Cana 就不會是現在這樣。</string>
     <string name="search_apps">搜尋應用</string>
     <string name="auto_update_bloat_list">自動更新膨脹軟體列表</string>
     <string name="auto_update_bloat_list_description">自動取得新版本的應用程式的膨脹資訊，這保證了最新的徽章和應用程式描述。</string>
@@ -55,7 +55,7 @@
     <string name="import_preset">導入預設</string>
     <string name="import_preset_description">從剪貼簿導入預設或直接粘貼 JSON 文字。</string>
     <string name="clipboard">剪貼簿</string>
-    <string name="import_preset_clipboard_description">從剪貼簿導入預設，確保您已複製有效的 JSON 文字的 Canta 預設。</string>
+    <string name="import_preset_clipboard_description">從剪貼簿導入預設，確保您已複製有效的 JSON 文字的 Cana 預設。</string>
     <string name="paste_preset_json">粘貼預設 JSON</string>
     <string name="paste_preset_json_here">將 JSON 預設貼到此處……</string>
     <string name="enter_valid_json">請輸入有效的 JSON</string>
@@ -87,9 +87,9 @@
     <string name="text">文本</string>
     <string name="install_shizuku">安裝 Shizuku 應用程式</string>
     <string name="start_shizuku_service">啟動 Shizuku 服務</string>
-    <string name="grant_shizuku_permission_to_canta">在 Shizuku 中向 Canta 授予許可權</string>
+    <string name="grant_shizuku_permission_to_canta">在 Shizuku 中向 Cana 授予許可權</string>
     <string name="shizuku_required">需要 Shizuku</string>
-    <string name="shizuku_requirement_description">Canta 使用 Shizuku 卸載應用程式，而無需 root 許可權。Shizuku 提供了一種訪問系統級 SDK 的安全方法。</string>
+    <string name="shizuku_requirement_description">Cana 使用 Shizuku 卸載應用程式，而無需 root 許可權。Shizuku 提供了一種訪問系統級 SDK 的安全方法。</string>
     <string name="commits_url">提交紀錄 URL</string>
     <string name="commits_url_description">從哪裡取得更新的提交資訊</string>
     <string name="reset_to_default">重設為預設值</string>
@@ -100,7 +100,6 @@
     <string name="allow_unsafe_selections">允許不安全的選取</string>
     <string name="allow_unsafe_uninstalls_description">是否允許選取被標記為不安全的應用程式（套用預設時已自動略過此限制）。</string>
     <string name="donate">贊助</string>
-    <string name="canta_donate_request">喜歡 Canta 嗎？這是我在閒暇時間打造、以隱私為核心的作品 - 沒有廣告，也沒有追蹤。如果你覺得它實用，請考慮支持它的開發！</string>
     <string name="success">成功 %1$s！</string>
     <string name="hide_success_dialog">隱藏成功對話框</string>
     <string name="hide_success_dialog_description">在解除安裝或重新安裝後隱藏成功對話框。</string>

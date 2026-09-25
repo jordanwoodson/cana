@@ -36,7 +36,7 @@
     <string name="copy">Copy</string>
     <string name="app_settings">App info</string>
     <string name="close">Close</string>
-    <string name="canta_description">Canta is an open source uninstaller app that uses Shizuku to remove system and user apps. It allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCanta would\'t be the same without their work.</string>
+    <string name="canta_description">Cana is an open source uninstaller app that uses Shizuku to remove system and user apps. It allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCana would\'t be the same without their work.</string>
     <string name="search_apps">Search apps</string>
     <string name="auto_update_bloat_list">Auto update bloat list</string>
     <string name="auto_update_bloat_list_description">Automatically fetch new version of app bloat info. This guarantees up-to-date badges and app descriptions.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Import preset</string>
     <string name="import_preset_description">Import a preset from clipboard or paste JSON text directly.</string>
     <string name="clipboard">Clipboard</string>
-    <string name="import_preset_clipboard_description">Import preset from clipboard. Make sure you have copied a valid Canta preset JSON.</string>
+    <string name="import_preset_clipboard_description">Import preset from clipboard. Make sure you have copied a valid Cana preset JSON.</string>
     <string name="paste_preset_json">Paste preset JSON</string>
     <string name="paste_preset_json_here">Paste JSON preset here ...</string>
     <string name="enter_valid_json">Please enter valid JSON</string>
@@ -91,9 +91,9 @@
     <string name="text">Text</string>
     <string name="install_shizuku">Install Shizuku app</string>
     <string name="start_shizuku_service">Start Shizuku service</string>
-    <string name="grant_shizuku_permission_to_canta">Grant permission to Canta in Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Grant permission to Cana in Shizuku</string>
     <string name="shizuku_required">Shizuku Required</string>
-    <string name="shizuku_requirement_description">Canta uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
+    <string name="shizuku_requirement_description">Cana uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
     <string name="commits_url">Commits URL</string>
     <string name="commits_url_description">Where to get commit info for updates from</string>
     <string name="reset_to_default">Reset to default</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Allow unsafe selections</string>
     <string name="allow_unsafe_uninstalls_description">Whether to allow selecting apps marked as unsafe (applying presets bypasses this already).</string>
     <string name="donate">Donate</string>
-    <string name="canta_donate_request">Enjoying Canta? It\'s built in my free time with privacy in mind - no ads, no tracking. If you find it useful, please consider supporting its development!</string>
     <string name="success">Success %1$s!</string>
     <string name="hide_success_dialog">Hide success dialog</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

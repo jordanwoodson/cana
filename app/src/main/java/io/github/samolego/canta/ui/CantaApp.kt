@@ -315,7 +315,7 @@ private fun MainContent(
                                 // Show easter egg toast
                                 Toast.makeText(
                                     context,
-                                    "Can'ta ouch this!",
+                                    "Even Cana can't touch this!",
                                     Toast.LENGTH_SHORT
                                 )
                                     .show()

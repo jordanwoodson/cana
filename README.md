@@ -1,55 +1,71 @@
 <div align="center">
 
-# Canta
+# Cana
 
-[![](https://raw.githubusercontent.com/samolego/Canta/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)](https://samolego.github.io/Canta/)
+[![](https://raw.githubusercontent.com/jordanwoodson/cana/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)](https://github.com/jordanwoodson/cana)
 
-Uninstall any\* app without root!
-Powered by [Shizuku](https://shizuku.rikka.app/) ([Android 16 fork](https://github.com/thedjchi/Shizuku)).
+Uninstall any\* app without root, in **any profile**, including your **work profile**.
+Powered by [Shizuku](https://shizuku.rikka.app/).
 
+*[Canta](https://github.com/samolego/Canta) can't. Cana can.*
 
-## Download
-
-[![](https://img.shields.io/f-droid/v/io.github.samolego.canta?include_prereleases&style=for-the-badge&logo=F-Droid&color=blue)](https://f-droid.org/en/packages/io.github.samolego.canta/)
-[![](https://img.shields.io/endpoint?&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAADAFBMVEUA0////wAA0v8A0v8A0////wD//wAFz/QA0/8A0/8A0/8A0/8A0v///wAA0/8A0/8A0/8A0/8A0//8/gEA0/8A0/8B0/4A0/8A0/8A0/+j5QGAwwIA0//C9yEA0/8A0/8A0/8A0/8A0/8A0/+n4SAA0/8A0/8A0/+o6gCw3lKt7QCv5SC+422b3wC19AC36zAA0/+d1yMA0/8A0/+W2gEA0/+w8ACz8gCKzgG7+QC+9CFLfwkA0/8A0////wAA0/8A0/8A0/8A0/+f2xym3iuHxCGq5BoA1P+m2joI0vONyiCz3mLO7oYA0/8M1Piq3Ei78CbB8EPe8LLj9Ly751G77zWQ1AC96UYC0fi37CL//wAA0/8A0////wD//wCp3jcA0/+j3SGj2i/I72Sx4zHE8FLB8zak1kYeycDI6nRl3qEA0/7V7psA0v6WzTa95mGi2RvB5XkPy9zH5YJ3uwGV1yxVihRLiwdxtQ1ZkAf//wD//wD//wD//wD//wCn5gf//wD//wD//wD//wD//wAA0/+h4A3R6p8A0/+X1w565OD6/ARg237n9csz2vPz+gNt37V/vifO8HW68B/L6ZOCwxXY8KRQsWRzhExAtG/E612a1Rd/pTBpmR9qjysduKVhmxF9mTY51aUozK+CsDSA52T//wD//wAA0////wD//wBJ1JRRxFWjzlxDyXRc0pGT1wCG0CWB3VGUzSTh8h6c0TSr5CCJ5FFxvl6s4H3m8xML0/DA5CvK51EX1N+Y2gSt4Dag3ChE3fax2ki68yO57NF10FRZnUPl88eJxhuCxgCz5EOLwEGf1DFutmahzGW98x0W1PGk3R154MHE6bOn69qv3gy92oG90o+Hn07B7rhCmiyMwECv1nO+0pQfwrCo57xF2daXsVhKrEdenQAduaee1Bsjr42z5D9RoCXy+QNovXpy2Z5MtWDO/TiSukaF3UtE1K6j3B4YwLc5wXlzpyIK0u5zy3uJqg4pu5RTpkZmpVKyAP8A0wBHcExHcEyBUSeEAAABAHRSTlP///9F9wjAAxD7FCEGzBjd08QyEL39abMd6///8P/ZWAnipIv/cC6B//7////////L/1Dz/0D///////86/vYnquY3/v///5T//v///17///////////////84S3QNB/8L/////////////7r/////NP////9l/////wPD4yis/x7Ym2lWSP+em////0n////////v///////////////////7//7pdGN3Urr6/+v/6aT////+//H/o2P/1v+7r7jp4PM/3p4g////g///K///481LxO///v////9w////8v/////9/p3J///a+P9v/5KR/+n///+p/xf//8P//wAAe7FyaAAABCZJREFUSMdj+E8iYKBUgwIHnwQ3N7cEHxcH+///VayoAE0Dh41qR7aBnCIQ8MsJKHH9/99czYYMWlA0cIkJGjMgAKfq//9RNYzIgLcBWYOTiCgDMhDn+B9bh6LebiWyH6L5UZQzONoAHWSHoqEpDkkDsyKqelv1//9rG1HUN9YihZK9AKp6BkG+/6xNqA5ajhSsCkrIipmYGGRa//9vQXVQXSySBnkWJOUMfn5Myuz/G3hR1NdEIUUchwiy+bkTsg4dbW/fu6W/e1c3XMMy5JiOZkFxUFZo74mgKTqaKXu0+2HqVwkja3BH9kFu361JwcHTfPJD4mdfe8ULAdVRyGlJAcVFfg+CQOozZ4XrJ85+JgwBsVXIGriQw5Tp4ZScezd8JiWnBupru30qwJZa+ZAjmWlC8fUZM4qB6kPnLNSPLMWqQQ5ZQ5aOzs1HmamBaQHzFs6y+qAmJCTE8f9/QgKSBg4DJPWc6zVDQkIC09JkZSPD38kukpExFpT4z67uYI/QwCOOCCK/izvu5CWl6AcEWMnKWml7LWbKZfH9/99UkknQHhGsynDz+65eWXv3/JmJrq5eXienVlRUfH/z8VvCf45soKQIH1yDEQsszrp6gwq9C73T87xcXadKl5TkFev4A/2tygmSBqYXqAYJmK+ZuoJydDR1vP09DA0NOy2kpdML81+U/heCpH1JU3jig7lJ5nKOT4i/t6ZHkqGzs4lJmIVHfrj+JR4HqLQSD0yDkCNEpGNn5ix9D03/eJdElTZdKV2TpNOhkwt8YUlNUgimgV0dLMBvf1gz1MolPd5FRcVNSkpDQ8owJeBCDyIhrIDnOD5QcuIU+3/2QKSs9laQ+noNLS0zLWdtqyP7mBAFAw88TwsJgMuJYweBGjYngtWbmeuZOW+bvNQToUFOAlFqOBk4Ov3/L7Z60/aN0p1tUhpa5nqWlub7C3p2I9QzyAghlUvczOz/1fhzPT3XSIfpSmmYAdVbmm1gV0dSz8DSilpUQsqCddIWIA3meuZaJqdMJZEzl6gRqgZIWZAxUdoizERXN8yi5MltcZTChzMaRQM3JNUWHS8rL/+yaPGvMmvr5ywoGoxtkDWwQ+Pb89ycBeWfGSJeL/la+RS1eOPnRtbQKgMRjZg+t8x6PkP273nWQAoFOPAgaeAThKXAmXMrK39Kmr5fsuBlBqoXfJGLe3VbmHjG9Mczi9T//3h7vygXtcDlQtJg44iQiIjIBRbGPO7gghPJy0ZIxT2HOLIUgwxQzsgYrUR350HSIMaJLidhgKY+mw+pflBDrX8E7OGBjPCAPc76gQFSTqAIiYrb/8dRP4CyosJ/rmwU5XIxHMilt4QBJwsSkBMClxOQULBlkRRwEONmR2kJcDGjADX2/+xO8r5iqjExqmLyrWpcPFRta1BfAwCtyN3XpuJ4RgAAAABJRU5ErkJggg==&url=https://apt.izzysoft.de/fdroid/api/v1/shield/io.github.samolego.canta&style=for-the-badge&label=IzzyOnDroid&color=blue)](https://apt.izzysoft.de/fdroid/index/apk/io.github.samolego.canta)
-[![](https://img.shields.io/github/v/release/samolego/canta?include_prereleases&style=for-the-badge&logo=GitHub&label=GitHub&color=blue)](https://github.com/samolego/Canta/releases/latest/)
-<a href="https://play.google.com/store/apps/details?id=io.github.samolego.canta">
-  <img src="https://github.com/user-attachments/assets/b9628c34-797c-4760-94bb-57712fdef178" height="32" />
-</a>
-
-[![GitHub all releases](https://img.shields.io/github/downloads/samolego/Canta/total?label=Downloads&logo=github)](https://github.com/samolego/Canta/releases/)
-[<img src="https://shields.rbtlog.dev/simple/io.github.samolego.canta" alt="badge">](https://shields.rbtlog.dev/io.github.samolego.canta)
-[![donate badge](https://img.shields.io/badge/Donate_via-Paypal-blue)](https://www.paypal.com/donate/?hosted_button_id=FD4R46ZZ5EWME)
 ---
 
 </div>
 
-> [!Note]
-> **This is a fork: Canta Profiles.** It's the same app, but you can pick which user
-> profile it works on (personal, work, clone, private space, secondary users), so you can
-> debloat system apps inside a **work profile**. See [Profiles fork](#profiles-fork) below.
+> [!Warning]
+> **DISCLAIMER:** ⛔ Use at your own risk. Nobody is responsible for any data loss or damage caused by this app ⛔.
 
-## Profiles fork
+## 📖 About
 
-Upstream Canta only sees and uninstalls apps in the profile it's installed in, and with Shizuku
-running over adb it always uninstalls for user 0. This fork adds a profile switcher (the person /
-briefcase icon in the top bar), which lists every user on the device through Shizuku. Picking one
-loads that profile's apps, and uninstall / reinstall then act on that profile only
+Cana is a fork of [Canta](https://github.com/samolego/Canta) by [samolego](https://github.com/samolego).
+It's the same app (uninstall pre-installed or user apps without root through Shizuku, with
+recommendations from the [Universal Debloat List](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/)),
+but it lets you **pick which user profile to work on**, so system apps inside a work profile
+can be debloated too.
+
+- ✅ No root required
+- ✅ Personal, work, clone and private space profiles, and secondary users
+- ✅ Detects previously uninstalled apps, per profile
+- ✅ Works on Android **9.0+ (SDK 28+)**
+- ⚠️ No *permanent* bricking (If you uninstall **critical apps**, you can experience bootloop and have to **factory reset**!)
+
+\* Some apps (e.g. some oplus apps) don't allow uninstallation, and a work profile's admin can
+block it entirely, see [below](#limits-set-by-the-work-profile-admin).
+
+### What's different from Canta
+
+Canta only sees and uninstalls apps in the profile it's installed in, and with Shizuku running
+over adb it always uninstalls for user 0. Cana adds a profile switcher (the person / briefcase
+icon in the top bar), which lists every user on the device through Shizuku. Picking one loads
+that profile's apps, and uninstall / reinstall then act on that profile only
 (`pm uninstall --user <id>` / `pm install-existing --user <id>` semantics).
 
-Other differences from upstream:
-
-* Application id is `io.github.samolego.canta.profiles`, so it installs next to regular Canta.
 * Uninstall / reinstall wait for the real result from Android. Failures (e.g. blocked by the
   work profile's admin) are reported in a toast with the reason in *Logs*, instead of the app
   being marked as uninstalled.
-* On Canta's own profile, uninstalling a *non-system* app still removes it for all users, like
-  upstream. On any other profile it only removes it from that profile.
+* On Cana's own profile, uninstalling a *non-system* app still removes it for all users, like
+  Canta does. On any other profile it only removes it from that profile.
+* Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
 
-### Using it with adb over Tailscale
+## Install
 
-Canta needs [Shizuku](https://shizuku.rikka.app/) running, and Shizuku gets its shell (adb)
-privileges from an adb connection. With Tailscale on both the phone and your computer:
+* [Obtainium](https://github.com/ImranR98/Obtainium): add `https://github.com/jordanwoodson/cana`
+* or grab the APK from [Releases](https://github.com/jordanwoodson/cana/releases/latest)
+
+### Verification
+
+You can verify the authenticity of downloaded APKs using this SHA-256 certificate fingerprint:
+```
+74:8E:75:1A:9D:D9:24:0F:9E:8C:C7:CD:7F:72:18:DD:15:41:E6:AB:AA:09:60:3D:28:22:84:06:26:39:E3:45
+```
+
+## How-to
+
+Cana needs [Shizuku](https://shizuku.rikka.app/) running. Shizuku gets its shell (adb)
+privileges from an adb connection, either from the phone itself
+([wireless debugging](https://shizuku.rikka.app/guide/setup/)) or from a computer. For example
+with adb over Tailscale, with Tailscale on both the phone and your computer:
 
 1. Enable *Developer options → USB debugging* on the phone and connect once over USB, or pair
    with *Wireless debugging*.
@@ -58,16 +74,16 @@ privileges from an adb connection. With Tailscale on both the phone and your com
 4. Start Shizuku. The exact command is shown in the Shizuku app under *Start via connected
    computer*, usually:
    `adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh`
-5. Open Canta Profiles, tap the profile icon, grant the Shizuku permission and pick
-   *Work profile*.
+5. Open Cana, tap the profile icon, grant the Shizuku permission and pick *Work profile*.
+6. Select apps and tap the trash button.
 
-The adb equivalents, handy for checking what Canta did:
+The adb equivalents, handy for checking what Cana did:
 
 ```sh
-adb shell pm list users                                  # find the work profile id (usually 10)
-adb shell pm list packages --user 10 -s                  # system apps in the work profile
-adb shell pm uninstall --user 10 <package>               # what Canta does on uninstall
-adb shell cmd package install-existing --user 10 <package>  # what Canta does on reinstall
+adb shell pm list users                                     # find the work profile id (usually 10)
+adb shell pm list packages --user 10 -s                     # system apps in the work profile
+adb shell pm uninstall --user 10 <package>                  # what Cana does on uninstall
+adb shell cmd package install-existing --user 10 <package>  # what Cana does on reinstall
 ```
 
 ### Limits set by the work profile admin
@@ -81,71 +97,22 @@ switcher warns about both:
 * **DISALLOW_UNINSTALL_APPS**: uninstalling in that profile fails with
   `DELETE_FAILED_USER_RESTRICTED`.
 
----
+## Building
 
-> [!Warning]
-> **DISCLAIMER:** ⛔ Use at your own risk. I am not responsible for any data loss or damage caused by this app ⛔.
-
----
-
-## 📖 About
-
-Canta allows you to **uninstall pre-installed or user apps without root**, by leveraging [Shizuku](https://shizuku.rikka.app/).  
-It integrates with the [Universal Debloat List](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/) to provide safe recommendations.
-
-- ✅ No root required  
-- ✅ Detects previously uninstalled apps (even across reinstalls)  
-- ✅ Works on Android **9.0+ (SDK 28+)**
-- ⚠️ No *permanent* bricking (If you uninstall **critical apps**, you can experience bootloop and have to **factory reset**!)
-
-\* **Some oplus apps** are known to be stubborn and don't allow uninstallations. See [tracking issue](https://github.com/samolego/Canta/issues/338).
-
----
-
-## Screenshots
-
-| <img width="256" src="metadata/en-US/images/phoneScreenshots/screenshot-main.png"> | <img width="256" src="metadata/en-US/images/phoneScreenshots/screenshot-search.png"> | <img width="256" src="metadata/en-US/images/phoneScreenshots/screenshot-uninstall-dialog.png"> |
-|:---:|:---:|:---:|
-| Home | Search | Uninstall |
-| <img width="256" src="metadata/en-US/images/phoneScreenshots/screenshot-app-description.png"> | <img width="256" src="metadata/en-US/images/phoneScreenshots/screenshot-uninstalled-list.png"> |  |
-| [App descriptions](https://github.com/Universal-Debloater-Alliance/universal-android-preinstalled-lists/) | See uninstalled |  |
-
-
-### Verification
-You can verify the authenticity of downloaded APKs using this SHA-256 certificate fingerprint:
+```sh
+./gradlew assembleDebug    # app/build/outputs/apk/debug/app-debug.apk
+./gradlew assembleRelease  # needs key.properties (storeFile, storePassword, keyAlias, keyPassword)
 ```
-0A:26:40:31:7C:43:27:21:88:C3:E1:31:94:C1:54:60:69:1F:12:C3:9E:A1:9B:BA:72:7D:D6:7F:B5:62:89:D4
-```
-
-## How-to
-
-* install [Shizuku](https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api)
-  & [activate it](https://shizuku.rikka.app/guide/setup/)
-    * you can
-      follow [this Android Police guide for more in-depth explanation](https://www.androidpolice.com/how-to-use-shizuku-for-adb-rootless-mods-on-any-android-device/)
-      * note: **Android 16** might need [forked version](https://github.com/thedjchi/Shizuku)
-* install Canta
-* select an app and click the trash button
-
-
-## Translations
-
-Do you want to help translate Canta? You can help us at [Crowdin](https://crowdin.com/project/canta)! Thank you 🙂!
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://badges.crowdin.net/badge/dark/crowdin-on-light.png">
-  <img alt="Crowdin logo" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png">
-</picture>
-
-https://crowdin.com/project/canta
 
 ## Thanks
 
+* [samolego](https://github.com/samolego) and the contributors of
+  [Canta](https://github.com/samolego/Canta), which Cana is built on. If you like Cana,
+  consider [supporting Canta](https://www.paypal.com/donate/?hosted_button_id=FD4R46ZZ5EWME).
 * [Universal-Debloater-Alliance](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/)
   for the debloat list
 * @RikkaApps for Shizuku
-* Icon created on [icon kitchen](https://icon.kitchen)
 
-## Star History
+## License
 
-[![Star History Chart](https://star-history.dera.page/svg?repos=samolego/Canta&type=Date)](https://star-history.dera.page/#samolego/Canta&Date)
+[LGPL-3.0](LICENSE), same as Canta.

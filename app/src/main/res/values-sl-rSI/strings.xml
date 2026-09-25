@@ -44,7 +44,7 @@
     <string name="copy">Kopiraj</string>
     <string name="app_settings">Podatki o aplikaciji</string>
     <string name="close">Zapri</string>
-    <string name="canta_description">Canta je odprtokodna aplikacija, ki uporablja Shizuku, da lahko odstrani sistemske in uporabniške aplikacije.\nOmogoča vam da razbremenite svojo napravo navlake, ne da bi potrebovali računalnik.\n\nZahvala gre tudi %s.\nCanta brez njih ne bi bila enaka.</string>
+    <string name="canta_description">Cana je odprtokodna aplikacija, ki uporablja Shizuku, da lahko odstrani sistemske in uporabniške aplikacije.\nOmogoča vam da razbremenite svojo napravo navlake, ne da bi potrebovali računalnik.\n\nZahvala gre tudi %s.\nCana brez njih ne bi bila enaka.</string>
     <string name="search_apps">Poišči aplikacije</string>
     <string name="auto_update_bloat_list">Samodejno posodobi seznam navlake</string>
     <string name="auto_update_bloat_list_description">Samodejno pridobi nov seznam z navlako. Ta zagotavlja najnovejše opise in značke aplikacij.</string>
@@ -101,7 +101,7 @@
     <string name="start_shizuku_service">Zaženi storitev Shizuku</string>
     <string name="grant_shizuku_permission_to_canta">Odobri dovoljenje Canti v Shizukuju</string>
     <string name="shizuku_required">Potreben je Shizuku</string>
-    <string name="shizuku_requirement_description">Canta za odstranjevanje aplikacij uporablja Shizuku, da ne potrebuje korenskega dostopa. Shizuku zagotavlja varen način dostopa do SDK-ja na sistemski ravni.</string>
+    <string name="shizuku_requirement_description">Cana za odstranjevanje aplikacij uporablja Shizuku, da ne potrebuje korenskega dostopa. Shizuku zagotavlja varen način dostopa do SDK-ja na sistemski ravni.</string>
     <string name="commits_url">URL za commite</string>
     <string name="commits_url_description">Od kod aplikacija pridobi informacije o commitih za posodobitve</string>
     <string name="reset_to_default">Ponastavi na privzeto</string>
@@ -112,7 +112,6 @@
     <string name="allow_unsafe_selections">Dovoli nevarne izbire</string>
     <string name="allow_unsafe_uninstalls_description">Ali dovoliti izbiranje aplikacij, označenih kot unsafe (uporaba predlog obide to nastavitev).</string>
     <string name="donate">Donate</string>
-    <string name="canta_donate_request">Enjoying Canta? It\'s built in my free time with privacy in mind - no ads, no tracking. If you find it useful, please consider supporting its development!</string>
     <string name="success">Success %1$s!</string>
     <string name="hide_success_dialog">Hide success dialog</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

@@ -36,7 +36,7 @@
     <string name="copy">Másolás</string>
     <string name="app_settings">App infó</string>
     <string name="close">Bezár</string>
-    <string name="canta_description">A Canta egy nyílt forráskódú app eltávolító, ami a Shizuku-t használja rendszer és felhasználói app-ok eltávolítására.\nKívánságod szerint debloat-olhatod vele az eszközöd, PC használata nélkül.\n\nAkiket külön köszönet illet: %s.\n A Canta nem lenne ugyanaz a munkájuk nélkül.</string>
+    <string name="canta_description">A Cana egy nyílt forráskódú app eltávolító, ami a Shizuku-t használja rendszer és felhasználói app-ok eltávolítására.\nKívánságod szerint debloat-olhatod vele az eszközöd, PC használata nélkül.\n\nAkiket külön köszönet illet: %s.\n A Cana nem lenne ugyanaz a munkájuk nélkül.</string>
     <string name="search_apps">Alkalmazások keresése</string>
     <string name="auto_update_bloat_list">Bloat lista automatikus frissítése</string>
     <string name="auto_update_bloat_list_description">Automatikusan lekérdezi az alkalmazás új verziójának bloat-információit. Ez garantálja a naprakész jelvényeket és alkalmazásleírásokat.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Import preset</string>
     <string name="import_preset_description">Import a preset from clipboard or paste JSON text directly.</string>
     <string name="clipboard">Vágólap</string>
-    <string name="import_preset_clipboard_description">Import preset from clipboard. Make sure you have copied a valid Canta preset JSON.</string>
+    <string name="import_preset_clipboard_description">Import preset from clipboard. Make sure you have copied a valid Cana preset JSON.</string>
     <string name="paste_preset_json">Paste preset JSON</string>
     <string name="paste_preset_json_here">Paste JSON preset here ...</string>
     <string name="enter_valid_json">Kérjük, adjon meg érvényes JSON-t</string>
@@ -91,9 +91,9 @@
     <string name="text">Szöveg</string>
     <string name="install_shizuku">Töltsd le a Shizuku alkalmazást</string>
     <string name="start_shizuku_service">Shizuku szolgáltatás indítása</string>
-    <string name="grant_shizuku_permission_to_canta">Engedélyezd a Canta alkalmazást a Shizuku-ban</string>
+    <string name="grant_shizuku_permission_to_canta">Engedélyezd a Cana alkalmazást a Shizuku-ban</string>
     <string name="shizuku_required">Shizuku szükséges</string>
-    <string name="shizuku_requirement_description">Canta uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
+    <string name="shizuku_requirement_description">Cana uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.</string>
     <string name="commits_url">Commits URL</string>
     <string name="commits_url_description">Where to get commit info for updates from</string>
     <string name="reset_to_default">Reset to default</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Allow unsafe selections</string>
     <string name="allow_unsafe_uninstalls_description">Whether to allow selecting apps marked as unsafe (applying presets bypasses this already).</string>
     <string name="donate">Támogatás</string>
-    <string name="canta_donate_request">Tetszik a Canta? Szabadidőmben fejlesztettem, szem előtt tartva az adatvédelmet - nincs benne reklám, nincs nyomkövetés. Ha hasznosnak találod, kérlek, fontold meg a fejlesztés támogatását!</string>
     <string name="success">Success %1$s!</string>
     <string name="hide_success_dialog">Hide success dialog</string>
     <string name="hide_success_dialog_description">Hides the success dialog after uninstall / reinstall.</string>

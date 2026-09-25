@@ -36,7 +36,7 @@
     <string name="copy">Kopieer</string>
     <string name="app_settings">App info</string>
     <string name="close">Sluiten</string>
-    <string name="canta_description">Canta is een opensource verwijderprogramma dat Shizuku gebruikt om systeem- en gebruikersapps te verwijderen. Hiermee kunt u uw apparaat naar wens debloaten, zonder dat u een pc nodig heeft.\n\nMet speciale dank aan %s.\nCanta zou niet hetzelfde zijn zonder hun werk.</string>
+    <string name="canta_description">Cana is een opensource verwijderprogramma dat Shizuku gebruikt om systeem- en gebruikersapps te verwijderen. Hiermee kunt u uw apparaat naar wens debloaten, zonder dat u een pc nodig heeft.\n\nMet speciale dank aan %s.\nCana zou niet hetzelfde zijn zonder hun werk.</string>
     <string name="search_apps">Apps zoeken</string>
     <string name="auto_update_bloat_list">Bloatware lijst automatisch bijwerken</string>
     <string name="auto_update_bloat_list_description">Automatisch nieuwe versie van app bloat info ophalen. Dit garandeert up-to-date badges en app beschrijvingen.</string>
@@ -59,7 +59,7 @@
     <string name="import_preset">Voorkeursinstellingen importeren</string>
     <string name="import_preset_description">Importeer een voorkeursinstelling rechtstreeks van klembord of plak JSON tekst.</string>
     <string name="clipboard">Klembord</string>
-    <string name="import_preset_clipboard_description">Importeer voorkeursinstelling vanaf klembord. Zorg ervoor dat u een geldige Canta JSON-voorinstelling kopieert.</string>
+    <string name="import_preset_clipboard_description">Importeer voorkeursinstelling vanaf klembord. Zorg ervoor dat u een geldige Cana JSON-voorinstelling kopieert.</string>
     <string name="paste_preset_json">Plak JSON-voorinstelling</string>
     <string name="paste_preset_json_here">Plak JSON-voorinstelling hier ...</string>
     <string name="enter_valid_json">Voer een geldige JSON in</string>
@@ -91,9 +91,9 @@
     <string name="text">Tekst</string>
     <string name="install_shizuku">Shizuku app installeren</string>
     <string name="start_shizuku_service">Shizuku service starten</string>
-    <string name="grant_shizuku_permission_to_canta">Geef toestemming aan Canta in Shizuku</string>
+    <string name="grant_shizuku_permission_to_canta">Geef toestemming aan Cana in Shizuku</string>
     <string name="shizuku_required">Shizuku vereist</string>
-    <string name="shizuku_requirement_description">Canta gebruikt Shizuku om apps te verwijderen zonder root-toegang. Shizuku biedt een veilige manier om toegang te krijgen tot SDK\'s op systeemniveau.</string>
+    <string name="shizuku_requirement_description">Cana gebruikt Shizuku om apps te verwijderen zonder root-toegang. Shizuku biedt een veilige manier om toegang te krijgen tot SDK\'s op systeemniveau.</string>
     <string name="commits_url">Commits URL</string>
     <string name="commits_url_description">Waar commit info voor updates op te halen</string>
     <string name="reset_to_default">Standaardwaarde herstellen</string>
@@ -104,7 +104,6 @@
     <string name="allow_unsafe_selections">Onveilige selecties toestaan</string>
     <string name="allow_unsafe_uninstalls_description">Toestaan dat apps gemarkeerd als onveilig worden geselecteerd (voorkeursinstellingen omzeilen dit altijd).</string>
     <string name="donate">Doneren</string>
-    <string name="canta_donate_request">Geniet je van Canta? Het is in mijn vrije tijd gebouwd met privacy in het achterhoofd - geen advertenties, geen tracking. Als je het nuttig vindt, overweeg dan de ontwikkeling ervan te ondersteunen!</string>
     <string name="success">Succes %1$s!</string>
     <string name="hide_success_dialog">Verberg succes dialoog</string>
     <string name="hide_success_dialog_description">Verbergt het succes dialoogvenster na deïnstalleren / opnieuw installeren.</string>
