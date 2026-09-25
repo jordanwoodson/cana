@@ -71,11 +71,7 @@ class AppListViewModel : ViewModel() {
 
     private val nameComparator = compareBy(Collator.getInstance(Locale.getDefault()), AppInfo::name)
     private val sortedList by derivedStateOf {
-        isLoading = true
-
-        apps.filter { selectedFilter.shouldShow(it) }.sortedWith(nameComparator).also {
-            isLoading = false
-        }
+        apps.filter { selectedFilter.shouldShow(it) }.sortedWith(nameComparator)
     }
 
     val appList by derivedStateOf {
