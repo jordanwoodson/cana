@@ -52,12 +52,16 @@ class AppListViewModel(
     suspend fun inspectUpdates(request: PackageActionRequest): List<UpdateImpact> =
         request.apps.filter { it.isUpdatedSystemApp }.map { packageOps.inspectUpdates(it.packageName, request.userId) }
 
+    suspend fun inspectSafety(request: PackageActionRequest) =
+        CanaServices.getInstance().safety.inspect(request.apps.map { it.packageName }, request.userId)
+
     suspend fun processRequest(
         context: Context,
         request: PackageActionRequest,
         included: Set<String>,
         resetToFactory: Boolean,
         approvedDowngrades: Map<String, Set<Int>>,
+        approvedWarnings: Map<String, Set<String>> = emptyMap(),
     ): BatchResult = withContext(Dispatchers.Main) {
         val packages = request.apps.filter { it.packageName in included }
         if (isOperating) return@withContext BatchResult(packages.map {
@@ -70,7 +74,7 @@ class AppListViewModel(
                 when (request.action) {
                     PackageAction.REINSTALL -> packageOps.reinstall(app.packageName, request.userId, batchId)
                     PackageAction.UNINSTALL -> packageOps.uninstall(app.packageName, request.userId, resetToFactory,
-                        batchId, approvedDowngrades[app.packageName].orEmpty())
+                        batchId, approvedDowngrades[app.packageName].orEmpty(), approvedWarnings[app.packageName].orEmpty())
                     PackageAction.REMOVE_UPDATES -> packageOps.removeUpdates(app.packageName, request.userId,
                         approvedDowngrades[app.packageName].orEmpty(), batchId)
                 }.also { if (it.success && request.userId == selectedUserId) selectedApps.remove(app.packageName) }

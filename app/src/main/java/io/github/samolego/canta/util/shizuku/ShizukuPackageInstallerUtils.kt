@@ -38,6 +38,14 @@ object ShizukuPackageInstallerUtils {
         return IPackageInstaller.Stub.asInterface(ShizukuBinderWrapper(packageInstaller.asBinder()))
     }
 
+    fun permissionControllerPackage(): String? = HiddenApiBypass.invoke(
+        IPackageManager::class.java, PACKAGE_MANAGER, "getPermissionControllerPackageName",
+    ) as String?
+
+    fun applicationEnabledSetting(packageName: String, userId: Int): Int = HiddenApiBypass.invoke(
+        IPackageManager::class.java, PACKAGE_MANAGER, "getApplicationEnabledSetting", packageName, userId,
+    ) as Int
+
     /**
      * Same as [PackageManager.getInstalledPackages], but for any user / profile.
      */

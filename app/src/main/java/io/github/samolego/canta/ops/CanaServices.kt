@@ -14,7 +14,8 @@ import rikka.shizuku.Shizuku
 class CanaServices private constructor(context: Context) {
     val history = HistoryStore(context.applicationContext.historyDataStore)
     val shell = ShellRunner(context.applicationContext)
-    val packageOps = PackageOps(context.applicationContext, history)
+    val safety = SafetyInspector(context.applicationContext, shell)
+    val packageOps = PackageOps(context.applicationContext, history, safety)
     val selfGrants = SelfGrants(context.applicationContext, shell, history)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

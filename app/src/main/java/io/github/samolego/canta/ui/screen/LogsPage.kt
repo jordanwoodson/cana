@@ -38,6 +38,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.component.IconClickButton
+import io.github.samolego.canta.ui.component.RestoreExportButton
 import io.github.samolego.canta.util.LogUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +54,7 @@ fun LogsPage(onNavigateBack: () -> Unit) {
                             containerColor = MaterialTheme.colorScheme.primaryContainer
                         ),
                         title = { Text(stringResource(R.string.logs)) },
+                        actions = { RestoreExportButton() },
                         navigationIcon = {
                             IconClickButton(
                                 onClick = onNavigateBack,

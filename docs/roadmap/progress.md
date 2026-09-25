@@ -6,7 +6,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - 2026-09-25: inspected clean repository; no roadmap features implemented at start. Created `roadmap` branch from master.
 - Emulator launched as unified exec session `42132`, serial `emulator-5554`; cold boot in progress. ADB initially reports offline. No phone commands executed.
-- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phase 2 implementation and emulator verification pass. Phases 3–7 and release remain pending.
+- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phases 2–3 implementation and emulator verification pass. Phases 4–7 and release remain pending.
 
 ## Interface preflight
 
@@ -42,7 +42,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 ### Remaining verification
 
 - Phase 0: offline first launch, category/menu interaction, persisted update settings, actual reset and both-profile isolation verified.
-- Phases 0–2 implementation and listed acceptance checks pass; Phases 3–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
+- Phases 0–3 implementation and listed acceptance checks pass; Phases 4–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
 
 ### Phase 1
 
@@ -77,3 +77,23 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 - Actual direct PackageInstaller reset on an already-uninstalled updated package: **1/1 PASS**, both profile directions, 32.437s (`/tmp/cana-phase2-direct-probe.log`). Android 15 supports direct removal; fallback is verified with deterministic failure tests.
 - Full cleanup integration: **1/1 PASS**, 48.993s (`/tmp/cana-phase2-cleanup-device.log`). Verifies shared-consent refusal, unchanged state on refusal, successful cleanup in both directions, AppInfo flags and readable APK size, durable history, no-update skip, unchanged installation state for both profiles, and exact freed bytes when both profiles are uninstalled. Print Spooler restored afterward.
 - Compose confirmation/actions: **2/2 PASS**, 65.543s (`/tmp/cana-phase2-ui.log`): both labeled actions work; shared work-profile cleanup starts unchecked, cannot confirm before selection, shows the downgrade warning and captured profile, then emits the exact approved peer ids. A compile-only import cleanup mistake was corrected before the successful build/test; an earlier stale-test-APK run was discarded.
+
+### Phase 3
+
+- Phase 2 commit: `9fd1cd9` (Cana-specific profile-aware cleanup).
+- Added immutable safety policy plus live inspection at the PackageOps mutation boundary. Core packages cannot be overridden; installer/permission/settings handlers are also resolved per user, with the actual platform permission-controller package protected. Roles, current/enabled IMEs, active admins and installed UAD dependents require fresh explicit warning consent. Query errors refuse the mutation. Android 9 uses default-intent/assistant queries because RoleManager arrived in Android 10.
+- UI shows essential-package refusals and a separate acknowledgement for actionable warnings, including when ordinary uninstall confirmation is disabled. Protected entries are skipped in mixed selections; backend refusal remains mandatory.
+- Recovery export uses ACTION_CREATE_DOCUMENT from Logs. Script arguments are shell-quoted and undo commands run in reverse history order, retaining partial/pending records and continuing after command errors. Restores captured enabled/component/suspend/permission flags/app-op/standby/netpolicy/global values; uid math includes the recorded profile. Non-recoverable update APKs, deleted app data and missing/unknown old state are explicit manual steps, never claimed as restored. Future phases populate the corresponding state fields/actions and add in-app undo.
+- Package history now captures exact enabled state, system status and suspension; new self-grants preserve original usage app-op mode. Older history without that mode yields a manual recovery note rather than an invented prior value.
+- JVM **47/47 PASS** (`/tmp/cana-phase3-unit-green.log`, `/tmp/cana-phase3-full-build.log`). Four safety and six restore regressions each failed before implementation. Shell-quoting test executes actual local `sh` and verifies substitution/quotes/newlines remain literal.
+- Safety device test **1/1 PASS**, 28.539s (`/tmp/cana-phase3-safety-device.log`): both-profile handler/role/IME/admin/installed queries succeed, fixture is allowed, package installer is protected, keyboard removal without warning consent is refused without change, essential package refusal cannot be overridden.
+- Warning UI **1/1 PASS** within `/tmp/cana-phase3-recovery-ui.log`: an enabled keyboard remains blocked until the separate warning acknowledgement even with ordinary confirmation disabled.
+- Recovery script emulator integration **1/1 PASS**, 21.942s (`/tmp/cana-phase3-recovery-green.log`): actual work-profile removal then generated script restores install and original enabled state, preserving personal installation. Initial harness passed shell quotes to UiAutomation (which tokenizes directly), yielding no output; corrected only the harness, then verified real execution. `sh -n` also passed on Android.
+- Actual document-picker export saved `/sdcard/Download/cana-restore.sh`, 5,920 bytes. Pulled `/tmp/cana-exported-restore.sh` passes shell syntax check. UI evidence `/tmp/cana-phase3-export-logs.png` and `/tmp/cana-phase3-export-saved.png`.
+- Primary API references: [AOSP roles](https://android.googlesource.com/platform/packages/modules/Permission/+/refs/heads/main/PermissionController/src/com/android/permissioncontroller/role/Role.md), [IDevicePolicyManager](https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/app/admin/IDevicePolicyManager.aidl). Shell installer resolution needs an APK content URI; querying only action and MIME returns no handlers on this emulator.
+
+### Phase 4 preflight
+
+- Exodus README/API terms permit database redistribution under ODbL 1.0, contents under DbCL 1.0. Public `/api/trackers` download succeeded once to `/tmp/cana-exodus-trackers.json`: 432 trackers, 571,866 bytes. Bundle the unchanged snapshot with source/hash/date and license links; show attribution by component matches. Do not call the Exodus API automatically from end-user apps (their API docs discourage production clients). Custom URL support remains required.
+- Primary terms: https://raw.githubusercontent.com/Exodus-Privacy/exodus/v1/README.md and https://raw.githubusercontent.com/Exodus-Privacy/exodus/v1/doc/api.md; ODbL https://opendatacommons.org/licenses/odbl/1-0/ sections 4.2–4.6. Database JSON is separate from Cana source licensing.
+- Later Phase 5 preflight: `/tmp/cana-connectivity-help.txt` confirms OEM_DENY_3 set/get commands exist on this Android 15 emulator, but package commands expose no `--user`. Determine actual uid resolution before enabling work-profile network controls. Current recovery planner refuses nonzero-user network records until a verified interface exists; do not silently act on user 0.

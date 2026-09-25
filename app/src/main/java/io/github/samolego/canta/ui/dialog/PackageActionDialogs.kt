@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.BatchResult
 import io.github.samolego.canta.ops.UpdateImpact
+import io.github.samolego.canta.ops.SafetyAssessment
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
@@ -40,11 +41,11 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
         } else {
             PackageActionConfirmation(request, model, settings.confirmBeforeUninstall.value,
                 onDismiss = { model.pendingAction = null },
-                onAgree = { included, reset, approvals ->
+                onAgree = { included, reset, approvals, warnings ->
                     model.pendingAction = null
                     val run = {
                         scope.launch {
-                            val batch = model.processRequest(context, request, included, reset, approvals)
+                            val batch = model.processRequest(context, request, included, reset, approvals, warnings)
                             if (batch.failureCount > 0 || request.action == PackageAction.REMOVE_UPDATES || !settings.hideSuccessDialog.value) {
                                 outcome = request.action to batch
                             }
@@ -76,24 +77,29 @@ internal fun PackageActionConfirmation(
     model: AppListViewModel,
     confirmUninstall: Boolean,
     onDismiss: () -> Unit,
-    onAgree: (Set<String>, Boolean, Map<String, Set<Int>>) -> Unit,
+    onAgree: (Set<String>, Boolean, Map<String, Set<Int>>, Map<String, Set<String>>) -> Unit,
 ) {
     val context = LocalContext.current
     var impacts by remember { mutableStateOf<List<UpdateImpact>?>(null) }
     var included by remember { mutableStateOf(request.apps.map { it.packageName }.toSet()) }
     var reset by remember { mutableStateOf(false) }
+    var safety by remember { mutableStateOf<Map<String, SafetyAssessment>>(emptyMap()) }
+    var warningsAccepted by remember { mutableStateOf(false) }
     val cleanup = request.action == PackageAction.REMOVE_UPDATES
     LaunchedEffect(request) {
         val inspected = if (request.action == PackageAction.REINSTALL) emptyList() else model.inspectUpdates(request)
+        safety = if (request.action == PackageAction.REINSTALL) emptyMap() else model.inspectSafety(request)
         impacts = inspected
         if (cleanup) included = inspected.filter { it.updated && it.error == null && it.otherInstalledProfiles.isEmpty() }.map { it.packageName }.toSet()
         else reset = inspected.isNotEmpty() && inspected.all { it.error == null && it.otherInstalledProfiles.isEmpty() }
+        included = included.filter { safety[it]?.protected != true && safety[it]?.error == null }.toSet()
         if (request.action == PackageAction.REINSTALL ||
-            (!confirmUninstall && !cleanup && inspected.isEmpty())) {
-            onAgree(included, false, emptyMap())
+            (!confirmUninstall && !cleanup && inspected.isEmpty() && safety.values.all { it.permits(emptySet()) })) {
+            onAgree(included, false, emptyMap(), emptyMap())
         }
     }
     val checked = impacts
+    val warnings = if (cleanup) emptyMap() else safety.filter { it.key in included && it.value.warnings.isNotEmpty() }
     val title = when (request.action) {
         PackageAction.REMOVE_UPDATES -> R.string.remove_updates
         PackageAction.REINSTALL -> R.string.reinstall
@@ -110,6 +116,26 @@ internal fun PackageActionConfirmation(
                 } else {
                     if (request.action == PackageAction.UNINSTALL) Text(stringResource(R.string.uninstall_confirmation, request.apps.size))
                     checked.filter { it.error != null }.forEach { Text("${it.packageName}: ${it.error}", color = MaterialTheme.colorScheme.error) }
+                    safety.filterValues { it.protected || it.error != null }.forEach { (name, assessment) ->
+                        Text(assessment.error ?: stringResource(R.string.safety_protected, name), color = MaterialTheme.colorScheme.error)
+                    }
+                    warnings.forEach { (name, assessment) ->
+                        Text(name, style = MaterialTheme.typography.labelLarge)
+                        assessment.warnings.forEach { warning ->
+                            Text(stringResource(when (warning.kind) {
+                                "role" -> R.string.safety_role
+                                "keyboard" -> R.string.safety_keyboard
+                                "admin" -> R.string.safety_admin
+                                else -> R.string.safety_dependent
+                            }, warning.detail))
+                        }
+                    }
+                    if (warnings.isNotEmpty()) {
+                        Row(Modifier.fillMaxWidth().clickable { warningsAccepted = !warningsAccepted }, verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(warningsAccepted, { warningsAccepted = it })
+                            Text(stringResource(R.string.safety_acknowledge))
+                        }
+                    }
                     if (checked.any { it.updated }) {
                         Text(stringResource(R.string.update_global_warning))
                         Text(stringResource(R.string.update_space_estimate,
@@ -123,10 +149,11 @@ internal fun PackageActionConfirmation(
                         checked.filter { it.updated }.forEach { impact ->
                             Column {
                                 if (cleanup) {
-                                    Row(Modifier.fillMaxWidth().clickable {
+                                    val selectable = safety[impact.packageName]?.let { !it.protected && it.error == null } ?: false
+                                    Row(Modifier.fillMaxWidth().clickable(enabled = selectable) {
                                         included = if (impact.packageName in included) included - impact.packageName else included + impact.packageName
                                     }, verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(impact.packageName in included, onCheckedChange = {
+                                        Checkbox(impact.packageName in included, enabled = selectable, onCheckedChange = {
                                             included = if (it) included + impact.packageName else included - impact.packageName
                                         })
                                         Text(request.apps.first { it.packageName == impact.packageName }.name)
@@ -145,10 +172,11 @@ internal fun PackageActionConfirmation(
             }
         },
         confirmButton = {
-            TextButton(enabled = checked != null && checked.none { it.error != null } && included.isNotEmpty(), onClick = {
+            TextButton(enabled = checked != null && checked.none { it.error != null } && included.isNotEmpty() &&
+                (warnings.isEmpty() || warningsAccepted), onClick = {
                 onAgree(included, reset, checked.orEmpty().associate { impact ->
                     impact.packageName to impact.otherInstalledProfiles.map { it.id }.toSet()
-                })
+                }, warnings.mapValues { (_, report) -> report.warnings.map { it.key }.toSet() })
             }) { Text(stringResource(title)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },

@@ -70,10 +70,10 @@ Files: `AppInfo.kt`, new update cleanup coordinator/policy, app list/banner/filt
 
 Files: new safety policy/probe/dialog, restore-script generator, history export entry point.
 
-- [ ] Always deny Cana/Shizuku/shell/framework/SystemUI/settings/installers/permission controllers, including resolved OEM handlers.
-- [ ] Probe selected-user roles, current/enabled IMEs, admins and installed UAD dependents; require explicit confirmation for remove/disable. Fail closed when a safety query fails.
-- [ ] ACTION_CREATE_DOCUMENT exports shell-quoted reverse chronological per-user undo script for all supported history actions. Test protected packages, warnings, partial successes, uid math, escaping and previous-state restoration.
-- [ ] Emulator verifies protected refusal and warnings, export, and script recovery. Commit phase.
+- [x] Always deny Cana/Shizuku/shell/framework/SystemUI/settings/installers/permission controllers, including resolved OEM handlers.
+- [x] Probe selected-user roles, current/enabled IMEs, admins and installed UAD dependents; require explicit confirmation for remove/disable. Fail closed when a safety query fails.
+- [x] ACTION_CREATE_DOCUMENT exports shell-quoted reverse chronological per-user undo script for all supported history actions. Test protected packages, warnings, partial successes, uid math, escaping and previous-state restoration.
+- [x] Emulator verifies protected refusal and warnings, export, and script recovery. Commit phase.
 
 ### Task 6: Phase 4 debloat actions and components
 
