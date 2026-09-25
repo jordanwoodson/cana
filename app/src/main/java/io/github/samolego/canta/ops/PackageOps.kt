@@ -13,6 +13,10 @@ import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.PackageInstallerResult
 import io.github.samolego.canta.util.UninstallSequence
 import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
+import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
+import io.github.samolego.canta.util.apps.updateApkSize
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
@@ -20,10 +24,34 @@ import org.json.JSONObject
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import java.util.UUID
+import java.io.File
 
 /** All mutations capture an explicit user and journal their before/after state. */
 class PackageOps(context: Context, private val history: HistoryStore) {
     private val context = context.applicationContext
+    private val mutationMutex = Mutex()
+
+    suspend fun inspectUpdates(packageName: String, userId: Int): UpdateImpact = withContext(Dispatchers.IO) {
+        try { inspectUpdatesNow(packageName, userId) }
+        catch (e: Exception) {
+            UpdateImpact(packageName, userId, false, false, 0, emptyList(),
+                (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
+        }
+    }
+
+    private fun inspectUpdatesNow(packageName: String, userId: Int): UpdateImpact {
+        val app = getPackageInfo(packageName, userId)?.applicationInfo
+            ?: error(context.getString(R.string.operation_package_missing))
+        val profiles = ShizukuUserUtils.getUsers()
+        check(profiles.any { it.id == userId }) { context.getString(R.string.profile_missing) }
+        val others = profiles.filter { it.id != userId }.filter { profile ->
+            val other = getPackageInfo(packageName, profile.id)?.applicationInfo
+            other != null && other.flags and ApplicationInfo.FLAG_INSTALLED != 0
+        }
+        val updated = app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
+        return UpdateImpact(packageName, userId, updated, app.flags and ApplicationInfo.FLAG_INSTALLED != 0,
+            updateApkSize(updated, app.sourceDir, app.splitSourceDirs?.toList().orEmpty()), others)
+    }
 
     suspend fun canResetToFactory(packageName: String, userId: Int): Boolean = withContext(Dispatchers.IO) {
         try {
@@ -41,6 +69,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         userId: Int,
         resetToFactory: Boolean = false,
         batchId: String = UUID.randomUUID().toString(),
+        approvedDowngradeUsers: Set<Int> = emptySet(),
     ): OperationResult = recorded(packageName, userId, "uninstall", batchId) { before ->
         val info = before?.applicationInfo ?: error(context.getString(R.string.operation_package_missing))
         check(info.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
@@ -48,6 +77,11 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         }
         val system = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
         val updated = info.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
+        if (resetToFactory && system && updated) {
+            check(inspectUpdatesNow(packageName, userId).otherInstalledProfiles.all { it.id in approvedDowngradeUsers }) {
+                context.getString(R.string.update_profiles_changed)
+            }
+        }
         val result = UninstallSequence.execute(
             resetFirst = resetToFactory && system && updated,
             uninstallFlags = if (system) 4 else 0,
@@ -71,20 +105,63 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         userId: Int,
         batchId: String = UUID.randomUUID().toString(),
     ): OperationResult = recorded(packageName, userId, "reinstall", batchId) {
-        val result = PackageInstallerResult.await(context) { sender ->
-            HiddenApiBypass.invoke(
-                IPackageInstaller::class.java,
-                ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller(),
-                "installExistingPackage", packageName, 0x00400000,
-                PackageManager.INSTALL_REASON_UNKNOWN, sender, userId, null,
-            )
-        }
+        val result = installExistingStep(packageName, userId)
         if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed))
         else {
             val installed = getPackageInfo(packageName, userId)?.applicationInfo?.let {
                 it.flags and ApplicationInfo.FLAG_INSTALLED != 0
             } == true
             OperationResult(installed, context.getString(if (installed) R.string.operation_success else R.string.operation_not_applied))
+        }
+    }
+
+    suspend fun removeUpdates(
+        packageName: String,
+        userId: Int,
+        approvedDowngradeUsers: Set<Int> = emptySet(),
+        batchId: String = UUID.randomUUID().toString(),
+    ): OperationResult = recorded(packageName, userId, "remove_updates", batchId) { before ->
+        val app = before?.applicationInfo ?: error(context.getString(R.string.operation_package_missing))
+        val updated = app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
+        if (!updated) return@recorded OperationResult(true, context.getString(R.string.no_leftover_updates), skipped = true)
+        val impact = inspectUpdatesNow(packageName, userId)
+        check(impact.otherInstalledProfiles.all { it.id in approvedDowngradeUsers }) {
+            context.getString(R.string.update_profiles_changed)
+        }
+        val profilesBefore = ShizukuUserUtils.getUsers().associate { profile ->
+            profile.id to isInstalled(packageName, profile.id)
+        }
+        val paths = (listOfNotNull(app.sourceDir) + app.splitSourceDirs.orEmpty()).distinct()
+            .filter { it.startsWith("/data/app/") }.associateWith { File(it).length() }
+        val result = UpdateCleanupSequence.execute(
+            UpdateState(updated, impact.installed),
+            readState = { getPackageInfo(packageName, userId)?.applicationInfo?.let {
+                UpdateState(it.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0,
+                    it.flags and ApplicationInfo.FLAG_INSTALLED != 0)
+            } },
+            reset = { uninstallStep(packageName, userId, 0) },
+            installExisting = { installExistingStep(packageName, userId) },
+            uninstallForUser = { uninstallStep(packageName, userId, 4) },
+        )
+        val preserved = profilesBefore.all { (id, installed) -> isInstalled(packageName, id) == installed }
+        val success = result.success && preserved
+        val freed = if (impact.otherInstalledProfiles.isEmpty()) paths.filterKeys { !File(it).exists() }.values.sum() else 0
+        OperationResult(success,
+            if (!preserved) context.getString(R.string.update_profile_state_changed)
+            else result.message ?: context.getString(if (success) R.string.operation_success else R.string.operation_failed),
+            freedBytes = freed)
+    }
+
+    private fun isInstalled(packageName: String, userId: Int): Boolean =
+        getPackageInfo(packageName, userId)?.applicationInfo?.let { it.flags and ApplicationInfo.FLAG_INSTALLED != 0 } == true
+
+    internal fun installExistingStep(packageName: String, userId: Int): PackageInstallerResult.Result {
+        LogUtils.i("PackageOps", "install-existing $packageName user=$userId")
+        return PackageInstallerResult.await(context) { sender ->
+            HiddenApiBypass.invoke(IPackageInstaller::class.java,
+                ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller(),
+                "installExistingPackage", packageName, 0x00400000,
+                PackageManager.INSTALL_REASON_UNKNOWN, sender, userId, null)
         }
     }
 
@@ -109,7 +186,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
         action: String,
         batchId: String,
         operation: (PackageInfo?) -> OperationResult,
-    ): OperationResult = withContext(Dispatchers.IO) {
+    ): OperationResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
         LogUtils.i("PackageOps", "$action $packageName user=$userId batch=$batchId")
         val id = UUID.randomUUID().toString()
         var before: PackageInfo? = null
@@ -144,7 +221,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
             val changed = previousState != "{}" && after != "{}" && previousState != after
             val result = outcome.copy(changed = changed)
             try {
-                history.complete(id, result.success, result.message, after, changed)
+                history.complete(id, result.success, result.message, after, changed, result.freedBytes)
             } catch (e: Exception) {
                 LogUtils.e("PackageOps", "Cannot persist result; operation remains pending", e)
                 return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
@@ -153,7 +230,7 @@ class PackageOps(context: Context, private val history: HistoryStore) {
             else LogUtils.e("PackageOps", "$action failed: ${result.message}")
             result
         }
-    }
+    } }
 
     private fun snapshot(info: PackageInfo?): String = JSONObject().apply {
         val app = info?.applicationInfo

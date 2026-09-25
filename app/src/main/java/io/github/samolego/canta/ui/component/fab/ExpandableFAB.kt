@@ -11,21 +11,29 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
-import io.github.samolego.canta.ui.component.IconClickButton
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.res.stringResource
+import io.github.samolego.canta.R
 
 @Composable
 fun ExpandableFAB(
     onBottomClick: () -> Unit,
     onTopClick: () -> Unit,
+    topIcon: ImageVector = Icons.Default.Download,
+    bottomIcon: ImageVector = Icons.Default.Add,
+    topLabel: String = stringResource(R.string.import_action),
+    bottomLabel: String = stringResource(R.string.create_action),
     modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
@@ -44,13 +52,6 @@ fun ExpandableFAB(
                     label = "spacing"
             )
 
-    val actionButtonScale by
-            animateFloatAsState(
-                    targetValue = if (isExpanded) 1f else 0f,
-                    animationSpec = tween(300, easing = FastOutSlowInEasing),
-                    label = "actionButtonScale"
-            )
-
     Box(
         modifier = modifier.clip(
             shape = RoundedCornerShape(16.dp),
@@ -66,29 +67,27 @@ fun ExpandableFAB(
         ) {
             // Import button
             if (isExpanded) {
-                IconClickButton(
-                    onClick = {
-                        onTopClick()
-                        isExpanded = false
-                    },
-                    icon = Icons.Default.Download,
-                    contentDescription = "Top click",
-                    scale = actionButtonScale
-                )
+                TextButton(onClick = { onTopClick(); isExpanded = false }) {
+                    Icon(topIcon, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(topLabel)
+                }
+                TextButton(onClick = { onBottomClick(); isExpanded = false }) {
+                    Icon(bottomIcon, null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(bottomLabel)
+                }
             }
             // Main FAB
             FloatingActionButton(
                 modifier = Modifier.rotate(rotation),
                     onClick = {
-                        if (isExpanded) {
-                            onBottomClick()
-                        }
                         isExpanded = !isExpanded
                     },
             ) {
                 Icon(
                         Icons.Default.Add,
-                        contentDescription = if (isExpanded) "Bottom click" else "More actions",
+                        contentDescription = stringResource(R.string.more_actions),
                 )
             }
         }

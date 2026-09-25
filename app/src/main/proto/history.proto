@@ -17,6 +17,7 @@ message OperationRecord {
   string after_state = 11;
   bool changed = 12;
   string undo_of = 13;
+  int64 freed_bytes = 14;
 }
 
 message OperationHistory {

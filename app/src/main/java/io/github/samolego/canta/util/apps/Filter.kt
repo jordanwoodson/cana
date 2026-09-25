@@ -23,6 +23,8 @@ class Filter(
         val any: Filter = Filter(name = "Any", shouldShow = { true })
 
         val user = Filter(name = "User", shouldShow = { app -> !app.isSystemApp })
+        val leftoverUpdates = Filter("Leftover updates", { it.isUninstalled && it.isUpdatedSystemApp },
+            nameRes = R.string.leftover_updates)
 
         /**
          * List of available filters.
@@ -53,6 +55,7 @@ class Filter(
             // Apps that are disabled
             val disabled = Filter(name = "Disabled", shouldShow = { app -> app.isDisabled })
             removalFilters.add(3, disabled)
+            removalFilters.add(4, leftoverUpdates)
 
             val categoryNames = mapOf(
                 InstallData.GOOGLE to R.string.category_google,

@@ -59,6 +59,7 @@ import java.io.File
 fun AppInfoDialog(
         appInfo: AppInfo,
         onDismiss: () -> Unit,
+        onRemoveUpdates: (() -> Unit)? = null,
 ) {
     val bloatDescription = appInfo.description
     val clipboardManager = LocalClipboardManager.current
@@ -197,6 +198,11 @@ fun AppInfoDialog(
                             text = stringResource(R.string.no_description_available),
                             style = MaterialTheme.typography.bodySmall
                     )
+                }
+            }
+            if (appInfo.isUninstalled && appInfo.isUpdatedSystemApp && onRemoveUpdates != null) {
+                Button(onClick = onRemoveUpdates, modifier = Modifier.align(Alignment.End)) {
+                    Text(stringResource(R.string.remove_updates))
                 }
             }
             if (!appInfo.isUninstalled) {

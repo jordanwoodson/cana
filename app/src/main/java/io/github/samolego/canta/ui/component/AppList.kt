@@ -94,12 +94,29 @@ fun AppList(
             AppInfoDialog(
                     appInfo = showAppDialog!!,
                     onDismiss = { showAppDialog = null },
+                    onRemoveUpdates = {
+                        appListModel.requestAction(io.github.samolego.canta.ui.viewmodel.PackageAction.REMOVE_UPDATES,
+                            listOf(showAppDialog!!.packageName))
+                        showAppDialog = null
+                    },
             )
         }
 
         if (appListModel.isLoading) {
             LoadingAppsInfo()
         } else {
+            if (appType == AppsType.UNINSTALLED && appListModel.leftoverUpdates.isNotEmpty()) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
+                        android.text.format.Formatter.formatFileSize(context, appListModel.leftoverUpdates.sumOf { it.updateSizeBytes })),
+                        modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                    androidx.compose.material3.TextButton(
+                        enabled = !appListModel.isOperating,
+                        onClick = { appListModel.requestAction(io.github.samolego.canta.ui.viewmodel.PackageAction.REMOVE_UPDATES,
+                            appListModel.leftoverUpdates.map { it.packageName }) },
+                    ) { Text(stringResource(R.string.remove_updates)) }
+                }
+            }
             if (appListModel.isLoadingBadges) {
                 LoadingBadgesIndicator()
             }

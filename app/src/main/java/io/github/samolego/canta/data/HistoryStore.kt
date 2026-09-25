@@ -37,13 +37,13 @@ class HistoryStore(private val dataStore: DataStore<OperationHistory>) {
         }
     }
 
-    suspend fun complete(id: String, success: Boolean, message: String, afterState: String, changed: Boolean) {
+    suspend fun complete(id: String, success: Boolean, message: String, afterState: String, changed: Boolean, freedBytes: Long = 0) {
         dataStore.updateData { history ->
             val index = history.recordsList.indexOfFirst { it.id == id }
             require(index >= 0) { "Unknown history id: $id" }
             val updated = history.getRecords(index).toBuilder().setCompleted(true)
                 .setSuccess(success).setResultMessage(message).setAfterState(afterState)
-                .setChanged(changed).build()
+                .setChanged(changed).setFreedBytes(freedBytes).build()
             history.toBuilder().setRecords(index, updated).build()
         }
     }
