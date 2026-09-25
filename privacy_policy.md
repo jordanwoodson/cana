@@ -33,4 +33,4 @@ Thus, you are advised to review this page periodically for any changes.
 We will notify you of any changes by posting the new Privacy Policy on this page.
 
 ## Contact Us
-If you have any questions or suggestions about this Privacy Policy, do not hesitate to contact us through our GitHub repository at [https://github.com/samolego/Cana](https://github.com/samolego/Cana).
+If you have any questions or suggestions about this Privacy Policy, do not hesitate to contact us through our [GitHub repository](https://github.com/jordanwoodson/cana).

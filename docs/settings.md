@@ -1,26 +1,26 @@
 ---
-title: Canta - Settings
-description: Configure Canta settings for optimal use
+title: Cana - Settings
+description: Configure Cana settings for optimal use
 ---
 # Settings
 
-Canta offers several configuration options to customize your experience. This page explains each setting and how it affects app functionality.
+Cana offers several configuration options to customize your experience. This page explains each setting and how it affects app functionality.
 
 ## Available Settings
 
 <div class="screenshot-container">
   <img src="/images/phoneScreenshots/screenshot-settings.png" alt="Settings screen" class="phone-screenshot">
   <div class="screenshot-caption">
-    Canta settings screen
+    Cana settings screen
   </div>
 </div>
 
 ### Auto-update Bloat List
 
-**Description:** When enabled, Canta automatically checks for and downloads the latest app classification data from the [Universal Debloater Alliance](https://github.com/Universal-Debloater-Alliance/universal-android-preinstalled-lists) repository.
+**Description:** When enabled, Cana automatically checks for and downloads the latest app classification data from the [Universal Debloater Alliance](https://github.com/Universal-Debloater-Alliance/universal-android-preinstalled-lists) repository.
 
 - **Enabled (Default):** Ensures you have the most up-to-date information about apps, including newly identified bloatware and revised safety recommendations.
-- **Disabled:** Canta will use only the locally stored bloat list data without checking for updates.
+- **Disabled:** Cana will use only the locally stored bloat list data without checking for updates.
 
 ::: tip
 Enable this setting to ensure you have the most accurate information about which apps are safe to remove.
@@ -39,7 +39,7 @@ We recommend keeping this enabled to avoid accidentally uninstalling important a
 
 ## Advanced Settings
 
-Canta includes advanced settings for power users who need more control over the app's behavior.
+Cana includes advanced settings for power users who need more control over the app's behavior.
 
 ### Allow Unsafe Selections
 
@@ -55,7 +55,7 @@ Enabling this setting allows you to select apps that could break vital system fu
 
 ### Bloat List URL
 
-**Description:** Specifies the source URL where Canta downloads app classification data, badges, and descriptions.
+**Description:** Specifies the source URL where Cana downloads app classification data, badges, and descriptions.
 
 - **Default:** Points to the Universal Debloater Alliance repository
 - **Custom:** You can specify an alternative source that follows the same data format
@@ -64,7 +64,7 @@ This setting allows organizations or advanced users to maintain their own app cl
 
 ### Commits URL
 
-**Description:** Defines where Canta checks for updates to the bloat list data.
+**Description:** Defines where Cana checks for updates to the bloat list data.
 
 - **Default:** Points to the commits API of the Universal Debloater Alliance repository
 - **Custom:** Can be changed to track updates from alternative sources
@@ -79,7 +79,7 @@ The Bloat List URL and Commits URL settings are primarily intended for developer
 
 ### Select All
 
-For advanced users, Canta includes a hidden "Select All" feature that can be enabled by tapping the version number in Settings multiple times. This feature adds a "Select All" option when having "recommended" filter applied.
+For advanced users, Cana includes a hidden "Select All" feature that can be enabled by tapping the version number in Settings multiple times. This feature adds a "Select All" option when having "recommended" filter applied.
 
 ::: warning CAUTION
 Use this feature carefully, as mass uninstallation could affect device functionality.

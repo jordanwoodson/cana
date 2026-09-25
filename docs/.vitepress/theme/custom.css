@@ -1,31 +1,42 @@
+/* Cana: forest text on light surfaces, mint on charcoal. */
 :root {
-    --vp-c-brand: #ff4444 !important;
-    --vp-c-brand-light: #ff6b6b !important;
-    --vp-c-brand-lighter: #ffa0a0 !important;
-    --vp-c-brand-dark: #cc0000 !important;
-    --vp-c-brand-darker: #a60000 !important;
-
-    --vp-home-hero-name-color: #ff4444 !important;
-    --vp-c-brand-1: #ff4444 !important;
-    --vp-c-brand-2: #ff6b6b !important;
-    --vp-c-brand-3: #ff8c8c !important;
-
-    --vp-button-brand-bg: #ff4444 !important;
-    --vp-button-brand-hover-bg: #ff6b6b !important;
-    --vp-button-brand-active-bg: #cc0000 !important;
+    --vp-c-brand-1: #006c45;
+    --vp-c-brand-2: #005234;
+    --vp-c-brand-3: #006c45;
+    --vp-c-brand-soft: rgba(0, 108, 69, 0.12);
+    --vp-home-hero-name-color: #006c45;
+    --vp-button-brand-bg: #006c45;
+    --vp-button-brand-hover-bg: #005234;
+    --vp-button-brand-active-bg: #003822;
+    --vp-button-brand-text: #ffffff;
+    --vp-c-bg: #fafbf8;
+    --vp-c-bg-soft: #eef3ed;
+    --vp-c-text-1: #152421;
 }
 
 .dark {
-    --vp-c-brand: #ff6666 !important;
-    --vp-c-brand-light: #ff8c8c !important;
-    --vp-c-brand-lighter: #ffb3b3 !important;
-    --vp-c-brand-dark: #ff4444 !important;
-    --vp-c-brand-darker: #cc0000 !important;
+    --vp-c-brand-1: #70efad;
+    --vp-c-brand-2: #94f7bd;
+    --vp-c-brand-3: #70efad;
+    --vp-c-brand-soft: rgba(112, 239, 173, 0.12);
+    --vp-home-hero-name-color: #70efad;
+    --vp-button-brand-bg: #70efad;
+    --vp-button-brand-hover-bg: #94f7bd;
+    --vp-button-brand-active-bg: #53d990;
+    --vp-button-brand-text: #152421;
+    --vp-c-bg: #101915;
+    --vp-c-bg-alt: #152421;
+    --vp-c-bg-soft: #1b2a23;
+    --vp-c-text-1: #eef6ef;
+}
 
-    --vp-home-hero-name-color: #ff6666 !important;
-    --vp-c-brand-1: #ff6666 !important;
-    --vp-c-brand-2: #ff8c8c !important;
-    --vp-c-brand-3: #ffb3b3 !important;
+.cana-wordmark {
+    font-weight: 400;
+    letter-spacing: -0.045em;
+}
+
+.cana-wordmark strong {
+    font-weight: 800;
 }
 
 .VPHero .image-src {
@@ -67,7 +78,7 @@
 }
 
 .VPFeature[href]:hover::after {
-    border-color: var(--vp-c-brand);
+    border-color: var(--vp-c-brand-1);
 }
 
 .dark .VPFeature[href]:hover {

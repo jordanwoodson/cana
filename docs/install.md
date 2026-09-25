@@ -1,16 +1,17 @@
 ---
-title: Canta - Installation
-description: Installation instructions for Canta.
+title: Cana - Installation
+description: Install Cana, start Shizuku, and choose which Android profile to manage.
 ---
-# Installation
+# Set up Cana
 
-1. Install [Shizuku](https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api) from Google Play Store
-  - Note: if you're using Android 16 and above, please use [forked version](https://github.com/thedjchi/Shizuku)
-2. [Activate Shizuku](https://shizuku.rikka.app/guide/setup/)
-3. Install Canta from your preferred source:
-   - [F-Droid](https://f-droid.org/en/packages/io.github.samolego.canta/)
-   - [IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/io.github.samolego.canta)
-   - [GitHub Releases](https://github.com/samolego/Canta/releases/latest/)
-   - [Google Play Store](https://play.google.com/store/apps/details?id=io.github.samolego.canta)
+1. Install [Shizuku](https://shizuku.rikka.app/download/).
+2. Follow Shizuku's [setup guide](https://shizuku.rikka.app/guide/setup/) to start the service.
+3. Install Cana from [GitHub Releases](https://github.com/jordanwoodson/cana/releases/latest),
+   or add `https://github.com/jordanwoodson/cana` to Obtainium.
+4. Open Cana and grant its Shizuku permission when prompted.
+5. Tap the profile icon in the top bar and choose the profile you want to manage.
 
-> For a more detailed Shizuku setup guide, check the [Android Police tutorial](https://www.androidpolice.com/how-to-use-shizuku-for-adb-rootless-mods-on-any-android-device/)
+Cana requires Android 9.0 or newer. It can be installed alongside the original
+Canta app.
+
+Continue with [Usage](/usage) for app removal, restoration, and profile restrictions.

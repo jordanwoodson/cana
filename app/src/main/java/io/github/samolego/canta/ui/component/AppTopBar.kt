@@ -38,7 +38,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
-import io.github.samolego.canta.APP_NAME
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.menu.FiltersMenu
 import io.github.samolego.canta.ui.menu.MoreOptionsMenu
@@ -75,7 +74,7 @@ fun CantaTopBar(
                             exit = fadeOut()
                     ) {
                         Column {
-                            Text(APP_NAME)
+                            CanaWordmark()
                             // Show which profile is being worked on once one was picked
                             appListViewModel.selectedProfile?.let { profile ->
                                 Text(
