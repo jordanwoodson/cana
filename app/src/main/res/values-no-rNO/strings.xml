@@ -36,7 +36,7 @@
     <string name="copy">Copy</string>
     <string name="app_settings">App info</string>
     <string name="close">Close</string>
-    <string name="canta_description">Cana is an open source uninstaller app that uses Shizuku to remove system and user apps.\nIt allows you to debloat your device as you wish, no PC required.\n\nSpecial thanks to %s.\nCana would\'t be the same without their work.</string>
+    <string name="canta_description">Do more. Because you can.\n\nCana gives you more control over your Android apps. Choose a personal, work, or other user profile, then use Shizuku to remove unwanted apps without root. Android and profile administrator restrictions still apply.\n\nBuilt on Canta by samolego. Special thanks to %s.</string>
     <string name="search_apps">Search apps</string>
     <string name="auto_update_bloat_list">Auto update bloat list</string>
     <string name="auto_update_bloat_list_description">Automatically fetch new version of app bloat info. This guarantees up-to-date badges and app descriptions.</string>

@@ -1,56 +1,52 @@
 ---
-title: Canta - Usage
-description: Usage instructions for Canta.
+title: Cana - Usage
+description: Usage instructions for Cana.
 ---
 # Usage
 
 ## Uninstalling Apps
 
-### 1. Launch Canta
+### 1. Launch Cana
 <div class="screenshot-container">
   <img src="/images/phoneScreenshots/screenshot-main.png" alt="Main screen" class="phone-screenshot">
   <div class="screenshot-caption">
-    Home screen of Canta showing list of installed apps
+    Home screen of Cana showing list of installed apps
   </div>
 </div>
 
-### 2. Select Apps to Uninstall
-<div class="screenshot-grid">
-  <div class="screenshot-item">
-    <img src="/images/phoneScreenshots/screenshot-search.png" alt="Search screen" class="phone-screenshot">
-    <div class="screenshot-caption">
-      Search or filter apps you want to uninstall
-    </div>
-  </div>
-  <div class="screenshot-item">
-    <img src="/images/phoneScreenshots/screenshot-app-description.png" alt="App description" class="phone-screenshot">
-    <div class="screenshot-caption">
-      Check app descriptions and badges
-    </div>
-  </div>
-</div>
+### 2. Choose a profile
 
-### 3. Click the Trash Button
+Tap the profile icon in the top bar. Choose Personal, Work profile, or another
+user on the device. The subtitle shows the selected profile and its Android user
+ID. Grant Cana permission in Shizuku if prompted.
+
+### 3. Select Apps to Uninstall
+Search or filter the app list. Tap an app to read its description and community
+recommendation, then select the apps you want to remove.
+
+### 4. Click the Trash Button
 
 ::: info
-You will need to grant Shizuku access for Canta upon first uninstallation.
+You will need to grant Shizuku access for Cana upon first uninstallation.
 :::
 
-### 4. Confirm Uninstallation
-<div class="screenshot-container">
-  <img src="/images/phoneScreenshots/screenshot-uninstall-dialog.png" alt="Uninstall confirmation" class="phone-screenshot">
-  <div class="screenshot-caption">
-    Confirm that you want to uninstall selected apps
-  </div>
-</div>
+### 5. Confirm Uninstallation
+Review the selection in the confirmation dialog before proceeding.
 
 ## Reinstalling Apps
 
 Navigate to the uninstalled apps tab, select the apps and click the reinstall button.
 
-<div class="screenshot-container">
-  <img src="/images/phoneScreenshots/screenshot-uninstalled-list.png" alt="Uninstalled apps" class="phone-screenshot">
-  <div class="screenshot-caption">
-    List of previously uninstalled apps that can be reinstalled
-  </div>
-</div>
+## Profile restrictions
+
+Cana respects Android's permissions and profile administrator policies:
+
+- **Debugging disallowed:** Shizuku running through ADB cannot modify this profile.
+- **Uninstalling disallowed:** Android rejects app removal in this profile.
+
+Cana shows these restrictions in the profile picker. If an operation fails,
+check **Logs** for Android's error message.
+
+For the profile Cana runs in, removing a non-system app still removes it for all
+users, as in Canta. For another selected profile, removal affects that profile
+only. Restoring uses the package already present on the device.

@@ -1,13 +1,14 @@
 <div align="center">
 
-# Cana
+<img src="assets/branding/cana-icon.svg" alt="Cana Open C icon" width="128" />
 
-[![](https://raw.githubusercontent.com/jordanwoodson/cana/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png)](https://github.com/jordanwoodson/cana)
+# (can)a
 
-Uninstall any\* app without root, in **any profile**, including your **work profile**.
+**Do more. Because you can.**
+
+More control over your Android apps. Debloat without root across **personal, work,
+and other user profiles**.\*
 Powered by [Shizuku](https://shizuku.rikka.app/).
-
-*[Canta](https://github.com/samolego/Canta) can't. Cana can.*
 
 ---
 
@@ -19,10 +20,10 @@ Powered by [Shizuku](https://shizuku.rikka.app/).
 ## 📖 About
 
 Cana is a fork of [Canta](https://github.com/samolego/Canta) by [samolego](https://github.com/samolego).
-It's the same app (uninstall pre-installed or user apps without root through Shizuku, with
-recommendations from the [Universal Debloat List](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/)),
-but it lets you **pick which user profile to work on**, so system apps inside a work profile
-can be debloated too.
+The name turns **(cant)a** into **(can)a**: a fork built to do more. Cana lets you
+**pick which user profile to work on**, so system apps inside a work profile can
+be debloated too. It uses Shizuku and recommendations from the
+[Universal Debloat List](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/).
 
 - ✅ No root required
 - ✅ Personal, work, clone and private space profiles, and secondary users
@@ -103,6 +104,8 @@ switcher warns about both:
 ./gradlew assembleDebug    # app/build/outputs/apk/debug/app-debug.apk
 ./gradlew assembleRelease  # needs key.properties (storeFile, storePassword, keyAlias, keyPassword)
 ```
+
+The Open C artwork and export instructions live in [assets/branding](assets/branding/README.md).
 
 ## Thanks
 

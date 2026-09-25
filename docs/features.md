@@ -1,19 +1,20 @@
 ---
-title: Canta - Features
-description: Features of Canta.
+title: Cana - Features
+description: Features of Cana.
 ---
 # Features
 
 ## Core Features
 
-### Safe Uninstallation
-No permanent device damage risk can be done when uninstalling apps with Canta. The uninstallation process happens for current user
-only (user 0), so APKs remain on device. In case you uninstall a critical system component, you can risk a bootloop.
-In that case, you will need to perform a factory reset and the device will not be bricked.
+### More control across profiles
 
-::: info
-Canta calls Android System APIs directly to uninstall apps, similar to how ADB does it.
-:::
+Choose a personal, work, clone, private space, or secondary user profile from the
+top bar. Cana loads that profile's apps and reports Android's actual result when
+uninstalling or restoring a package.
+
+Android and profile administrator restrictions still apply. Removing critical
+system apps can cause a bootloop and require a factory reset. See
+[profile restrictions](/usage#profile-restrictions) before making changes.
 
 ### System Requirements
 * Android 9.0 (SDK 28) or higher
@@ -47,28 +48,28 @@ Finding specific apps is effortless thanks to the quick search functionality and
 <div class="screenshot-container">
   <img src="/images/phoneScreenshots/screenshot-main.png" alt="Main screen" class="phone-screenshot">
   <div class="screenshot-caption">
-      Canta Home Screen
+      Cana Home Screen
   </div>
 </div>
 
 ## Advanced Features
 
 ### Presets System
-Canta's preset system allows you to create, manage, and share collections of apps for removal. This feature enables:
+Cana's preset system allows you to create, manage, and share collections of apps for removal. This feature enables:
 
 * **Device Consistency**: Apply the same bloatware removal across multiple devices
 * **Community Sharing**: Share your carefully curated removal lists with others
 * **Quick Setup**: Rapidly configure new devices with proven app configurations
 * **Backup & Restore**: Save your uninstall preferences before major changes
 
-Presets are stored locally and can be exported as JSON for easy sharing. When importing presets, Canta automatically validates app availability on your device and filters out incompatible entries.
+Presets are stored locally and can be exported as JSON for easy sharing. When importing presets, Cana automatically validates app availability on your device and filters out incompatible entries.
 
 [Learn more about Presets →](/presets)
 
 ## Privacy & Security
 
 ### Privacy-Focused
-Canta can operate without internet connection and collects no data whatsoever.
+Cana can operate without internet connection and collects no data whatsoever.
 There's no analytics or tracking built into the app.
 
 ::: warning NOTE
@@ -77,4 +78,6 @@ No data is uploaded whatsoever.
 :::
 
 ### Open Source
-Canta is licensed under LGPL-3.0, with its complete source code available on [GitHub](https://github.com/samolego/Canta). This transparency ensures you can verify the app's functionality and contribute to its development if you wish.
+Cana is licensed under LGPL-3.0, with its complete source code available on [GitHub](https://github.com/jordanwoodson/cana). This transparency ensures you can verify the app's functionality and contribute to its development if you wish.
+
+Cana is a fork of [Canta](https://github.com/samolego/Canta) by samolego.

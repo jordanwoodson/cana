@@ -1,5 +1,8 @@
-Cana allows you to uninstall <b>any(*)</b> app
-from your device, even if you don't have root access.
+<b>Do more. Because you can.</b>
+
+Cana gives you more control over your Android apps. Choose a personal, work,
+clone, private space, or secondary user profile, then remove unwanted apps
+without root using Shizuku.
 
 You'll need to install Shizuku (https://shizuku.rikka.app/download/)
 and activate it (https://shizuku.rikka.app/guide/setup/) before using Cana.
@@ -9,6 +12,18 @@ Please read the guide on how <a href="https://github.com/Universal-Debloater-All
 
 <b>Features</b>
 <ul>
-    <li>No device bricking - though if you remove an important app and get stuck in bootloop after rebooting, you will still need to perform a factory reset</li>
+    <li>Choose which profile to manage</li>
+    <li>Uninstall apps and restore existing packages in the selected profile</li>
+    <li>Search, community recommendations, and reusable presets</li>
+    <li>Real Android results and error logs</li>
     <li>No root required</li>
 </ul>
+
+Android and profile administrator restrictions still apply. Removing critical
+apps can cause a bootloop and require a factory reset.
+
+Cana is an open source fork of <a href="https://github.com/samolego/Canta">Canta</a>
+by samolego. From (cant)a to (can)a: built to do more.
+
+Get Cana from <a href="https://github.com/jordanwoodson/cana/releases/latest">GitHub Releases</a>
+or follow the repository with Obtainium.

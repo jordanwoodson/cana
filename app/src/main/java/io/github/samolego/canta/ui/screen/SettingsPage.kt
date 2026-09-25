@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.BuildConfig
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ui.component.CanaWordmark
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SettingsTextItem
@@ -247,6 +248,14 @@ fun SettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                CanaWordmark(style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    text = stringResource(R.string.brand_tagline),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+
                 // App version
                 Text(
                     text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
