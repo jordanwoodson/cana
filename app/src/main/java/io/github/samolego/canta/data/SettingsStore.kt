@@ -5,9 +5,9 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import io.github.samolego.canta.data.proto.AppSettings
-import io.github.samolego.canta.util.DEFAULT_BLOAT_COMMITS_URL
 import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 
 // Proto DataStore instance
 private val Context.dataStore: DataStore<AppSettings> by
@@ -19,13 +19,10 @@ class SettingsStore private constructor(context: Context) {
     val autoUpdateBloatListFlow = dataStore.data.map { it.autoUpdateBloatList }
     val confirmBeforeUninstallFlow = dataStore.data.map { it.confirmBeforeUninstall }
     val disableRiskDialogFlow = dataStore.data.map { it.disableRiskDialog }
-    val latestCommitHashFlow = dataStore.data.map { it.latestBloatCommitHash }
     val bloatListUrlFlow = dataStore.data.map {
         it.bloatListUrl.ifEmpty { DEFAULT_BLOAT_URL }
     }
-    val commitsUrlFlow = dataStore.data.map {
-        it.commitsUrl.ifEmpty { DEFAULT_BLOAT_COMMITS_URL }
-    }
+    val bloatUnmeteredOnlyFlow = dataStore.data.map { it.bloatUnmeteredOnly }
     val allowUnsafeUninstallsFlow = dataStore.data.map { it.allowUnsafeUninstalls }
     val hideSuccessDialogFlow = dataStore.data.map { it.hideSuccessDialog }
 
@@ -44,16 +41,25 @@ class SettingsStore private constructor(context: Context) {
         dataStore.updateData { it.toBuilder().setDisableRiskDialog(disable).build() }
     }
 
-    suspend fun setLatestCommitHash(hash: String) {
-        dataStore.updateData { it.toBuilder().setLatestBloatCommitHash(hash).build() }
-    }
-
     suspend fun setBloatListUrl(url: String) {
-        dataStore.updateData { it.toBuilder().setBloatListUrl(url).build() }
+        dataStore.updateData {
+            it.toBuilder().setBloatListUrl(url.trim()).clearBloatEtag()
+                .clearBloatCacheUrl().clearBloatLastCheckedMs().build()
+        }
     }
 
-    suspend fun setCommitsUrl(url: String) {
-        dataStore.updateData { it.toBuilder().setCommitsUrl(url).build() }
+    suspend fun bloatUpdateSettings(): AppSettings = dataStore.data.first()
+
+    suspend fun setBloatUnmeteredOnly(value: Boolean) {
+        dataStore.updateData { it.toBuilder().setBloatUnmeteredOnly(value).build() }
+    }
+
+    suspend fun setBloatCacheMetadata(url: String, etag: String, checkedMs: Long) {
+        dataStore.updateData {
+            if (it.bloatListUrl.ifBlank { DEFAULT_BLOAT_URL } != url) it
+            else it.toBuilder().setBloatCacheUrl(url).setBloatEtag(etag)
+                .setBloatLastCheckedMs(checkedMs).build()
+        }
     }
 
     suspend fun setAllowUnsafeUninstalls(allow: Boolean) {

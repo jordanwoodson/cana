@@ -11,70 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
-import java.io.File
-import java.net.URL
 
 const val DEFAULT_BLOAT_URL =
         "https://raw.githubusercontent.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/main/resources/assets/uad_lists.json"
-const val DEFAULT_BLOAT_COMMITS_URL =
-        "https://api.github.com/repos/Universal-Debloater-Alliance/universal-android-debloater-next-generation/commits?path=resources%2Fassets%2Fuad_lists.json"
-
-/**
- * Parse commits to get latest commit hash
- */
-fun parseLatestHash(commits: String): String {
-    val c = commits.substringAfter("\"sha\":\"")
-    return c.substringBefore("\"")
-}
-
-private const val TAG = "BloatUtils"
-
-class BloatUtils {
-    fun fetchBloatList(
-            uadList: File,
-            bloatUrl: String = DEFAULT_BLOAT_URL,
-            commitsUrl: String = DEFAULT_BLOAT_COMMITS_URL
-    ): Pair<JSONObject, String> {
-        try {
-            // Fetch json from bloatUrl and parse it
-            val response = URL(bloatUrl).readText()
-            // Parse response to json
-            val json = JSONObject(response)
-
-            val commits = URL(commitsUrl).readText()
-
-            val hash = parseLatestHash(commits)
-
-            // Write json to file
-            uadList.writeText(json.toString())
-
-            LogUtils.i(TAG, "Successfully fetched latest bloat list.")
-
-            return Pair(json, hash)
-        } catch (e: Exception) {
-            LogUtils.e(TAG, "Failed to fetch bloat list", e)
-            return Pair(JSONObject(), "")
-        }
-    }
-
-    fun checkForUpdates(
-            latestBloatHash: String,
-            commitsUrl: String = DEFAULT_BLOAT_COMMITS_URL
-    ): Boolean {
-        return try {
-            val commits = URL(commitsUrl).readText()
-            val hash = parseLatestHash(commits)
-
-            val needsUpdate = hash != latestBloatHash
-            LogUtils.i(TAG, "Bloat list needs update: $needsUpdate (commit hash: $hash)")
-
-            return needsUpdate
-        } catch (e: Exception) {
-            LogUtils.e(TAG, "Failed to check for updates", e)
-            false
-        }
-    }
-}
 
 /**
  * App bloat information, parsed from the UAD json.

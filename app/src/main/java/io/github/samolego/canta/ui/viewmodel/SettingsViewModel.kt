@@ -32,13 +32,11 @@ class SettingsViewModel(
     private val _disableRiskDialog = MutableStateFlow(true)
     val disableRiskDialog = _disableRiskDialog.asStateFlow()
 
-    private var _latestCommitHash = MutableStateFlow("")
-
     private val _bloatListUrl = MutableStateFlow("")
     val bloatListUrl = _bloatListUrl.asStateFlow()
 
-    private val _commitsUrl = MutableStateFlow("")
-    val commitsUrl = _commitsUrl.asStateFlow()
+    private val _bloatUnmeteredOnly = MutableStateFlow(false)
+    val bloatUnmeteredOnly = _bloatUnmeteredOnly.asStateFlow()
 
     private val _allowUnsafeUninstalls = MutableStateFlow(false)
     val allowUnsafeUninstall = _allowUnsafeUninstalls.asStateFlow()
@@ -57,11 +55,10 @@ class SettingsViewModel(
 
         // you could also use something like this in other parts of the code for easy management.
         observeSettings()
-        observeLatestCommitHash()
         observeAutoUpdateBloatList()
         observeConfirmBeforeUninstall()
         observeBloatListUrl()
-        observeCommitsUrl()
+        settingsStore.bloatUnmeteredOnlyFlow.onEach { _bloatUnmeteredOnly.value = it }.launchIn(viewModelScope)
         observeAllowUnsafeUninstalls()
         observeHideSuccessDialog()
         observeAuthEnabled()
@@ -84,9 +81,7 @@ class SettingsViewModel(
     private fun observeAutoUpdateBloatList() {
         settingsStore
                 .autoUpdateBloatListFlow
-                .onEach {
-                    _autoUpdateBloatList.update { it }
-                }
+                .onEach { _autoUpdateBloatList.value = it }
                 .launchIn(viewModelScope)
     }
 
@@ -94,13 +89,6 @@ class SettingsViewModel(
         settingsStore
                 .confirmBeforeUninstallFlow
                 .onEach { _confirmBeforeUninstall.value = it }
-                .launchIn(viewModelScope)
-    }
-
-    private fun observeLatestCommitHash() {
-        settingsStore
-                .latestCommitHashFlow
-                .onEach { _latestCommitHash.value = it }
                 .launchIn(viewModelScope)
     }
 
@@ -129,10 +117,6 @@ class SettingsViewModel(
         settingsStore.bloatListUrlFlow.onEach { _bloatListUrl.value = it }.launchIn(viewModelScope)
     }
 
-    private fun observeCommitsUrl() {
-        settingsStore.commitsUrlFlow.onEach { _commitsUrl.value = it }.launchIn(viewModelScope)
-    }
-
     fun saveAutoUpdateBloatList(autoupdate: Boolean) {
         viewModelScope.launch { settingsStore.setAutoUpdateBloatList(autoupdate) }
     }
@@ -145,8 +129,8 @@ class SettingsViewModel(
         viewModelScope.launch { settingsStore.setBloatListUrl(url) }
     }
 
-    fun saveCommitsUrl(url: String) {
-        viewModelScope.launch { settingsStore.setCommitsUrl(url) }
+    fun saveBloatUnmeteredOnly(value: Boolean) {
+        viewModelScope.launch { settingsStore.setBloatUnmeteredOnly(value) }
     }
 
     fun saveDisableRiskDialog(permanentlyHide: Boolean) {

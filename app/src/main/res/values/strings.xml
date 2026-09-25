@@ -178,4 +178,6 @@
     <string name="category_carrier">Carrier</string>
     <string name="category_aosp">AOSP</string>
     <string name="category_misc">Misc</string>
+    <string name="bloat_unmetered_only">Update list only on unmetered networks</string>
+    <string name="bloat_unmetered_only_description">Applies to automatic updates and pull to refresh. Cached and bundled data remain available offline.</string>
 </resources>

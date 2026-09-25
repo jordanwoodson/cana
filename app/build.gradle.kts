@@ -100,8 +100,9 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
-    // Android's org.json is a stub in local JVM tests.
-    testImplementation("org.json:json:20240303")
+    // Use Android's JSON semantics (including last-key-wins) instead of the JVM stub.
+    testImplementation("com.vaadin.external.google:android-json:0.0.20131108.vaadin1")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
