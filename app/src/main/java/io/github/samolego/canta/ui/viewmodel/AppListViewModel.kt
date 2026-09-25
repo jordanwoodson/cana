@@ -26,6 +26,8 @@ import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
+import io.github.samolego.canta.util.RemovalRecommendation
 import java.util.Locale
 import java.util.UUID
 import org.json.JSONObject
@@ -45,15 +47,18 @@ class AppListViewModel(
     fun requestAction(action: PackageAction, packages: List<String> = selectedApps.keys.toList()) {
         if (isOperating) return
         val selected = apps.filter { it.packageName in packages &&
-            it.isUninstalled == (action != PackageAction.UNINSTALL) }
+            it.isUninstalled == (action in setOf(PackageAction.REINSTALL, PackageAction.REMOVE_UPDATES)) }
         if (selected.isNotEmpty()) pendingAction = PackageActionRequest(action, selectedUserId, selected)
     }
 
     suspend fun inspectUpdates(request: PackageActionRequest): List<UpdateImpact> =
-        request.apps.filter { it.isUpdatedSystemApp }.map { packageOps.inspectUpdates(it.packageName, request.userId) }
+        if (request.action in setOf(PackageAction.UNINSTALL, PackageAction.REMOVE_UPDATES))
+            request.apps.filter { it.isUpdatedSystemApp }.map { packageOps.inspectUpdates(it.packageName, request.userId) }
+        else emptyList()
 
     suspend fun inspectSafety(request: PackageActionRequest) =
-        CanaServices.getInstance().safety.inspect(request.apps.map { it.packageName }, request.userId)
+        CanaServices.getInstance().safety.inspect(request.apps.map { it.packageName }, request.userId,
+            removing = request.action in setOf(PackageAction.UNINSTALL, PackageAction.UNINSTALL_KEEP_DATA))
 
     suspend fun processRequest(
         context: Context,
@@ -77,13 +82,40 @@ class AppListViewModel(
                         batchId, approvedDowngrades[app.packageName].orEmpty(), approvedWarnings[app.packageName].orEmpty())
                     PackageAction.REMOVE_UPDATES -> packageOps.removeUpdates(app.packageName, request.userId,
                         approvedDowngrades[app.packageName].orEmpty(), batchId)
+                    PackageAction.UNINSTALL_KEEP_DATA -> packageOps.uninstall(app.packageName, request.userId,
+                        batchId = batchId, approvedWarnings = approvedWarnings[app.packageName].orEmpty(), keepData = true)
+                    PackageAction.DISABLE, PackageAction.ENABLE -> packageOps.setEnabled(app.packageName, request.userId,
+                        request.action == PackageAction.ENABLE, approvedWarnings[app.packageName].orEmpty(), batchId)
+                    PackageAction.SUSPEND, PackageAction.UNSUSPEND -> packageOps.setSuspended(app.packageName, request.userId,
+                        request.action == PackageAction.SUSPEND, approvedWarnings[app.packageName].orEmpty(), batchId)
                 }.also { if (it.success && request.userId == selectedUserId) selectedApps.remove(app.packageName) }
             }
             if (request.userId == selectedUserId) loadInstalled(context.packageManager, context)
             BatchResult(results + request.apps.filter { it.packageName !in included }.map {
                 OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
-            })
+            }, batchId)
         } finally { isOperating = false }
+    }
+
+    suspend fun undoBatch(context: Context, batchId: String): BatchResult = withContext(Dispatchers.Main) {
+        if (isOperating) return@withContext BatchResult(listOf(OperationResult(false, context.getString(R.string.operation_busy))))
+        isOperating = true
+        try {
+            val records = CanaServices.getInstance().history.records.first().filter { it.batchId == batchId && it.changed }.asReversed()
+            val undoBatch = UUID.randomUUID().toString()
+            val results = records.map { packageOps.undo(it, undoBatch) }
+            loadInstalled(context.packageManager, context)
+            BatchResult(results)
+        } finally { isOperating = false }
+    }
+
+    val defaultAction: PackageAction get() {
+        val selected = apps.filter { it.packageName in selectedApps }
+        return when {
+            selected.isNotEmpty() && selected.all { it.isDisabled } -> PackageAction.ENABLE
+            selected.any { it.removalInfo in setOf(RemovalRecommendation.EXPERT, RemovalRecommendation.UNSAFE) } -> PackageAction.DISABLE
+            else -> PackageAction.UNINSTALL
+        }
     }
 
     companion object {
@@ -219,7 +251,11 @@ class AppListViewModel(
 
 }
 
-enum class PackageAction { UNINSTALL, REINSTALL, REMOVE_UPDATES }
+enum class PackageAction(val label: Int) {
+    UNINSTALL(R.string.uninstall), REINSTALL(R.string.reinstall), REMOVE_UPDATES(R.string.remove_updates),
+    DISABLE(R.string.disable_app), ENABLE(R.string.enable_app), SUSPEND(R.string.suspend_app),
+    UNSUSPEND(R.string.unsuspend_app), UNINSTALL_KEEP_DATA(R.string.uninstall_keep_data),
+}
 
 data class PackageActionRequest(val action: PackageAction, val userId: Int, val apps: List<AppInfo>)
 

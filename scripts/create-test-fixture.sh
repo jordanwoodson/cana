@@ -6,9 +6,19 @@ if [[ -n "${JAVA_HOME:-}" ]]; then export PATH="$JAVA_HOME/bin:$PATH"; fi
 fixture_dir=/tmp/cana-roadmap-fixture
 mkdir -p "$fixture_dir"
 cat > "$fixture_dir/AndroidManifest.xml" <<'MANIFEST'
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jordanwoodson.cana.fixture" android:versionCode="1" android:versionName="1.0">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jordanwoodson.cana.fixture" android:versionCode="2" android:versionName="2.0">
   <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="35" />
-  <application android:label="Cana Test Fixture" android:hasCode="false" android:allowBackup="false" />
+  <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.READ_CONTACTS" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <!-- Metadata-only components: tests enumerate/toggle them, never launch this APK. -->
+  <application android:label="Cana Test Fixture" android:hasCode="false" android:allowBackup="false" android:debuggable="true" android:testOnly="true">
+    <activity android:name=".FixtureActivity" android:exported="false" />
+    <service android:name="com.google.android.gms.measurement.FixtureService" android:exported="false" />
+    <receiver android:name=".FixtureReceiver" android:exported="false" />
+    <provider android:name=".FixtureProvider" android:authorities="io.github.jordanwoodson.cana.fixture.provider" android:exported="false" />
+  </application>
 </manifest>
 MANIFEST
 "$ANDROID_HOME/build-tools/36.0.0/aapt2" link -I "$ANDROID_HOME/platforms/android-36/android.jar" \

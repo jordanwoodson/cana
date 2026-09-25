@@ -1,0 +1,24 @@
+Exodus Privacy tracker database
+
+Source: https://reports.exodus-privacy.eu.org/api/trackers
+Retrieved: 2026-09-25
+Snapshot: 432 records, unchanged API JSON
+SHA-256: bf6922f7c95ceb130fcfabf96c32c615e60d62ca507a4b82dcd74b41061c5121
+
+Database: Open Database License (ODbL) 1.0
+https://opendatacommons.org/licenses/odbl/1-0/
+Individual contents: Database Contents License (DbCL) 1.0
+https://opendatacommons.org/licenses/dbcl/1-0/
+
+Contains information from the Exodus Privacy database. This database is
+distributed under the ODbL 1.0 and its contents under DbCL 1.0, separately
+from Cana source code. The full machine-readable snapshot is included as
+exodus-trackers.json and in Cana's public source repository.
+
+Original licensing statement:
+https://github.com/Exodus-Privacy/exodus/blob/v1/README.md#license
+API terms:
+https://github.com/Exodus-Privacy/exodus/blob/v1/doc/api.md
+
+Cana uses the bundled snapshot offline. It does not automatically contact
+the Exodus production API. A user may configure their own compatible list URL.

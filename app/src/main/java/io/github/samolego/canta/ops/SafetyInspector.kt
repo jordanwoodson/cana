@@ -6,6 +6,8 @@ import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.IBinder
 import io.github.samolego.canta.R
+import io.github.samolego.canta.data.SettingsStore
+import io.github.samolego.canta.util.RemovalRecommendation
 import io.github.samolego.canta.util.BloatData
 import io.github.samolego.canta.util.BloatListRepository
 import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
@@ -13,6 +15,7 @@ import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -22,7 +25,7 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
     private val context = context.applicationContext
     val alwaysProtected = SafetyPolicy.protectedPackages(context.packageName)
 
-    suspend fun inspect(names: List<String>, userId: Int): Map<String, SafetyAssessment> = withContext(Dispatchers.IO) {
+    suspend fun inspect(names: List<String>, userId: Int, removing: Boolean = false): Map<String, SafetyAssessment> = withContext(Dispatchers.IO) {
         if (names.all { it in alwaysProtected }) return@withContext names.associateWith { SafetyAssessment(protected = true) }
         try {
             val profile = ShizukuUserUtils.getUsers().firstOrNull { it.id == userId }
@@ -45,8 +48,13 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
                 .filter { (it.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_INSTALLED != 0 }.map { it.packageName }.toSet()
             val snapshot = SafetySnapshot(protected, roles, keyboards, activeAdmins(userId), installed)
             val metadata = BloatListRepository(context).load(false)
-            names.associateWith { name -> SafetyPolicy.assess(name, snapshot,
-                metadata.optJSONObject(name)?.let { BloatData.fromJson(it).neededBy }.orEmpty()) }
+            val allowUnsafe = SettingsStore.getInstance().allowUnsafeUninstallsFlow.first()
+            names.associateWith { name ->
+                val data = metadata.optJSONObject(name)?.let(BloatData::fromJson)
+                val assessment = SafetyPolicy.assess(name, snapshot, data?.neededBy.orEmpty())
+                if (removing && !allowUnsafe && data?.removal == RemovalRecommendation.UNSAFE)
+                    assessment.copy(error = context.getString(R.string.unsafe_uninstall_blocked)) else assessment
+            }
         } catch (e: CancellationException) { throw e }
         catch (e: Exception) {
             names.associateWith { SafetyAssessment(protected = it in alwaysProtected,
@@ -54,8 +62,8 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
         }
     }
 
-    suspend fun requireAllowed(name: String, userId: Int, approved: Set<String>) {
-        val report = inspect(listOf(name), userId).getValue(name)
+    suspend fun requireAllowed(name: String, userId: Int, approved: Set<String>, removing: Boolean = false) {
+        val report = inspect(listOf(name), userId, removing).getValue(name)
         check(report.permits(approved)) {
             when {
                 report.protected -> context.getString(R.string.safety_protected, name)
@@ -63,6 +71,11 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
                 else -> context.getString(R.string.safety_confirmation_required, name)
             }
         }
+    }
+
+    suspend fun requireUnprotected(name: String, userId: Int) {
+        val report = inspect(listOf(name), userId).getValue(name)
+        check(!report.protected && report.error == null) { report.error ?: context.getString(R.string.safety_protected, name) }
     }
 
     private suspend fun checked(args: List<String>): String {

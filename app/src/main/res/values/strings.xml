@@ -229,4 +229,27 @@
     <string name="restore_export">Export recovery script</string>
     <string name="restore_export_saved">Recovery script saved. Review its manual steps before running it over adb.</string>
     <string name="restore_export_failed">Could not export recovery script: %1$s</string>
+    <string name="component_requires_root">Android restricts component changes in this app. Root-backed Shizuku is required; whole-app disable remains available.</string>
+    <string name="disable_app">Disable</string>
+    <string name="enable_app">Enable</string>
+    <string name="suspend_app">Suspend</string>
+    <string name="unsuspend_app">Unsuspend</string>
+    <string name="uninstall_keep_data">Uninstall keeping data</string>
+    <string name="undo_action">Undo</string>
+    <string name="action_app_count">Apply to %1$d apps in this profile?</string>
+    <string name="unsafe_uninstall_blocked">Uninstalling Unsafe apps is disabled in Settings. Disable is available instead.</string>
+    <string name="components">Components</string>
+    <string name="component_activity">Activity</string>
+    <string name="component_service">Service</string>
+    <string name="component_receiver">Receiver</string>
+    <string name="component_provider">Provider</string>
+    <string name="tracker_match_description">Signature matches identify possible tracker components. They do not prove that data is being collected.</string>
+    <string name="tracker_attribution">Bundled signatures contain Exodus Privacy database information under ODbL 1.0; individual contents under DbCL 1.0. Snapshot: September 25, 2026.</string>
+    <string name="tracker_active_source">Active source: %1$s</string>
+    <string name="suspended_badge">SUSPENDED</string>
+    <string name="tracker_fallback">Custom list unavailable; using the bundled Exodus snapshot: %1$s</string>
+    <string name="tracker_source">Tracker list source</string>
+    <string name="tracker_source_description">Leave blank for the bundled Exodus snapshot. A custom URL must provide Exodus-compatible tracker JSON. Save downloads and validates it; the saved copy works offline.</string>
+    <string name="tracker_url">Custom list URL</string>
+    <string name="undo_unsupported">This action needs a different recovery method. See its history details or export a recovery script.</string>
 </resources>

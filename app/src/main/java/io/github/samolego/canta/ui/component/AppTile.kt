@@ -95,6 +95,7 @@ fun AppTile(
                             if (appInfo.isDisabled) {
                                 DisabledBadge()
                             }
+                            if (appInfo.isSuspended) SuspendedBadge()
                             if (appInfo.packageName == packageName) {
                                 CantaBadge()
                             }

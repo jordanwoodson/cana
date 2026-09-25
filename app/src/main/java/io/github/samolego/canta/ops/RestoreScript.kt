@@ -29,7 +29,10 @@ object RestoreScript {
                 if (before.getBoolean("installed")) {
                     command("cmd", "package", "install-existing", "--user", user, pkg)
                     if (before.has("enabledSetting")) enabled(pkg)
-                    if (!before.optBoolean("systemApp", true)) notes += "If Android deleted the last copy, reinstall the original APK for $pkg; deleted app data cannot be recovered."
+                    if (!before.optBoolean("systemApp", true) && !after.optBoolean("apkAvailable", true))
+                        notes += "Android removed the last APK copy of $pkg. Reinstall its APK to recover the app."
+                    if (record.action == "uninstall")
+                        notes += "Uninstall may have deleted data for $pkg. Installation can be restored; deleted app data cannot be recovered."
                 }
             }
             "reinstall" -> if (!before.getBoolean("installed")) command("pm", "uninstall", "--user", user, pkg)

@@ -56,6 +56,7 @@ fun AppList(
 ) {
     val context = LocalContext.current
     var showAppDialog by remember { mutableStateOf<AppInfo?>(null) }
+    var componentTarget by remember { mutableStateOf<Pair<String, Int>?>(null) }
 
     val appList by remember {
         derivedStateOf {
@@ -99,7 +100,14 @@ fun AppList(
                             listOf(showAppDialog!!.packageName))
                         showAppDialog = null
                     },
+                    onComponents = {
+                        componentTarget = showAppDialog!!.packageName to appListModel.selectedUserId
+                        showAppDialog = null
+                    },
             )
+        }
+        componentTarget?.let { (name, user) ->
+            io.github.samolego.canta.ui.dialog.ComponentsDialog(name, user) { componentTarget = null }
         }
 
         if (appListModel.isLoading) {
@@ -204,7 +212,7 @@ fun AppList(
                                 appInfo = appInfo,
                                 isSelected =
                                         appListModel.selectedApps.contains(appInfo.packageName),
-                                enabled = appInfo.removalInfo != RemovalRecommendation.UNSAFE || settingsViewModel.allowUnsafeUninstall.collectAsState().value,
+                                enabled = !appListModel.isOperating,
                                 onCheckChanged = { checked ->
                                     if (checked) {
                                         appListModel.selectedApps.add(appInfo.packageName)

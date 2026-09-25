@@ -11,6 +11,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DisabledByDefault
 import androidx.compose.material.icons.filled.RestoreFromTrash
+import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.ui.res.stringResource
+import io.github.samolego.canta.R
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,6 +50,9 @@ fun DisabledBadge() {
         color = MaterialTheme.colorScheme.tertiary,
     )
 }
+
+@Composable
+fun SuspendedBadge() = AppBadge(stringResource(R.string.suspended_badge), Icons.Default.PauseCircle, MaterialTheme.colorScheme.secondary)
 
 @Composable
 fun CantaBadge() {

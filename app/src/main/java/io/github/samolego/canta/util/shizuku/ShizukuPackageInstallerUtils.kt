@@ -1,6 +1,7 @@
 package io.github.samolego.canta.util.shizuku
 
 import android.content.Context
+import android.content.ComponentName
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageManager
 import android.content.pm.PackageInfo
@@ -44,6 +45,10 @@ object ShizukuPackageInstallerUtils {
 
     fun applicationEnabledSetting(packageName: String, userId: Int): Int = HiddenApiBypass.invoke(
         IPackageManager::class.java, PACKAGE_MANAGER, "getApplicationEnabledSetting", packageName, userId,
+    ) as Int
+
+    fun componentEnabledSetting(component: ComponentName, userId: Int): Int = HiddenApiBypass.invoke(
+        IPackageManager::class.java, PACKAGE_MANAGER, "getComponentEnabledSetting", component, userId,
     ) as Int
 
     /**
