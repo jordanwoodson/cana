@@ -113,14 +113,8 @@ class MainActivity : FragmentActivity() {
         val packageInstaller = getPackageInstaller(userId)
 
         // 0x00000004 = PackageManager.DELETE_SYSTEM_APP
-        // 0x00000002 = PackageManager.DELETE_ALL_USERS
-        // DELETE_ALL_USERS would remove the app from every profile, so only use it when
-        // working on Canta's own profile, like upstream Canta does.
-        val flags = when {
-            isSystem -> 0x00000004
-            userId == UserProfile.currentUserId -> 0x00000002
-            else -> 0
-        }
+        // Never use DELETE_ALL_USERS: the selected profile is the only target.
+        val flags = if (isSystem) 0x00000004 else 0
         val uninstall = { deleteFlags: Int ->
             LogUtils.i(APP_NAME, "Uninstall '$packageName' user $userId flags $deleteFlags")
             PackageInstallerResult.await(applicationContext) { intentSender ->
