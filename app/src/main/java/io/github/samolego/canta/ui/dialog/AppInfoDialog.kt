@@ -61,6 +61,7 @@ fun AppInfoDialog(
         onDismiss: () -> Unit,
         onRemoveUpdates: (() -> Unit)? = null,
         onComponents: (() -> Unit)? = null,
+        onPrivacy: (() -> Unit)? = null,
 ) {
     val bloatDescription = appInfo.description
     val clipboardManager = LocalClipboardManager.current
@@ -99,7 +100,8 @@ fun AppInfoDialog(
             onDismissRequest = onDismiss,
     ) {
         Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.85f)
+                    .verticalScroll(rememberScrollState()).padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Column(
@@ -207,6 +209,9 @@ fun AppInfoDialog(
                 }
             }
             if (!appInfo.isUninstalled) {
+                onPrivacy?.let { action ->
+                    Button(onClick = action, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.privacy)) }
+                }
                 onComponents?.let { action ->
                     Button(onClick = action, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.components)) }
                 }

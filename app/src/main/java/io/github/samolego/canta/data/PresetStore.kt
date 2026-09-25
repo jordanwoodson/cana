@@ -10,6 +10,9 @@ import io.github.samolego.canta.data.proto.CantaPreset
 import io.github.samolego.canta.data.proto.PresetsList
 import io.github.samolego.canta.extension.getInfoForPackage
 import io.github.samolego.canta.util.CantaPresetData
+import io.github.samolego.canta.util.LockdownSettings
+import io.github.samolego.canta.util.PresetJson
+import io.github.samolego.canta.data.proto.PresetLockdown
 import io.github.samolego.canta.util.LogUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -61,6 +64,7 @@ class PresetStore(private val context: Context) {
                         createdDate = protoPreset.createdDate,
                         apps = protoPreset.appsList.toSet(),
                         version = protoPreset.version.ifEmpty { "1.0" },
+                        lockdown = protoPreset.lockdownList.map { LockdownSettings(it.packageName, it.revokePermissions, it.restrictBackground, it.denyMetered, it.blockNetwork) },
                         uuid = protoPreset.uuid
                     )
                 }
@@ -112,6 +116,7 @@ class PresetStore(private val context: Context) {
                         .addAllApps(presetWithUuid.apps)
                         .setVersion(presetWithUuid.version)
                         .setUuid(presetWithUuid.uuid)
+                        .addAllLockdown(presetWithUuid.lockdown.map { it.toProto() })
                         .build()
 
                 currentPresets.toBuilder().addPresets(protoPreset).build()
@@ -162,6 +167,7 @@ class PresetStore(private val context: Context) {
                                 .addAllApps(presetWithUuid.apps)
                                 .setVersion(presetWithUuid.version)
                                 .setUuid(presetWithUuid.uuid)
+                        .addAllLockdown(presetWithUuid.lockdown.map { it.toProto() })
                                 .build()
                         } else {
                             protoPreset
@@ -182,56 +188,18 @@ class PresetStore(private val context: Context) {
         preset: CantaPresetData,
         newApps: Set<String>
     ): Boolean {
-        val updatedPreset = preset.copy(apps = newApps)
+        val updatedPreset = preset.copy(apps = newApps, lockdown = preset.lockdown.filterNot { it.packageName in newApps })
         return updatePreset(preset, updatedPreset)
     }
 
-    fun exportToJson(preset: CantaPresetData): String {
-        val jsonObject =
-            JSONObject().apply {
-                put("name", preset.name)
-                put("description", preset.description)
-                put("createdDate", preset.createdDate)
-                put("version", preset.version)
-                put("apps", org.json.JSONArray(preset.apps.toList()))
-            }
-        return jsonObject.toString(2)
-    }
+    fun exportToJson(preset: CantaPresetData): String = PresetJson.encode(preset)
 
-    fun importFromJson(jsonString: String): CantaPresetData? {
-        return try {
-            val json = JSONObject(jsonString)
-            val apps = mutableSetOf<String>()
-            val appsArray = json.getJSONArray("apps")
+    fun importFromJson(jsonString: String): CantaPresetData? = try { PresetJson.decode(jsonString) }
+    catch (e: Exception) { LogUtils.e(TAG, "Failed to import preset", e); null }
 
-            for (i in 0 until appsArray.length()) {
-                val packageName =
-                    try {
-                        // New format: array of package-name strings
-                        appsArray.getString(i)
-                    } catch (e: Exception) {
-                        // Legacy format: array of { "packageName": "..." } objects
-                        appsArray.getJSONObject(i).getString("packageName")
-                    }
-
-                // Check if package exists on this device
-                context.packageManager.getInfoForPackage(packageName) ?: continue
-                apps.add(packageName)
-            }
-
-            CantaPresetData(
-                name = json.getString("name"),
-                description = json.getString("description"),
-                createdDate = json.getLong("createdDate"),
-                apps = apps,
-                version = json.optString("version", "1.0"),
-                uuid = generateUuid()
-            )
-        } catch (e: Exception) {
-            LogUtils.e(TAG, "Failed to import preset from JSON: ${e.message}")
-            null
-        }
-    }
+    private fun LockdownSettings.toProto(): PresetLockdown = PresetLockdown.newBuilder()
+        .setPackageName(packageName).setRevokePermissions(revokePermissions).setRestrictBackground(restrictBackground)
+        .setDenyMetered(denyMetered).setBlockNetwork(blockNetwork).build()
 
     fun createPresetFromUninstalledApps(
         apps: Set<String>,

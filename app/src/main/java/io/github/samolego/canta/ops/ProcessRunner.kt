@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit
 internal object ProcessRunner {
     data class Output(val exitCode: Int, val stdout: String, val stderr: String)
 
-    fun exec(argv: List<String>, timeoutMs: Long): Output {
+    fun exec(argv: List<String>, timeoutMs: Long, environment: Map<String, String> = emptyMap()): Output {
         if (argv.isEmpty() || argv.size > 128 || argv.sumOf { it.length } > 32_768 ||
             argv.any { '\u0000' in it }) return Output(2, "", "Invalid command arguments")
         val process = try {
-            ProcessBuilder(argv).start()
+            ProcessBuilder(argv).apply { environment().putAll(environment) }.start()
         } catch (e: Exception) {
             return Output(127, "", e.message ?: e.javaClass.simpleName)
         }

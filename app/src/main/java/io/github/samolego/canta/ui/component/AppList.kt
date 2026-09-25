@@ -57,6 +57,7 @@ fun AppList(
     val context = LocalContext.current
     var showAppDialog by remember { mutableStateOf<AppInfo?>(null) }
     var componentTarget by remember { mutableStateOf<Pair<String, Int>?>(null) }
+    var privacyTarget by remember { mutableStateOf<Pair<String, Int>?>(null) }
 
     val appList by remember {
         derivedStateOf {
@@ -104,10 +105,17 @@ fun AppList(
                         componentTarget = showAppDialog!!.packageName to appListModel.selectedUserId
                         showAppDialog = null
                     },
+                    onPrivacy = {
+                        privacyTarget = showAppDialog!!.packageName to appListModel.selectedUserId
+                        showAppDialog = null
+                    },
             )
         }
         componentTarget?.let { (name, user) ->
             io.github.samolego.canta.ui.dialog.ComponentsDialog(name, user) { componentTarget = null }
+        }
+        privacyTarget?.let { (name, user) ->
+            io.github.samolego.canta.ui.dialog.PrivacyDialog(name, user) { privacyTarget = null }
         }
 
         if (appListModel.isLoading) {

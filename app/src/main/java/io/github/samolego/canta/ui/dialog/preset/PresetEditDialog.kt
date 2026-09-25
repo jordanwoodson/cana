@@ -4,6 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -18,15 +21,18 @@ import io.github.samolego.canta.util.CantaPresetData
 private fun PresetDialog(
     initialName: String,
     initialDescription: String,
+    capturePrivacy: Boolean = false,
+    busy: Boolean = false,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, description: String) -> Unit
+    onConfirm: (name: String, description: String, includePrivacy: Boolean) -> Unit
 ) {
     var name by remember { mutableStateOf(initialName) }
     var description by remember { mutableStateOf(initialDescription) }
     var nameError by remember { mutableStateOf(false) }
+    var includePrivacy by remember { mutableStateOf(capturePrivacy) }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!busy) onDismiss() },
         title = {
             Text(
                 text = stringResource(R.string.create_preset),
@@ -35,7 +41,7 @@ private fun PresetDialog(
             )
         },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = stringResource(R.string.create_preset_description),
                     style = MaterialTheme.typography.bodyMedium,
@@ -67,22 +73,27 @@ private fun PresetDialog(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3
                 )
+                if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+                if (capturePrivacy) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(includePrivacy, { includePrivacy = it })
+                    Text(stringResource(R.string.preset_capture_privacy))
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (name.isNotBlank()) {
-                        onConfirm(name.trim(), description.trim())
+                        onConfirm(name.trim(), description.trim(), includePrivacy)
                     } else {
                         nameError = true
                     }
                 },
-                enabled = name.isNotBlank()
+                enabled = name.isNotBlank() && !busy
             ) { Text(stringResource(R.string.save)) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(enabled = !busy, onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -100,11 +111,14 @@ fun PresetCreateDialog(
     PresetDialog(
         initialName = "",
         initialDescription = "",
+        capturePrivacy = true,
+        busy = presetViewModel.isLoading,
         onDismiss = closeDialog,
-        onConfirm = { name, description ->
+        onConfirm = { name, description, includePrivacy ->
             presetViewModel.savePreset(
                 name = name,
                 description = description,
+                privacyUserId = if (includePrivacy) appListViewModel.selectedUserId else null,
                 apps = appListViewModel.appList.filter { it.isUninstalled }.map { it.packageName }
                     .toSet(),
                 onSuccess = { closeDialog() },
@@ -133,7 +147,7 @@ fun PresetEditDialog(
         initialName = preset.name,
         initialDescription = preset.description,
         onDismiss = closeDialog,
-        onConfirm = { name, description ->
+        onConfirm = { name, description, _ ->
             presetViewModel.updatePreset(
                 oldPreset = preset,
                 newName = name,

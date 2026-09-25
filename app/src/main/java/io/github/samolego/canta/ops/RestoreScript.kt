@@ -44,21 +44,28 @@ object RestoreScript {
             "suspend", "unsuspend" -> command("pm", if (before.getBoolean("suspended")) "suspend" else "unsuspend", "--user", user, pkg)
             "background" -> {
                 command("cmd", "appops", "set", "--user", user, pkg, "RUN_ANY_IN_BACKGROUND", before.getString("runAnyInBackground"))
-                command("am", "set-standby-bucket", "--user", user, pkg, before.getInt("standbyBucket").toString())
+                if (before.getInt("standbyBucket") != 5)
+                    command("am", "set-standby-bucket", "--user", user, pkg, before.getInt("standbyBucket").toString())
             }
-            "metered" -> {
+            "metered", "metered_reapply" -> {
                 val appId = before.getInt("appId")
-                require(appId in 0 until 100_000)
-                val uid = (record.userId.toLong() * 100_000 + appId).also { require(it <= Int.MAX_VALUE) }.toString()
-                val policy = before.getInt("meteredPolicy")
-                command("cmd", "netpolicy", "remove", "restrict-background-blacklist", uid)
-                command("cmd", "netpolicy", "remove", "restrict-background-whitelist", uid)
-                if (policy and 1 != 0) command("cmd", "netpolicy", "add", "restrict-background-blacklist", uid)
-                if (policy and 4 != 0) command("cmd", "netpolicy", "add", "restrict-background-whitelist", uid)
+                PrivacyPolicy.uid(record.userId, appId)
+                if (before.has("desiredMetered")) command("cana-privacy", "metered-desired-set", pkg, user, appId.toString(), before.getBoolean("desiredMetered").toString())
+                command("cana-privacy", "metered-set", pkg, user, appId.toString(), before.getInt("meteredPolicy").toString())
             }
-            "network" -> {
-                require(record.userId == 0) { "This Android interface only resolves packages in the system user" }
-                command("cmd", "connectivity", "set-package-networking-enabled", before.getBoolean("networkEnabled").toString(), pkg)
+            "metered_desired_restore" -> command("cana-privacy", "metered-desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredMetered").toString())
+            "network_desired_restore" -> command("cana-privacy", "desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredBlock").toString())
+            "network", "network_reapply" -> {
+                if (before.has("networkRule")) {
+                    PrivacyPolicy.uid(record.userId, before.getInt("appId"))
+                    val rule = before.getInt("networkRule")
+                    require(rule in 0..2)
+                    if (before.has("desiredBlock")) command("cana-privacy", "desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredBlock").toString())
+                    command("cana-privacy", "network-set", pkg, user, before.getInt("appId").toString(), rule.toString())
+                } else {
+                    require(record.userId == 0) { "Legacy networking records are only safe in the system user" }
+                    command("cmd", "connectivity", "set-package-networking-enabled", before.getBoolean("networkEnabled").toString(), pkg)
+                }
             }
             "permissions" -> {
                 val permissions = before.getJSONArray("permissions")
@@ -66,6 +73,7 @@ object RestoreScript {
                     val permission = permissions.getJSONObject(index)
                     val name = permission.getString("name")
                     val flags = permission.getInt("flags")
+                    if (!PrivacyPolicy.mutablePermission(flags)) continue
                     command("pm", "clear-permission-flags", "--user", user, pkg, name, "user-fixed", "user-set")
                     command("pm", if (permission.getBoolean("granted")) "grant" else "revoke", "--user", user, pkg, name)
                     val originalFlags = buildList { if (flags and 1 != 0) add("user-set"); if (flags and 2 != 0) add("user-fixed") }
@@ -111,11 +119,20 @@ object RestoreScript {
             append("# Restores captured values in reverse history order. Review manual steps below.\n")
             append("failures=0\nmanual_steps=$manual\n")
             append("run() {\n  \"\$@\"\n  result=\$?\n  if [ \"\$result\" -ne 0 ]; then\n    failures=\$((failures + 1))\n    printf '%s\\n' \"Recovery command failed (\$result): \$*\" >&2\n  fi\n}\n")
+            if (steps.any { it.second.commands.any { command -> command.firstOrNull() == "cana-privacy" } }) {
+                append("cana_privacy() {\n  cana_apk=\$(pm path --user 0 io.github.jordanwoodson.cana | sed -n 's/^package://p' | head -n 1)\n")
+                append("  [ -r \"\$cana_apk\" ] || { printf '%s\\n' 'Install Cana to use per-profile network recovery.' >&2; return 1; }\n")
+                append("  CLASSPATH=\"\$cana_apk\" app_process /system/bin io.github.samolego.canta.ops.PrivacyRecovery \"\$@\"\n}\n")
+
+            }
             for ((record, plan) in steps) {
                 fun comment(text: String) { append("# ").append(text.replace('\n', ' ').replace('\r', ' ')).append('\n') }
                 comment("${record.action}: ${record.packageName} (user ${record.userId})")
                 plan.notes.forEach { comment("MANUAL: $it") }
-                plan.commands.forEach { append("run ").append(it.joinToString(" ", transform = ::quote)).append('\n') }
+                plan.commands.forEach { command ->
+                    val argv = if (command.firstOrNull() == "cana-privacy") listOf("cana_privacy") + command.drop(1) else command
+                    append("run ").append(argv.joinToString(" ", transform = ::quote)).append('\n')
+                }
             }
             append("printf 'Recovery finished: %s failed commands; %s manual steps.\\n' \"\$failures\" \"\$manual_steps\"\n")
             append("[ \"\$failures\" -eq 0 ] || exit 1\n[ \"\$manual_steps\" -eq 0 ] || exit 2\n")

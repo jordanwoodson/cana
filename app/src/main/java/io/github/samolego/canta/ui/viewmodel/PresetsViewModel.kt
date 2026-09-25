@@ -53,18 +53,21 @@ class PresetsViewModel : ViewModel() {
         name: String,
         description: String,
         apps: Set<String>,
+        privacyUserId: Int? = null,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
+        if (isLoading) return
+        isLoading = true
         viewModelScope.launch {
-            val preset = presetStore.createPresetFromUninstalledApps(apps, name, description)
-            val success = presetStore.savePreset(preset)
-            if (success) {
-                onSuccess()
-            } else {
-                onError()
-                LogUtils.e(TAG, "Failed to save preset ${preset.name}!")
-            }
+            try {
+                val lockdown = privacyUserId?.let { io.github.samolego.canta.ops.CanaServices.getInstance().presets.captureLockdown(it) }.orEmpty()
+                val preset = presetStore.createPresetFromUninstalledApps(apps, name, description)
+                    .copy(lockdown = lockdown.filterNot { it.packageName in apps })
+                if (presetStore.savePreset(preset)) onSuccess() else onError()
+            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
+            catch (e: Exception) { LogUtils.e(TAG, "Cannot capture or save preset", e); onError() }
+            finally { isLoading = false }
         }
     }
 

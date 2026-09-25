@@ -10,5 +10,11 @@ data class CantaPresetData(
     val createdDate: Long,
     val apps: Set<String>,
     val version: String = "1.0",
-    val uuid: String = ""
+    val uuid: String = "",
+    val lockdown: List<LockdownSettings> = emptyList(),
+) : Parcelable
+
+@Parcelize
+data class LockdownSettings(val packageName: String, val revokePermissions: Boolean = false,
+    val restrictBackground: Boolean = false, val denyMetered: Boolean = false, val blockNetwork: Boolean = false,
 ) : Parcelable
