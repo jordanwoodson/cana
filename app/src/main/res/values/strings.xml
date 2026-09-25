@@ -180,4 +180,20 @@
     <string name="category_misc">Misc</string>
     <string name="bloat_unmetered_only">Update list only on unmetered networks</string>
     <string name="bloat_unmetered_only_description">Applies to automatic updates and pull to refresh. Cached and bundled data remain available offline.</string>
+    <string name="operation_success">Verified successfully</string>
+    <string name="operation_failed">Operation failed</string>
+    <string name="operation_not_applied">Android did not apply the requested change</string>
+    <string name="operation_package_missing">Package information is unavailable</string>
+    <string name="operation_already_uninstalled">The app is already uninstalled for this profile</string>
+    <string name="operation_shizuku_unavailable">Shizuku is not running or permission is missing</string>
+    <string name="operation_history_failed">Could not save operation history. Check logs before retrying.</string>
+    <string name="operation_busy">Another operation is still running</string>
+    <string name="self_grants_title">Persistent permissions</string>
+    <string name="self_grant_secure_settings">Secure settings: %1$s</string>
+    <string name="self_grant_usage_stats">Usage access: %1$s</string>
+    <string name="grant_allowed">Allowed</string>
+    <string name="grant_missing">Not granted</string>
+    <string name="self_grants_description">Shizuku grants these once. Usage access and supported system settings then remain available when Shizuku stops.</string>
+    <string name="self_grants_action">Grant through Shizuku</string>
+    <string name="operation_failure_count">%1$d operations failed</string>
 </resources>

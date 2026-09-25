@@ -12,6 +12,9 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.extension.getAllPackagesInfo
 import io.github.samolego.canta.extension.mutableStateSetOf
 import io.github.samolego.canta.packageName
+import io.github.samolego.canta.ops.CanaServices
+import io.github.samolego.canta.ops.BatchResult
+import io.github.samolego.canta.ops.OperationResult
 import io.github.samolego.canta.util.BloatData
 import io.github.samolego.canta.util.BloatListRepository
 import io.github.samolego.canta.util.LogUtils
@@ -23,8 +26,43 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import java.util.UUID
 
 class AppListViewModel : ViewModel() {
+    private val packageOps get() = CanaServices.getInstance().packageOps
+    var isOperating by mutableStateOf(false)
+        private set
+
+    suspend fun canResetAny(packages: List<String>, userId: Int): Boolean {
+        for (name in packages) if (packageOps.canResetToFactory(name, userId)) return true
+        return false
+    }
+
+    suspend fun processSelected(context: Context, reinstall: Boolean, resetToFactory: Boolean): BatchResult =
+        withContext(Dispatchers.Main) {
+            val userId = selectedUserId
+            val packages = apps.filter { selectedApps.contains(it.packageName) && it.isUninstalled == reinstall }
+                .map { it.packageName }
+            if (isOperating) return@withContext BatchResult(packages.map {
+                OperationResult(false, context.getString(R.string.operation_busy))
+            })
+            isOperating = true
+            val batchId = UUID.randomUUID().toString()
+            val results = mutableListOf<OperationResult>()
+            try {
+                for (name in packages) {
+                    val result = if (reinstall) packageOps.reinstall(name, userId, batchId)
+                        else packageOps.uninstall(name, userId, resetToFactory, batchId)
+                    results += result
+                    if (result.success && userId == selectedUserId) {
+                        apps = apps.map { if (it.packageName == name) it.copy(isUninstalled = !reinstall) else it }
+                        selectedApps.remove(name)
+                    }
+                }
+                if (userId == selectedUserId) loadInstalled(context.packageManager, context)
+                BatchResult(results)
+            } finally { isOperating = false }
+        }
 
     companion object {
         private const val TAG = "AppListViewModel"
@@ -151,17 +189,7 @@ class AppListViewModel : ViewModel() {
         }
     }
 
-    /** Changes app status from installed to uninstalled or vice versa. */
-    fun changeAppStatus(packageName: String) {
-        apps =
-                apps.map {
-                    if (it.packageName == packageName) {
-                        it.copy(isUninstalled = !it.isUninstalled)
-                    } else {
-                        it
-                    }
-                }
-    }
+
 }
 
 private fun cantaBloatData(context: Context): BloatData {
