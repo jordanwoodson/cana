@@ -75,15 +75,7 @@ fun AppInfoDialog(
                 null
             }
 
-    val appSize =
-            try {
-                val applicationInfo = appInfo.applicationInfo
-                    ?: context.packageManager.getPackageInfo(appInfo.packageName, 0).applicationInfo
-                val appFile = applicationInfo?.sourceDir?.let { File(it) }
-                appFile?.let { formatFileSize(context, it.length()) } ?: "? MB"
-            } catch (e: Exception) {
-                null
-            }
+    val appSize = stringResource(R.string.app_apk_size, formatFileSize(context, appInfo.apkSizeBytes))
 
     BasicAlertDialog(
             modifier =
@@ -159,6 +151,13 @@ fun AppInfoDialog(
                 }
             }
             Spacer(modifier = Modifier.size(8.dp))
+            appInfo.lastUsed?.let { lastUsed ->
+                Text(if (lastUsed == 0L) stringResource(R.string.last_used_no_record)
+                    else stringResource(R.string.last_used_date, java.text.DateFormat.getDateInstance().format(java.util.Date(lastUsed))))
+            }
+            appInfo.bloatData?.suggestions?.takeIf { it.isNotEmpty() }?.let { suggestions ->
+                Text(stringResource(R.string.app_suggestions, suggestions.toString()))
+            }
             val configuration = LocalConfiguration.current
             val screenHeight = configuration.screenHeightDp.dp
             val maxScrollableHeight = (screenHeight * 0.6f)

@@ -24,6 +24,9 @@ fun MoreOptionsMenu(
             onDismissRequest = onDismiss,
             modifier = Modifier.width(200.dp)
     ) {
+        DropdownMenuItem(text = { Text(stringResource(R.string.history)) }, onClick = {
+            navigateToPage(Screen.History.route); onDismiss()
+        })
         // Badge info dialog
         DropdownMenuItem(
                 text = { Text(stringResource(R.string.badge_info)) },

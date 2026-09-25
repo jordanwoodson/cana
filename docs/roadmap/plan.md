@@ -97,11 +97,11 @@ Files: new privacy repository/panel, desired-state proto/store, boot/binder rece
 
 Files: new history page/undo coordinator, OTA detector/store/notification receiver, preset profile kinds, sort/usage UI.
 
-- [ ] History page and Undo last batch reverse verified changes, report partial failures and avoid recursive undo selection.
-- [ ] Store fingerprint and package sets by profile. At startup/boot/package replacement detect removed apps restored and new system apps; notification/banner reapply passes safety. Declare/request notifications.
-- [ ] Backward-compatible optional profile kind in proto/JSON and apply-to-all with individual user results.
-- [ ] Size/last-used sort, unused-90-days filter, UsageStats self grant; probe cross-profile availability and hide unavailable data. Show UAD suggestions.
-- [ ] JVM tests for OTA decisions, old/new presets and undo; emulator UI/action checks. Commit phase.
+- [x] History page and Undo last batch reverse verified changes, report partial failures and avoid recursive undo selection.
+- [x] Store fingerprint and package sets by profile. At startup/boot/package replacement detect removed apps restored and new system apps; notification/banner reapply passes safety. Declare/request notifications.
+- [x] Backward-compatible optional profile kind in proto/JSON and apply-to-all with individual user results.
+- [x] Size/last-used sort, unused-90-days filter, UsageStats self grant; probe cross-profile availability and hide unavailable data. Show UAD suggestions.
+- [x] JVM tests for OTA decisions, old/new presets and undo; emulator UI/action checks. Commit phase.
 
 ### Task 9: Phase 7 system controls
 

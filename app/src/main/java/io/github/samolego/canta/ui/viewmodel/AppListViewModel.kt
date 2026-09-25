@@ -154,6 +154,9 @@ class AppListViewModel(
         private set
 
     var selectedFilter by mutableStateOf(Filter.any)
+    var sortOrder by mutableStateOf(AppSort.NAME)
+    var usageAvailable by mutableStateOf(false)
+        private set
 
     val selectedAppsSorted by derivedStateOf {
         sortedList.filter { selectedApps.contains(it.packageName) }
@@ -161,7 +164,12 @@ class AppListViewModel(
 
     private val nameComparator = compareBy(Collator.getInstance(Locale.getDefault()), AppInfo::name)
     private val sortedList by derivedStateOf {
-        apps.filter { selectedFilter.shouldShow(it) }.sortedWith(nameComparator)
+        val comparator = when (sortOrder) {
+            AppSort.NAME -> nameComparator
+            AppSort.SIZE -> compareByDescending<AppInfo> { it.apkSizeBytes }.then(nameComparator)
+            AppSort.LAST_USED -> compareByDescending<AppInfo> { it.lastUsed ?: Long.MIN_VALUE }.then(nameComparator)
+        }
+        apps.filter { selectedFilter.shouldShow(it) }.sortedWith(comparator)
     }
 
     val appList by derivedStateOf {
@@ -212,12 +220,20 @@ class AppListViewModel(
         isLoading = true
         loadError = null
         apps = emptyList()
+        usageAvailable = false
         try {
             val packages = withContext(Dispatchers.IO) {
-                packageManager.getAllPackagesInfo(userId)
+                val loaded = packageManager.getAllPackagesInfo(userId)
+                val usage = runCatching { io.github.samolego.canta.ops.UsageRepository(context.applicationContext).lastUsed(userId) }.getOrNull()
+                loaded.map { it.copy(lastUsed = if (usage == null || it.isUninstalled) null else usage[it.packageName] ?: 0L) } to (usage != null)
             }
             if (generation != loadGeneration || userId != selectedUserId) return@withContext
-            apps = packages
+            apps = packages.first
+            usageAvailable = packages.second
+            if (!usageAvailable) {
+                if (sortOrder == AppSort.LAST_USED) sortOrder = AppSort.NAME
+                if (selectedFilter == Filter.unused) selectedFilter = Filter.any
+            }
             isLoading = false
             isLoadingBadges = true
             val bloatMap = withContext(Dispatchers.IO) {
@@ -250,6 +266,8 @@ class AppListViewModel(
 
 
 }
+
+enum class AppSort(val title: Int) { NAME(R.string.sort_name), SIZE(R.string.sort_size), LAST_USED(R.string.sort_last_used) }
 
 enum class PackageAction(val label: Int) {
     UNINSTALL(R.string.uninstall), REINSTALL(R.string.reinstall), REMOVE_UPDATES(R.string.remove_updates),

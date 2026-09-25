@@ -22,14 +22,16 @@ private fun PresetDialog(
     initialName: String,
     initialDescription: String,
     capturePrivacy: Boolean = false,
+    profileKind: String? = null,
     busy: Boolean = false,
     onDismiss: () -> Unit,
-    onConfirm: (name: String, description: String, includePrivacy: Boolean) -> Unit
+    onConfirm: (name: String, description: String, includePrivacy: Boolean, profileKind: String?) -> Unit
 ) {
     var name by remember { mutableStateOf(initialName) }
     var description by remember { mutableStateOf(initialDescription) }
     var nameError by remember { mutableStateOf(false) }
     var includePrivacy by remember { mutableStateOf(capturePrivacy) }
+    var includeProfile by remember { mutableStateOf(profileKind != null) }
 
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -74,6 +76,10 @@ private fun PresetDialog(
                     maxLines = 3
                 )
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+                if (profileKind != null) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(includeProfile, { includeProfile = it })
+                    Text(stringResource(R.string.preset_remember_profile, profileKind))
+                }
                 if (capturePrivacy) Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(includePrivacy, { includePrivacy = it })
                     Text(stringResource(R.string.preset_capture_privacy))
@@ -84,7 +90,7 @@ private fun PresetDialog(
             Button(
                 onClick = {
                     if (name.isNotBlank()) {
-                        onConfirm(name.trim(), description.trim(), includePrivacy)
+                        onConfirm(name.trim(), description.trim(), includePrivacy, profileKind.takeIf { includeProfile })
                     } else {
                         nameError = true
                     }
@@ -112,13 +118,17 @@ fun PresetCreateDialog(
         initialName = "",
         initialDescription = "",
         capturePrivacy = true,
+        profileKind = appListViewModel.selectedProfile?.kind?.name
+            ?: appListViewModel.users.find { it.id == appListViewModel.selectedUserId }?.kind?.name
+            ?: "PERSONAL".takeIf { appListViewModel.selectedUserId == 0 },
         busy = presetViewModel.isLoading,
         onDismiss = closeDialog,
-        onConfirm = { name, description, includePrivacy ->
+        onConfirm = { name, description, includePrivacy, kind ->
             presetViewModel.savePreset(
                 name = name,
                 description = description,
                 privacyUserId = if (includePrivacy) appListViewModel.selectedUserId else null,
+                profileKind = kind,
                 apps = appListViewModel.appList.filter { it.isUninstalled }.map { it.packageName }
                     .toSet(),
                 onSuccess = { closeDialog() },
@@ -146,12 +156,14 @@ fun PresetEditDialog(
     PresetDialog(
         initialName = preset.name,
         initialDescription = preset.description,
+        profileKind = preset.profileKind,
         onDismiss = closeDialog,
-        onConfirm = { name, description, _ ->
+        onConfirm = { name, description, _, kind ->
             presetViewModel.updatePreset(
                 oldPreset = preset,
                 newName = name,
                 newDescription = description,
+                profileKind = kind,
                 onSuccess = { closeDialog() },
                 onError = {
                     Toast.makeText(

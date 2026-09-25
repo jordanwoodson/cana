@@ -64,6 +64,7 @@ class PresetStore(private val context: Context) {
                         createdDate = protoPreset.createdDate,
                         apps = protoPreset.appsList.toSet(),
                         version = protoPreset.version.ifEmpty { "1.0" },
+                        profileKind = protoPreset.profileKind.takeIf { protoPreset.hasProfileKind() && it.isNotBlank() },
                         lockdown = protoPreset.lockdownList.map { LockdownSettings(it.packageName, it.revokePermissions, it.restrictBackground, it.denyMetered, it.blockNetwork) },
                         uuid = protoPreset.uuid
                     )
@@ -117,6 +118,7 @@ class PresetStore(private val context: Context) {
                         .setVersion(presetWithUuid.version)
                         .setUuid(presetWithUuid.uuid)
                         .addAllLockdown(presetWithUuid.lockdown.map { it.toProto() })
+                        .apply { presetWithUuid.profileKind?.let { setProfileKind(it) } }
                         .build()
 
                 currentPresets.toBuilder().addPresets(protoPreset).build()
@@ -168,6 +170,7 @@ class PresetStore(private val context: Context) {
                                 .setVersion(presetWithUuid.version)
                                 .setUuid(presetWithUuid.uuid)
                         .addAllLockdown(presetWithUuid.lockdown.map { it.toProto() })
+                                .apply { presetWithUuid.profileKind?.let { setProfileKind(it) } }
                                 .build()
                         } else {
                             protoPreset

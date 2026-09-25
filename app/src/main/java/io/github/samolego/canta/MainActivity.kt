@@ -20,6 +20,7 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        io.github.samolego.canta.ops.CanaServices.getInstance().onSystemEvent()
         setContent {
             CantaTheme {
                 Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

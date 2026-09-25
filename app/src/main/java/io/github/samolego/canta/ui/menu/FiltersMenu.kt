@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
+import io.github.samolego.canta.ui.viewmodel.AppSort
 import io.github.samolego.canta.util.apps.Filter
 
 @Composable
@@ -42,6 +43,10 @@ fun FiltersMenu(
             onDismissRequest = onDismiss,
             modifier = Modifier.width(180.dp)
     ) {
+        AppSort.entries.filter { it != AppSort.LAST_USED || appListViewModel.usageAvailable }.forEach { order ->
+            FilterChip(text = stringResource(order.title), isSelected = appListViewModel.sortOrder == order,
+                onClick = { appListViewModel.sortOrder = order })
+        }
         // System apps toggle
         val toggleSystem = { enabled: Boolean ->
             appListViewModel.onlySystem = enabled
@@ -77,7 +82,7 @@ fun FiltersMenu(
         )
 
         if (filtersMenu) {
-            Filter.availableFilters.forEach { filter ->
+            Filter.availableFilters.filter { it != Filter.unused || appListViewModel.usageAvailable }.forEach { filter ->
                 FilterChip(
                         text = filter.nameRes?.let { stringResource(it) } ?: filter.name,
                         isSelected = appListViewModel.selectedFilter == filter,

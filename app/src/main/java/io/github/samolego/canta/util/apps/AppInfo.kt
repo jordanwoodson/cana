@@ -26,6 +26,10 @@ data class AppInfo(
     val isUpdatedSystemApp: Boolean = false,
     val updateSizeBytes: Long = 0,
     val isSuspended: Boolean = false,
+    val apkSizeBytes: Long = 0,
+    val firstInstallTime: Long = 0,
+    /** Null means unavailable for this profile; zero means no use in Android's retained history. */
+    val lastUsed: Long? = null,
 ) : Parcelable {
 
     val name: String
@@ -77,6 +81,9 @@ data class AppInfo(
                     packageInfo.applicationInfo!!.splitSourceDirs?.toList().orEmpty(),
                 ),
                 isSuspended = packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SUSPENDED != 0,
+                apkSizeBytes = (listOfNotNull(packageInfo.applicationInfo!!.sourceDir) + packageInfo.applicationInfo!!.splitSourceDirs.orEmpty())
+                    .distinct().sumOf { java.io.File(it).length().coerceAtLeast(0) },
+                firstInstallTime = packageInfo.firstInstallTime,
             )
         }
     }

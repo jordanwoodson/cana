@@ -5,6 +5,13 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PresetJsonTest {
+    @Test fun profileHintIsOptionalAndSurvivesRoundtripIncludingFutureKinds() {
+        for (kind in listOf("WORK", "FUTURE_PROFILE")) {
+            val preset = CantaPresetData("Profile", "", 1, setOf("test.app"), profileKind = kind)
+            assertEquals(kind, PresetJson.decode(PresetJson.encode(preset)).profileKind)
+        }
+        assertNull(PresetJson.decode("{\"name\":\"Old\",\"apps\":[]}").profileKind)
+    }
     @Test fun oldStringAndObjectArraysKeepUninstalledAndOtherProfilePackages() {
         for (apps in listOf("[\"other.profile.app\"]", "[{\"packageName\":\"other.profile.app\"}]")) {
             val preset = PresetJson.decode("{\"name\":\"Old\",\"description\":\"\",\"createdDate\":1,\"apps\":$apps}")
