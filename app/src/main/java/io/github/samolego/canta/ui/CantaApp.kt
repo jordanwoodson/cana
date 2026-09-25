@@ -543,7 +543,7 @@ suspend fun uninstallOrReinstall(
                 appsToProcess.forEach { app ->
                     val uninstalled = uninstallApp(app, userId, resetToFactory)
                     if (uninstalled) {
-                        with(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
                             count += 1
                             appListViewModel.changeAppStatus(app)
                             appListViewModel.selectedApps.remove(app)
@@ -556,7 +556,7 @@ suspend fun uninstallOrReinstall(
                 appsToProcess.forEach { app ->
                     val installed = reinstallApp(app, userId)
                     if (installed) {
-                        with(Dispatchers.Main) {
+                        withContext(Dispatchers.Main) {
                             count += 1
                             appListViewModel.changeAppStatus(app)
                             appListViewModel.selectedApps.remove(app)
