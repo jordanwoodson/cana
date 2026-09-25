@@ -32,30 +32,30 @@
 
 Files: `MainActivity.kt`, `util/UninstallSequence.kt`, `ui/CantaApp.kt`, `ui/viewmodel/AppListViewModel.kt`, corresponding JVM tests.
 
-- [ ] Test reset(0) then verify no update flag then per-user uninstall; failed reset/check/final uninstall must fail. Implement a pure sequence using callbacks to the real PackageInstaller result adapter.
-- [ ] Commit reset fix separately as upstreamable.
-- [ ] Remove DELETE_ALL_USERS for user apps, test profile flag decisions and emulator isolation, commit separately as Cana-specific.
-- [ ] Replace `with(Dispatchers.Main)` with `withContext`; remove derived-state loading side effects; separate upstreamable commits.
-- [ ] Run `./gradlew testDebugUnitTest assembleDebug`; expected PASS. Exercise reset and profile uninstall on emulator, preserving other profile's installed state.
+- [x] Test reset(0) then verify no update flag then per-user uninstall; failed reset/check/final uninstall must fail. Implement a pure sequence using callbacks to the real PackageInstaller result adapter.
+- [x] Commit reset fix separately as upstreamable.
+- [x] Remove DELETE_ALL_USERS for user apps, test profile flag decisions and emulator isolation, commit separately as Cana-specific.
+- [x] Replace `with(Dispatchers.Main)` with `withContext`; remove derived-state loading side effects; separate upstreamable commits.
+- [x] Run `./gradlew testDebugUnitTest assembleDebug`; expected PASS. Exercise reset and profile uninstall on emulator, preserving other profile's installed state.
 
 ### Task 2: Phase 0 UAD data and updates
 
 Files: `util/BloatUtils.kt`, `util/BloatListRepository.kt`, `util/BloatUpdatePolicy.kt`, settings proto/store/view model/screen, app-list loading/filter UI, `assets/uad_lists.json`, tests.
 
-- [ ] Test all categories, unknown/missing values, dependencies/neededBy/labels/suggestions with real JSON. Implement parser and category filters; commit upstreamable.
-- [ ] Test first load, 24h boundary, manual refresh, auto-update off, metered restriction, clock rollback, URL changes, 200/304/error/corrupt responses and fallback. Implement one conditional GET with timeouts, atomic validated cache, URL-scoped ETag and last attempt time; retain deprecated proto fields.
-- [ ] Bundle attributed UAD snapshot; preserve custom list URL; add unmetered setting and force refresh wiring. Commit upstreamable.
-- [ ] Run JVM suite and debug build; verify offline first launch and settings/filter/refresh UI on emulator.
+- [x] Test all categories, unknown/missing values, dependencies/neededBy/labels/suggestions with real JSON. Implement parser and category filters; commit upstreamable.
+- [x] Test first load, 24h boundary, manual refresh, auto-update off, metered restriction, clock rollback, URL changes, 200/304/error/corrupt responses and fallback. Implement one conditional GET with timeouts, atomic validated cache, URL-scoped ETag and last attempt time; retain deprecated proto fields.
+- [x] Bundle attributed UAD snapshot; preserve custom list URL; add unmetered setting and force refresh wiring. Commit upstreamable.
+- [x] Run JVM suite and debug build; verify offline first launch and settings/filter/refresh UI on emulator.
 
 ### Task 3: Phase 1 foundation
 
 Files: new `ops/PackageOps.kt`, `ops/OperationResult.kt`, `ops/ShellRunner.kt`, `service/ShellUserService.kt`, AIDL interface/result, `data/HistoryStore.kt`, history proto, grants settings UI.
 
-- [ ] Extract PackageOps(applicationContext) with userId and message-bearing results; view models call it directly. Remove activity operation lambdas.
-- [ ] Add bounded argv-only shell exec with timeout, stdout/stderr/exit code, disconnect/not-running results, service lifecycle handling. Probe from Shizuku uid.
-- [ ] Declare and self-grant WRITE_SECURE_SETTINGS / PACKAGE_USAGE_STATS once, verify and display live status.
-- [ ] Persist timestamp, batch id, userId, package, action, previous state and real result for all operations, including failures. Tests cover output limits, timeout, sequencing and store roundtrip.
-- [ ] Build/test and emulator Shizuku running/stopped checks, commit phase.
+- [x] Extract PackageOps(applicationContext) with userId and message-bearing results; view models call it directly. Remove activity operation lambdas.
+- [x] Add bounded argv-only shell exec with timeout, stdout/stderr/exit code, disconnect/not-running results, service lifecycle handling. Probe from Shizuku uid.
+- [x] Declare and self-grant WRITE_SECURE_SETTINGS / PACKAGE_USAGE_STATS once, verify and display live status.
+- [x] Persist timestamp, batch id, userId, package, action, previous state and real result for all operations, including failures. Tests cover output limits, timeout, sequencing and store roundtrip.
+- [x] Build/test and emulator Shizuku running/stopped checks, commit phase.
 
 ### Task 4: Phase 2 leftover updates
 
