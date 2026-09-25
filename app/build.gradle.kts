@@ -29,7 +29,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = namespace
+        // Own id so this fork installs next to upstream Canta
+        applicationId = "io.github.samolego.canta.profiles"
         minSdk = 28 // todo - figure out a way to bypass hidden api methods on android < 9
         targetSdk = 35
         versionCode = project.property("version_code")?.toString()?.toInt() ?: 1

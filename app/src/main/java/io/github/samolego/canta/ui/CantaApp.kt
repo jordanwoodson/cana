@@ -83,9 +83,9 @@ private const val secretTaps = 12
 
 @Composable
 fun CantaApp(
-    canResetAppToFactory: (String) -> Boolean,
-    uninstallApp: (String, Boolean) -> Boolean,
-    reinstallApp: (String) -> Boolean,
+    canResetAppToFactory: (packageName: String, userId: Int) -> Boolean,
+    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
+    reinstallApp: (packageName: String, userId: Int) -> Boolean,
     closeApp: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -188,9 +188,9 @@ fun CantaApp(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent(
-    canResetAppToFactory: (String) -> Boolean,
-    uninstallApp: (String, Boolean) -> Boolean,
-    reinstallApp: (String) -> Boolean,
+    canResetAppToFactory: (packageName: String, userId: Int) -> Boolean,
+    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
+    reinstallApp: (packageName: String, userId: Int) -> Boolean,
     onPresetEditFinish: () -> Unit,
     navigateToPage: (route: String) -> Unit,
     closeApp: () -> Unit,
@@ -233,6 +233,17 @@ private fun MainContent(
     val cantaIcon = remember(context) { context.packageManager.getApplicationIcon(packageName) }
 
     var showExplainBadgeDialog by rememberSaveable { mutableStateOf(false) }
+    var showProfilesMenu by remember { mutableStateOf(false) }
+
+    val openProfilesMenu = {
+        coroutineScope.launch {
+            if (appListViewModel.loadUsers()) {
+                showProfilesMenu = true
+            } else {
+                Toast.makeText(context, R.string.profiles_load_failed, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -240,6 +251,32 @@ private fun MainContent(
                 openBadgesInfoDialog = { showExplainBadgeDialog = true },
                 navigateToPage = navigateToPage,
                 appListViewModel = appListViewModel,
+                showProfilesMenu = showProfilesMenu,
+                onProfilesClick = {
+                    // Other profiles can only be seen through Shizuku
+                    if (ShizukuPermission.isCantaAuthorized()) {
+                        openProfilesMenu()
+                    } else {
+                        currentDialog = {
+                            ShizukuRequirementDialog(
+                                shizukuStatus =
+                                ShizukuPermission.checkShizukuActive(context.packageManager),
+                                onClose = { proceed ->
+                                    currentDialog = null
+                                    if (proceed) {
+                                        openProfilesMenu()
+                                    }
+                                }
+                            )
+                        }
+                    }
+                },
+                onProfileSelected = { profile ->
+                    coroutineScope.launch {
+                        appListViewModel.selectUser(profile, context.packageManager, context)
+                    }
+                },
+                onDismissProfilesMenu = { showProfilesMenu = false },
             )
 
             if (showExplainBadgeDialog) {
@@ -290,6 +327,7 @@ private fun MainContent(
                                 val uninstall = { resetToFactory: Boolean ->
                                     val process = {
                                         coroutineScope.launch {
+                                            val attempted = appListViewModel.selectedApps.size
                                             val uninstalled = uninstallOrReinstall(
                                                 uninstallApp = uninstallApp,
                                                 reinstallApp = reinstallApp,
@@ -297,6 +335,19 @@ private fun MainContent(
                                                 appListViewModel = appListViewModel,
                                                 resetToFactory = resetToFactory,
                                             )
+
+                                            val failed = attempted - uninstalled
+                                            if (failed > 0) {
+                                                Toast.makeText(
+                                                    context,
+                                                    context.resources.getQuantityString(
+                                                        R.plurals.apps_failed_see_logs,
+                                                        failed,
+                                                        failed
+                                                    ),
+                                                    Toast.LENGTH_LONG
+                                                ).show()
+                                            }
 
                                             if (uninstalled > 0 && !settingsViewModel.hideSuccessDialog.value) {
                                                 currentDialog = {
@@ -330,7 +381,10 @@ private fun MainContent(
                                         currentDialog = {
                                             val canResetAny =
                                                 appListViewModel.selectedApps.keys.any {
-                                                    canResetAppToFactory(it)
+                                                    canResetAppToFactory(
+                                                        it,
+                                                        appListViewModel.selectedUserId
+                                                    )
                                                 }
 
                                             UninstallAppsDialog(
@@ -474,19 +528,20 @@ private fun MainContent(
 }
 
 suspend fun uninstallOrReinstall(
-    uninstallApp: (String, Boolean) -> Boolean,
-    reinstallApp: (String) -> Boolean,
+    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
+    reinstallApp: (packageName: String, userId: Int) -> Boolean,
     selectedAppsType: AppsType,
     appListViewModel: AppListViewModel,
     resetToFactory: Boolean = false,
 ): Int {
     val appsToProcess = appListViewModel.selectedApps.keys.toList()
+    val userId = appListViewModel.selectedUserId
     var count = 0
     withContext(Dispatchers.IO) {
         when (selectedAppsType) {
             AppsType.INSTALLED -> {
                 appsToProcess.forEach { app ->
-                    val uninstalled = uninstallApp(app, resetToFactory)
+                    val uninstalled = uninstallApp(app, userId, resetToFactory)
                     if (uninstalled) {
                         with(Dispatchers.Main) {
                             count += 1
@@ -499,7 +554,7 @@ suspend fun uninstallOrReinstall(
 
             AppsType.UNINSTALLED -> {
                 appsToProcess.forEach { app ->
-                    val installed = reinstallApp(app)
+                    val installed = reinstallApp(app, userId)
                     if (installed) {
                         with(Dispatchers.Main) {
                             count += 1

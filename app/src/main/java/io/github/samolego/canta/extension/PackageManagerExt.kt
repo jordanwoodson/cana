@@ -6,6 +6,8 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.apps.AppInfo
+import io.github.samolego.canta.util.apps.UserProfile
+import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
 
 
 private fun PackageManager.getUninstalledPackages(installedPackages: List<PackageInfo>): List<PackageInfo> {
@@ -32,6 +34,29 @@ fun PackageManager.getAllPackagesInfo(): List<AppInfo> {
     }
 
     return all
+}
+
+/**
+ * Like [getAllPackagesInfo], but for any user / profile. Other profiles can't be queried by Canta
+ * itself, so those go through Shizuku.
+ */
+fun PackageManager.getAllPackagesInfo(userId: Int): List<AppInfo> {
+    if (userId == UserProfile.currentUserId) {
+        return getAllPackagesInfo()
+    }
+
+    val installedPackages =
+        ShizukuPackageInstallerUtils.getInstalledPackages(PackageManager.GET_META_DATA, userId)
+    val installed = installedPackages.mapTo(HashSet()) { it.packageName }
+    val uninstalledPackages = ShizukuPackageInstallerUtils
+        .getInstalledPackages(PackageManager.MATCH_UNINSTALLED_PACKAGES, userId)
+        .filter { it.packageName !in installed }
+
+    return uninstalledPackages.map { app ->
+        AppInfo.fromPackageInfo(app, this, true, otherUser = true)
+    } + installedPackages.map { app ->
+        AppInfo.fromPackageInfo(app, this, false, otherUser = true)
+    }
 }
 
 fun PackageManager.getInstalledPackages(): List<PackageInfo> {

@@ -146,7 +146,8 @@ fun AppIconImage(
     val context = LocalContext.current
     val appIcon =
             try {
-                context.packageManager.getApplicationIcon(appInfo.packageName)
+                appInfo.applicationInfo?.let { context.packageManager.getApplicationIcon(it) }
+                    ?: context.packageManager.getApplicationIcon(appInfo.packageName)
             } catch (e: Exception) {
                 LogUtils.w("AppTile", "Cannot find app icon: ${e.stackTraceToString()}")
                 null

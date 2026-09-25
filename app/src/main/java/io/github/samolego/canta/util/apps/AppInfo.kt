@@ -20,7 +20,9 @@ data class AppInfo(
     val isSystemApp: Boolean,
     val isUninstalled: Boolean,
     val isDisabled: Boolean,
-    val bloatData: BloatData?
+    val bloatData: BloatData?,
+    /** Only set for apps of other profiles, which Canta's own [PackageManager] can't look up. */
+    val applicationInfo: ApplicationInfo? = null,
 ) : Parcelable {
 
     val name: String
@@ -36,14 +38,18 @@ data class AppInfo(
             packageInfo: PackageInfo,
             packageManager: PackageManager,
             isUninstalled: Boolean,
-            bloatList: Map<String, BloatData> = emptyMap()
+            bloatList: Map<String, BloatData> = emptyMap(),
+            otherUser: Boolean = false,
         ): AppInfo {
             val bloatData = bloatList[packageInfo.packageName]
 
             val isSystemApp =
                 (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) != 0
 
-            val isDisabled = try {
+            val isDisabled = if (otherUser) {
+                // Already holds the enabled state for the queried user
+                !packageInfo.applicationInfo!!.enabled
+            } else try {
                 !packageManager.getApplicationInfo(packageInfo.packageName, 0).enabled
             } catch (e: PackageManager.NameNotFoundException) {
                 false
@@ -60,6 +66,7 @@ data class AppInfo(
                 isUninstalled = isUninstalled,
                 isDisabled = isDisabled,
                 bloatData = bloatData,
+                applicationInfo = if (otherUser) packageInfo.applicationInfo else null,
             )
         }
     }

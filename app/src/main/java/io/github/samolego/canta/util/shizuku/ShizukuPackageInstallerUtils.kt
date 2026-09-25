@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageManager
+import android.content.pm.PackageInfo
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.os.Build
@@ -36,6 +37,60 @@ object ShizukuPackageInstallerUtils {
     fun getPrivilegedPackageInstaller(): IPackageInstaller {
         val packageInstaller: IPackageInstaller = PACKAGE_MANAGER.packageInstaller
         return IPackageInstaller.Stub.asInterface(ShizukuBinderWrapper(packageInstaller.asBinder()))
+    }
+
+    /**
+     * Same as [PackageManager.getInstalledPackages], but for any user / profile.
+     */
+    fun getInstalledPackages(flags: Int, userId: Int): List<PackageInfo> {
+        // flags became a long in Android 13
+        val slice = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            HiddenApiBypass.invoke(
+                IPackageManager::class.java,
+                PACKAGE_MANAGER,
+                "getInstalledPackages",
+                flags.toLong(),
+                userId
+            )
+        } else {
+            HiddenApiBypass.invoke(
+                IPackageManager::class.java,
+                PACKAGE_MANAGER,
+                "getInstalledPackages",
+                flags,
+                userId
+            )
+        } ?: return emptyList()
+
+        // ParceledListSlice<PackageInfo>
+        @Suppress("UNCHECKED_CAST")
+        return slice.javaClass.getMethod("getList").invoke(slice) as List<PackageInfo>
+    }
+
+    /**
+     * Same as [PackageManager.getPackageInfo], but for any user / profile.
+     * @return null if the package isn't installed for [userId]
+     */
+    fun getPackageInfo(packageName: String, flags: Int, userId: Int): PackageInfo? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            HiddenApiBypass.invoke(
+                IPackageManager::class.java,
+                PACKAGE_MANAGER,
+                "getPackageInfo",
+                packageName,
+                flags.toLong(),
+                userId
+            )
+        } else {
+            HiddenApiBypass.invoke(
+                IPackageManager::class.java,
+                PACKAGE_MANAGER,
+                "getPackageInfo",
+                packageName,
+                flags,
+                userId
+            )
+        } as PackageInfo?
     }
 
     /**

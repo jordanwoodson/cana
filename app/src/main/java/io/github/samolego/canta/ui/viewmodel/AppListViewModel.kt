@@ -18,6 +18,8 @@ import io.github.samolego.canta.util.BloatUtils
 import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.apps.AppInfo
 import io.github.samolego.canta.util.apps.Filter
+import io.github.samolego.canta.util.apps.UserProfile
+import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -30,7 +32,27 @@ class AppListViewModel : ViewModel() {
     companion object {
         private const val TAG = "AppListViewModel"
         private var apps by mutableStateOf<List<AppInfo>>(emptyList())
+
+        /**
+         * Profile whose apps are shown and modified, null = the one Canta runs in.
+         * Kept next to [apps] so the two can never get out of sync.
+         */
+        private var selectedUser by mutableStateOf<UserProfile?>(null)
     }
+
+    /** Users / profiles on the device, filled by [loadUsers]. */
+    var users by mutableStateOf<List<UserProfile>>(emptyList())
+        private set
+
+    val selectedUserId: Int
+        get() = selectedUser?.id ?: UserProfile.currentUserId
+
+    /** The profile explicitly picked by the user, if any. */
+    val selectedProfile: UserProfile?
+        get() = selectedUser
+
+    var loadError by mutableStateOf<String?>(null)
+        private set
 
     var selectedApps = mutableStateSetOf<String>()
 
@@ -65,15 +87,55 @@ class AppListViewModel : ViewModel() {
                 .filter { it.isSystemApp || !onlySystem }
     }
 
+    /** Lists the users / profiles on the device through Shizuku. */
+    suspend fun loadUsers(): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                users = ShizukuUserUtils.getUsers()
+                LogUtils.i(TAG, "Found users: ${users.joinToString { "${it.id} (${it.kind})" }}")
+                true
+            } catch (e: Exception) {
+                LogUtils.e(TAG, "Failed to list users", e.cause ?: e)
+                false
+            }
+        }
+    }
+
+    /** Switches to managing apps of [user]. */
+    suspend fun selectUser(user: UserProfile, packageManager: PackageManager, context: Context) {
+        val changed = user.id != selectedUserId
+        selectedUser = user
+        if (changed) {
+            LogUtils.i(TAG, "Switching to user ${user.id} (${user.kind})")
+            selectedApps.clear()
+            loadInstalled(packageManager, context)
+        }
+    }
+
     suspend fun loadInstalled(packageManager: PackageManager, context: Context) {
         isLoading = true
+        loadError = null
         val filesDir = context.filesDir
+        val userId = selectedUserId
 
         withContext(Dispatchers.IO) {
             val start = System.currentTimeMillis()
-            apps = packageManager.getAllPackagesInfo()
+            var error: Throwable? = null
+            val packages = try {
+                packageManager.getAllPackagesInfo(userId)
+            } catch (e: Exception) {
+                error = e.cause ?: e
+                LogUtils.e(TAG, "Failed to load packages of user $userId", error)
+                emptyList()
+            }
+            // User switched profile while this was loading
+            if (userId != selectedUserId) {
+                return@withContext
+            }
+            loadError = error?.toString()
+            apps = packages
             val endPackages = System.currentTimeMillis()
-            LogUtils.i(TAG, "Loaded packages in ${endPackages - start}ms")
+            LogUtils.i(TAG, "Loaded ${apps.size} packages of user $userId in ${endPackages - start}ms")
             isLoading = false
 
             isLoadingBadges = true
