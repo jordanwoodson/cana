@@ -1,6 +1,5 @@
 package io.github.samolego.canta.util.shizuku
 
-import android.app.Activity
 import android.content.Context
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageManager
@@ -107,7 +106,7 @@ object ShizukuPackageInstallerUtils {
         installer: IPackageInstaller?,
         installerPackageName: String?,
         userId: Int,
-        activity: Activity,
+        context: Context,
     ): PackageInstaller {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
             return PackageInstaller::class.java.getConstructor(
@@ -130,8 +129,8 @@ object ShizukuPackageInstallerUtils {
                 Int::class.javaPrimitiveType
             )
                 .newInstance(
-                    activity,
-                    activity.packageManager,
+                    context,
+                    context.packageManager,
                     installer,
                     installerPackageName,
                     userId

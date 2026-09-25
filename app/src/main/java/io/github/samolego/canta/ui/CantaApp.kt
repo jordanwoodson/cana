@@ -75,17 +75,12 @@ import io.github.samolego.canta.ui.viewmodel.SettingsViewModelFactory
 import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.showBiometricPrompt
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 private const val secretTaps = 12
 
 @Composable
 fun CantaApp(
-    canResetAppToFactory: (packageName: String, userId: Int) -> Boolean,
-    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
-    reinstallApp: (packageName: String, userId: Int) -> Boolean,
     closeApp: () -> Unit,
 ) {
     val navController = rememberNavController()
@@ -101,9 +96,6 @@ fun CantaApp(
         composable(Screen.Main.route) {
             val presetSaveError = stringResource(R.string.preset_save_error)
             MainContent(
-                canResetAppToFactory = canResetAppToFactory,
-                uninstallApp = uninstallApp,
-                reinstallApp = reinstallApp,
                 navigateToPage = { navController.navigate(it) },
                 closeApp = closeApp,
                 presetEditMode = presetViewModel.editingPreset != null,
@@ -188,9 +180,6 @@ fun CantaApp(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun MainContent(
-    canResetAppToFactory: (packageName: String, userId: Int) -> Boolean,
-    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
-    reinstallApp: (packageName: String, userId: Int) -> Boolean,
     onPresetEditFinish: () -> Unit,
     navigateToPage: (route: String) -> Unit,
     closeApp: () -> Unit,
@@ -286,7 +275,7 @@ private fun MainContent(
         floatingActionButton = {
             AnimatedVisibility(
                 // Make the FAB hidden if no apps are selected
-                visible = appListViewModel.selectedApps.isNotEmpty(),
+                visible = appListViewModel.selectedApps.isNotEmpty() && !appListViewModel.isOperating,
                 enter = fadeIn() + scaleIn(),
                 exit = fadeOut() + scaleOut()
             ) {
@@ -327,16 +316,10 @@ private fun MainContent(
                                 val uninstall = { resetToFactory: Boolean ->
                                     val process = {
                                         coroutineScope.launch {
-                                            val attempted = appListViewModel.selectedApps.size
-                                            val uninstalled = uninstallOrReinstall(
-                                                uninstallApp = uninstallApp,
-                                                reinstallApp = reinstallApp,
-                                                selectedAppsType = selectedAppsType,
-                                                appListViewModel = appListViewModel,
-                                                resetToFactory = resetToFactory,
-                                            )
-
-                                            val failed = attempted - uninstalled
+                                            val reinstall = selectedAppsType == AppsType.UNINSTALLED
+                                            val batch = appListViewModel.processSelected(context, reinstall, resetToFactory)
+                                            val uninstalled = batch.successCount
+                                            val failed = batch.failureCount
                                             if (failed > 0) {
                                                 Toast.makeText(
                                                     context,
@@ -353,7 +336,7 @@ private fun MainContent(
                                                 currentDialog = {
                                                     SuccessDialog(
                                                         count = uninstalled,
-                                                        isReinstall = selectedAppsType == AppsType.UNINSTALLED,
+                                                        isReinstall = reinstall,
                                                         onDismissRequest = {
                                                             currentDialog = null
                                                         }
@@ -379,13 +362,12 @@ private fun MainContent(
                                         // Haven't touched it as for now due to its role in
                                         // core uninstall flow.
                                         currentDialog = {
-                                            val canResetAny =
-                                                appListViewModel.selectedApps.keys.any {
-                                                    canResetAppToFactory(
-                                                        it,
-                                                        appListViewModel.selectedUserId
-                                                    )
-                                                }
+                                            var canResetAny by remember { mutableStateOf(false) }
+                                            val selected = appListViewModel.selectedApps.keys.toList()
+                                            val userId = appListViewModel.selectedUserId
+                                            LaunchedEffect(selected, userId) {
+                                                canResetAny = appListViewModel.canResetAny(selected, userId)
+                                            }
 
                                             UninstallAppsDialog(
                                                 appCount =
@@ -526,49 +508,6 @@ private fun MainContent(
             }
         }
     }
-}
-
-suspend fun uninstallOrReinstall(
-    uninstallApp: (packageName: String, userId: Int, resetToFactory: Boolean) -> Boolean,
-    reinstallApp: (packageName: String, userId: Int) -> Boolean,
-    selectedAppsType: AppsType,
-    appListViewModel: AppListViewModel,
-    resetToFactory: Boolean = false,
-): Int {
-    val appsToProcess = appListViewModel.selectedApps.keys.toList()
-    val userId = appListViewModel.selectedUserId
-    var count = 0
-    withContext(Dispatchers.IO) {
-        when (selectedAppsType) {
-            AppsType.INSTALLED -> {
-                appsToProcess.forEach { app ->
-                    val uninstalled = uninstallApp(app, userId, resetToFactory)
-                    if (uninstalled) {
-                        withContext(Dispatchers.Main) {
-                            count += 1
-                            appListViewModel.changeAppStatus(app)
-                            appListViewModel.selectedApps.remove(app)
-                        }
-                    }
-                }
-            }
-
-            AppsType.UNINSTALLED -> {
-                appsToProcess.forEach { app ->
-                    val installed = reinstallApp(app, userId)
-                    if (installed) {
-                        withContext(Dispatchers.Main) {
-                            count += 1
-                            appListViewModel.changeAppStatus(app)
-                            appListViewModel.selectedApps.remove(app)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return count
 }
 
 enum class AppsType(val icon: ImageVector) {

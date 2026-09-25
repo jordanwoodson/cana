@@ -54,6 +54,7 @@ import io.github.samolego.canta.ui.component.CanaWordmark
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SettingsTextItem
+import io.github.samolego.canta.ui.component.SelfGrantSettings
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
 import io.github.samolego.canta.util.showBiometricPrompt
@@ -100,6 +101,8 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
+            SelfGrantSettings()
+
             // Auto-update bloat list
             SettingsItem(
                 title = stringResource(R.string.auto_update_bloat_list),
