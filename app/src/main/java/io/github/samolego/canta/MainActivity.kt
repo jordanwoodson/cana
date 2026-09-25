@@ -173,7 +173,8 @@ class MainActivity : FragmentActivity() {
             result.success
         } catch (e: Exception) {
             LogUtils.e(APP_NAME, "Failed to uninstall '$packageName' for user $userId")
-            LogUtils.e(APP_NAME, "Error: ${e.message}")
+            // HiddenApiBypass wraps the real error (e.g. SecurityException) in an InvocationTargetException
+            LogUtils.e(APP_NAME, "Error: ${e.cause ?: e}")
             e.printStackTrace()
             false
         }
@@ -216,7 +217,8 @@ class MainActivity : FragmentActivity() {
             result.success
         } catch (e: Exception) {
             LogUtils.e(APP_NAME, "Failed to reinstall '$packageName' for user $userId")
-            LogUtils.e(APP_NAME, "Error: ${e.message}")
+            // HiddenApiBypass wraps the real error (e.g. SecurityException) in an InvocationTargetException
+            LogUtils.e(APP_NAME, "Error: ${e.cause ?: e}")
             e.printStackTrace()
             false
         }
