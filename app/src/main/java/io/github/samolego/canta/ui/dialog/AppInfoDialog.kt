@@ -60,6 +60,7 @@ fun AppInfoDialog(
         appInfo: AppInfo,
         onDismiss: () -> Unit,
         onRemoveUpdates: (() -> Unit)? = null,
+        onComponents: (() -> Unit)? = null,
 ) {
     val bloatDescription = appInfo.description
     val clipboardManager = LocalClipboardManager.current
@@ -206,6 +207,9 @@ fun AppInfoDialog(
                 }
             }
             if (!appInfo.isUninstalled) {
+                onComponents?.let { action ->
+                    Button(onClick = action, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.components)) }
+                }
                 Row(modifier = Modifier.align(Alignment.End)) {
                     Button(
                             onClick = {

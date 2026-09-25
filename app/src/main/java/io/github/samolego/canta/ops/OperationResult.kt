@@ -8,7 +8,7 @@ data class OperationResult(
     val skipped: Boolean = false,
 )
 
-data class BatchResult(val results: List<OperationResult>) {
+data class BatchResult(val results: List<OperationResult>, val batchId: String? = null) {
     val successCount: Int get() = results.count { it.success && !it.skipped }
     val failureCount: Int get() = results.count { !it.success }
     val skippedCount: Int get() = results.count { it.skipped }

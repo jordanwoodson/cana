@@ -34,7 +34,7 @@ class RecoveryDeviceTest {
             // UiAutomation tokenizes argv itself; it does not interpret shell quoting.
             val descriptor = instrumentation.uiAutomation.executeShellCommand("sh ${path.absolutePath}")
             val output = ParcelFileDescriptor.AutoCloseInputStream(descriptor).bufferedReader().use { it.readText() }
-            assertTrue(output, output.contains("0 failed commands; 0 manual steps"))
+            assertTrue(output, output.contains("0 failed commands; 1 manual steps"))
             for (user in listOf(0, 10)) {
                 val app = services.packageOps.getPackageInfo(name, user)!!.applicationInfo!!
                 assertNotEquals(0, app.flags and ApplicationInfo.FLAG_INSTALLED)

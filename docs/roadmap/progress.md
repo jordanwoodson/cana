@@ -6,7 +6,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - 2026-09-25: inspected clean repository; no roadmap features implemented at start. Created `roadmap` branch from master.
 - Emulator launched as unified exec session `42132`, serial `emulator-5554`; cold boot in progress. ADB initially reports offline. No phone commands executed.
-- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phases 2–3 implementation and emulator verification pass. Phases 4–7 and release remain pending.
+- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phases 2–3 implementation and emulator verification pass. Phase 4 implementation and emulator checks also pass. Phases 5–7 and release remain pending.
 
 ## Interface preflight
 
@@ -42,7 +42,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 ### Remaining verification
 
 - Phase 0: offline first launch, category/menu interaction, persisted update settings, actual reset and both-profile isolation verified.
-- Phases 0–3 implementation and listed acceptance checks pass; Phases 4–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
+- Phases 0–4 implementation and listed acceptance checks pass; Phases 5–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
 
 ### Phase 1
 
@@ -97,3 +97,21 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 - Exodus README/API terms permit database redistribution under ODbL 1.0, contents under DbCL 1.0. Public `/api/trackers` download succeeded once to `/tmp/cana-exodus-trackers.json`: 432 trackers, 571,866 bytes. Bundle the unchanged snapshot with source/hash/date and license links; show attribution by component matches. Do not call the Exodus API automatically from end-user apps (their API docs discourage production clients). Custom URL support remains required.
 - Primary terms: https://raw.githubusercontent.com/Exodus-Privacy/exodus/v1/README.md and https://raw.githubusercontent.com/Exodus-Privacy/exodus/v1/doc/api.md; ODbL https://opendatacommons.org/licenses/odbl/1-0/ sections 4.2–4.6. Database JSON is separate from Cana source licensing.
 - Later Phase 5 preflight: `/tmp/cana-connectivity-help.txt` confirms OEM_DENY_3 set/get commands exist on this Android 15 emulator, but package commands expose no `--user`. Determine actual uid resolution before enabling work-profile network controls. Current recovery planner refuses nonzero-user network records until a verified interface exists; do not silently act on user 0.
+
+### Phase 4 implementation and evidence
+
+- Phase 3 commit: `17a0199`.
+- Added Disable/Enable, Suspend/Unsuspend and Uninstall keeping data to the installed selection controls. Expert/Unsafe selections default to Disable even when filtered out of the visible list; Unsafe uninstall still obeys Settings and is enforced at the operation boundary. Batches capture user and package ids; results expose Undo.
+- Exact undo restores original enabled/component/suspended/install state, journals its own before/after with `undo_of`, and skips already-successful undos. Keep-data removal retains the data marker through uninstall and undo. Ordinary uninstall recovery now explicitly reports that deleted app data cannot be recreated, including for system apps; APK availability is captured separately.
+- Added per-user services/receivers/providers/activities with actual enabled state, tracker matches, toggle/undo where permitted, active source and licensing information. Suspend state is also represented on app rows.
+- Bundled unchanged Exodus API snapshot: 432 records, 571,866 bytes, SHA-256 `bf6922f7c95ceb130fcfabf96c32c615e60d62ca507a4b82dcd74b41061c5121`, ODbL 1.0 / DbCL 1.0 with notice/source/date/license links. Literal signatures support alternatives, slash namespaces, and leading-dot fragments found in the real database; no downloaded regular expressions are executed. Three matcher regressions failed against the stub, then the full asset test exposed leading-dot signatures and passed after handling them.
+- Custom Exodus-compatible URL is explicitly fetched/validated on Save, cached atomically by URL, reloads offline, and falls back visibly to the bundle if the cache is corrupt. No automatic calls to the Exodus production API.
+- **Confirmed framework limitation / adaptation:** Android 15 PackageManager refuses shell uid component mutation for ordinary apps regardless of CHANGE_COMPONENT_ENABLED_STATE. The exception is `FLAG_TEST_ONLY`; root-backed Shizuku is also outside the shell restriction. Both `disable` and `default-state` were refused for Print Spooler without changes. Components remain inspectable, with disabled toggles and an explanation for unsupported apps; package disabling and other actions remain available. Root-backed component support is implemented but not exercised because this goal uses shell-backed Shizuku, not a rooted phone.
+- Primary source: [Android 15 PackageManagerService, setEnabledSettings](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android15-release/services/core/java/com/android/server/pm/PackageManagerService.java), shell restriction around lines 3898–3918.
+- Emulator fixture is now v2, `testOnly` and debuggable with metadata-only activity/service/receiver/provider and camera/contacts/notifications declarations. Install with `adb -s emulator-5554 install -r -t /tmp/cana-roadmap-fixture/fixture.apk`. Components are never launched. A normal non-test system package separately proves the component restriction.
+- Capability probe PASS in `/tmp/cana-phase4-device-actions.log`: both-profile disable/suspend, data retention and test-only component changes preserve peer state; non-test component changes are refused. Early attempts exposed the actual framework restriction and a test-harness `run-as` argument-order mistake (correct form: `run-as PACKAGE --user N COMMAND`).
+- Typed PackageOps integration PASS and tracker-cache integration PASS in `/tmp/cana-phase4-final-device.log` (the suite's sole failure was a UI test method returning a non-void Compose interaction, fixed separately). Proves each new action and exact undo in both profiles, durable undo links, repeated-undo skip, all four component kinds and actual Exodus match, kept data restored, and normal-app component refusal. Fixture initially used an unmatched class name; changed it to the actual Exodus measurement namespace without changing the matcher.
+- UI **2/2 PASS**, 40.671s (`/tmp/cana-phase4-ui-green.log`): all action labels reachable, Unsafe selection defaults to Disable even when the selection is filtered out, request retains the intended app/action, work-profile component limitation is visible and switches disabled.
+- Latest JVM suite **50/50 PASS** and debug/test APK builds pass. Final build log `/tmp/cana-phase4-complete-build.log` follows the suspended badge and component scrolling refinements.
+
+- Final focused device checks **2/2 PASS**, 57.592s (`/tmp/cana-phase4-final-check.log`): scrollable component restriction UI and generated recovery script restoring the selected work profile, with deleted-data manual step reported honestly. Task 6 complete.

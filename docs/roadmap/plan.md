@@ -79,10 +79,10 @@ Files: new safety policy/probe/dialog, restore-script generator, history export 
 
 Files: PackageOps/action UI, new component repository/dialog, tracker signature source/assets attribution.
 
-- [ ] Probe disable/enable, suspend/unsuspend, keep-data uninstall and cross-app component mutation on Android 15.
-- [ ] Implement actions and undo, default Disable for Expert/Unsafe. Route destructive actions through safety and history.
-- [ ] Enumerate services/receivers/providers/activities and per-user state; identify trackers using licensed Exodus data or attributed curated fallback plus custom URL.
-- [ ] Verify all actions/undo on personal and work profiles; tests for matching/commands/results. Commit phase.
+- [x] Probe disable/enable, suspend/unsuspend, keep-data uninstall and cross-app component mutation on Android 15.
+- [x] Implement actions and undo, default Disable for Expert/Unsafe. Route destructive actions through safety and history.
+- [x] Enumerate services/receivers/providers/activities and per-user state; identify trackers using licensed Exodus data or attributed curated fallback plus custom URL.
+- [x] Verify all actions/undo on personal and work profiles; tests for matching/commands/results. Commit phase.
 
 ### Task 7: Phase 5 lockdown
 

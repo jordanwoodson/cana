@@ -67,7 +67,14 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
                     batch.results.filter { !it.success }.forEach { Text(it.message) }
                 }
             },
-            confirmButton = { TextButton(onClick = { outcome = null }) { Text(stringResource(R.string.ok)) } })
+            confirmButton = { TextButton(onClick = { outcome = null }) { Text(stringResource(R.string.ok)) } },
+            dismissButton = {
+                batch.batchId?.let { id ->
+                    TextButton(enabled = !model.isOperating, onClick = {
+                        scope.launch { outcome = action to model.undoBatch(context, id) }
+                    }) { Text(stringResource(R.string.undo_action)) }
+                }
+            })
     }
 }
 
@@ -94,17 +101,13 @@ internal fun PackageActionConfirmation(
         else reset = inspected.isNotEmpty() && inspected.all { it.error == null && it.otherInstalledProfiles.isEmpty() }
         included = included.filter { safety[it]?.protected != true && safety[it]?.error == null }.toSet()
         if (request.action == PackageAction.REINSTALL ||
-            (!confirmUninstall && !cleanup && inspected.isEmpty() && safety.values.all { it.permits(emptySet()) })) {
+            (!confirmUninstall && request.action == PackageAction.UNINSTALL && inspected.isEmpty() && safety.values.all { it.permits(emptySet()) })) {
             onAgree(included, false, emptyMap(), emptyMap())
         }
     }
     val checked = impacts
     val warnings = if (cleanup) emptyMap() else safety.filter { it.key in included && it.value.warnings.isNotEmpty() }
-    val title = when (request.action) {
-        PackageAction.REMOVE_UPDATES -> R.string.remove_updates
-        PackageAction.REINSTALL -> R.string.reinstall
-        PackageAction.UNINSTALL -> R.string.uninstall
-    }
+    val title = request.action.label
     AlertDialog(onDismissRequest = onDismiss,
         title = { Text(stringResource(title)) },
         text = {
@@ -115,6 +118,10 @@ internal fun PackageActionConfirmation(
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 } else {
                     if (request.action == PackageAction.UNINSTALL) Text(stringResource(R.string.uninstall_confirmation, request.apps.size))
+                    if (request.action !in setOf(PackageAction.UNINSTALL, PackageAction.REINSTALL, PackageAction.REMOVE_UPDATES)) {
+                        Text(stringResource(R.string.action_app_count, request.apps.size))
+                        request.apps.forEach { Text(it.name, style = MaterialTheme.typography.bodySmall) }
+                    }
                     checked.filter { it.error != null }.forEach { Text("${it.packageName}: ${it.error}", color = MaterialTheme.colorScheme.error) }
                     safety.filterValues { it.protected || it.error != null }.forEach { (name, assessment) ->
                         Text(assessment.error ?: stringResource(R.string.safety_protected, name), color = MaterialTheme.colorScheme.error)

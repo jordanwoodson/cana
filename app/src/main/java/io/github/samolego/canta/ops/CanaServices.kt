@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import io.github.samolego.canta.data.HistoryStore
 import io.github.samolego.canta.data.historyDataStore
 import io.github.samolego.canta.util.LogUtils
+import io.github.samolego.canta.util.TrackerRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,8 +16,10 @@ class CanaServices private constructor(context: Context) {
     val history = HistoryStore(context.applicationContext.historyDataStore)
     val shell = ShellRunner(context.applicationContext)
     val safety = SafetyInspector(context.applicationContext, shell)
-    val packageOps = PackageOps(context.applicationContext, history, safety)
+    val packageOps = PackageOps(context.applicationContext, history, safety, shell)
     val selfGrants = SelfGrants(context.applicationContext, shell, history)
+    val trackers = TrackerRepository(context.applicationContext)
+    val components = ComponentRepository(trackers)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     init {

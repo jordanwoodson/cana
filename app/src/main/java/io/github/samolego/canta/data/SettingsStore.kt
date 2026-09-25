@@ -27,6 +27,11 @@ class SettingsStore private constructor(context: Context) {
     val hideSuccessDialogFlow = dataStore.data.map { it.hideSuccessDialog }
 
     val authEnabledFlow = dataStore.data.map { it.authEnabled }
+    val trackerListUrlFlow = dataStore.data.map { it.trackerListUrl }
+
+    suspend fun setTrackerListUrl(url: String) {
+        dataStore.updateData { it.toBuilder().setTrackerListUrl(url).build() }
+    }
 
 
     suspend fun setAutoUpdateBloatList(autoUpdate: Boolean) {

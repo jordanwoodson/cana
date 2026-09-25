@@ -25,6 +25,7 @@ data class AppInfo(
     val applicationInfo: ApplicationInfo? = null,
     val isUpdatedSystemApp: Boolean = false,
     val updateSizeBytes: Long = 0,
+    val isSuspended: Boolean = false,
 ) : Parcelable {
 
     val name: String
@@ -75,6 +76,7 @@ data class AppInfo(
                     packageInfo.applicationInfo!!.sourceDir,
                     packageInfo.applicationInfo!!.splitSourceDirs?.toList().orEmpty(),
                 ),
+                isSuspended = packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SUSPENDED != 0,
             )
         }
     }

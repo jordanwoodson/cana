@@ -1,6 +1,7 @@
 package io.github.samolego.canta.ops
 
 import android.content.Context
+import android.content.ComponentName
 import android.content.pm.ApplicationInfo
 import android.content.pm.IPackageInstaller
 import android.content.pm.PackageInfo
@@ -20,6 +21,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
@@ -27,7 +29,7 @@ import java.util.UUID
 import java.io.File
 
 /** All mutations capture an explicit user and journal their before/after state. */
-class PackageOps(context: Context, private val history: HistoryStore, private val safety: SafetyInspector) {
+class PackageOps(context: Context, private val history: HistoryStore, private val safety: SafetyInspector, private val shell: ShellRunner) {
     private val context = context.applicationContext
     private val mutationMutex = Mutex()
 
@@ -71,8 +73,9 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         batchId: String = UUID.randomUUID().toString(),
         approvedDowngradeUsers: Set<Int> = emptySet(),
         approvedWarnings: Set<String> = emptySet(),
-    ): OperationResult = recorded(packageName, userId, "uninstall", batchId) { before ->
-        safety.requireAllowed(packageName, userId, approvedWarnings)
+        keepData: Boolean = false,
+    ): OperationResult = recorded(packageName, userId, if (keepData) "uninstall_keep_data" else "uninstall", batchId) { before ->
+        safety.requireAllowed(packageName, userId, approvedWarnings, removing = true)
         val info = before?.applicationInfo ?: error(context.getString(R.string.operation_package_missing))
         check(info.flags and ApplicationInfo.FLAG_INSTALLED != 0) {
             context.getString(R.string.operation_already_uninstalled)
@@ -85,8 +88,8 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             }
         }
         val result = UninstallSequence.execute(
-            resetFirst = resetToFactory && system && updated,
-            uninstallFlags = if (system) 4 else 0,
+            resetFirst = resetToFactory && !keepData && system && updated,
+            uninstallFlags = (if (system) 4 else 0) or (if (keepData) 1 else 0),
             hasUpdates = {
                 getPackageInfo(packageName, userId)?.applicationInfo?.let {
                     it.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0
@@ -101,6 +104,87 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             OperationResult(removed, context.getString(if (removed) R.string.operation_success else R.string.operation_not_applied))
         }
     }
+
+    suspend fun setEnabled(packageName: String, userId: Int, enabled: Boolean,
+        approvedWarnings: Set<String> = emptySet(), batchId: String = UUID.randomUUID().toString(),
+    ): OperationResult = recorded(packageName, userId, if (enabled) "enable" else "disable", batchId) {
+        if (!enabled) safety.requireAllowed(packageName, userId, approvedWarnings)
+        else safety.requireUnprotected(packageName, userId)
+        val result = shell.exec(listOf("pm", if (enabled) "enable" else "disable-user", "--user", "$userId", packageName))
+        val applied = ShizukuPackageInstallerUtils.applicationEnabledSetting(packageName, userId) == if (enabled) 1 else 3
+        verified(result, applied)
+    }
+
+    suspend fun setSuspended(packageName: String, userId: Int, suspended: Boolean,
+        approvedWarnings: Set<String> = emptySet(), batchId: String = UUID.randomUUID().toString(),
+    ): OperationResult = recorded(packageName, userId, if (suspended) "suspend" else "unsuspend", batchId) {
+        if (suspended) safety.requireAllowed(packageName, userId, approvedWarnings)
+        else safety.requireUnprotected(packageName, userId)
+        val result = shell.exec(listOf("pm", if (suspended) "suspend" else "unsuspend", "--user", "$userId", packageName))
+        val actual = getPackageInfo(packageName, userId)?.applicationInfo?.let { it.flags and ApplicationInfo.FLAG_SUSPENDED != 0 }
+        verified(result, actual == suspended)
+    }
+
+    suspend fun setComponentEnabled(component: ComponentName, userId: Int, enabled: Boolean,
+        approvedWarnings: Set<String> = emptySet(), batchId: String = UUID.randomUUID().toString(),
+    ): OperationResult = recorded(component.packageName, userId, "component", batchId,
+        snapshotter = { info, user -> componentSnapshot(info, user, component) }) { before ->
+        check(Shizuku.getUid() != 2000 || (before?.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_TEST_ONLY != 0) {
+            context.getString(R.string.component_requires_root)
+        }
+        if (!enabled) safety.requireAllowed(component.packageName, userId, approvedWarnings)
+        else safety.requireUnprotected(component.packageName, userId)
+        val result = shell.exec(listOf("pm", if (enabled) "enable" else "disable", "--user", "$userId", component.flattenToString()))
+        verified(result, ShizukuPackageInstallerUtils.componentEnabledSetting(component, userId) == if (enabled) 1 else 2)
+    }
+
+    /** Undo uses the recorded target/user, restores exact prior values, and is journaled itself. */
+    suspend fun undo(record: OperationRecord, batchId: String = UUID.randomUUID().toString(),
+        approvedWarnings: Set<String> = emptySet(),
+    ): OperationResult {
+        if (record.action !in setOf("uninstall", "uninstall_keep_data", "reinstall", "remove_updates", "disable", "enable", "suspend", "unsuspend", "component")) {
+            return OperationResult(false, context.getString(R.string.undo_unsupported))
+        }
+        val known = history.records.first()
+        if (known.none { it == record }) return OperationResult(false, context.getString(R.string.operation_history_failed))
+        if (known.any { it.undoOf == record.id && it.completed && it.success }) {
+            return OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
+        }
+        val prior = runCatching { JSONObject(record.previousState) }.getOrDefault(JSONObject())
+        val component = prior.optString("component").takeIf { it.isNotBlank() }?.let(ComponentName::unflattenFromString)
+        return recorded(record.packageName, record.userId, record.action, batchId, undoOf = record.id,
+            snapshotter = { info, user -> if (component != null) componentSnapshot(info, user, component) else snapshot(info, user) }) {
+            val plan = RestoreScript.plan(record)
+            check(plan.commands.isNotEmpty()) { plan.notes.joinToString("\n").ifBlank { context.getString(R.string.operation_not_applied) } }
+            if (plan.commands.any { it.getOrNull(1) in setOf("disable", "disable-user", "disable-until-used", "uninstall", "suspend") }) {
+                safety.requireAllowed(record.packageName, record.userId, approvedWarnings,
+                    removing = plan.commands.any { it.getOrNull(1) == "uninstall" })
+            }
+            val results = plan.commands.map { shell.exec(it) }
+            val after = JSONObject(if (component != null) componentSnapshot(getPackageInfo(record.packageName, record.userId), record.userId, component)
+                else snapshot(getPackageInfo(record.packageName, record.userId), record.userId))
+            val keys = when (record.action) {
+                "disable", "enable", "component" -> listOf("enabledSetting")
+                "suspend", "unsuspend" -> listOf("suspended")
+                "uninstall", "uninstall_keep_data", "reinstall" -> listOf("installed", "enabledSetting")
+                else -> emptyList()
+            }
+            val matches = keys.isNotEmpty() && keys.filter { prior.has(it) }.all { prior.get(it) == after.opt(it) }
+            val success = results.all { it.success } && matches && plan.notes.isEmpty()
+            val messages = results.filter { !it.success }.map { it.message } + plan.notes
+            OperationResult(success, messages.joinToString("\n").ifBlank {
+                context.getString(if (success) R.string.operation_success else R.string.operation_not_applied)
+            })
+        }
+    }
+
+    private fun componentSnapshot(info: PackageInfo?, userId: Int, component: ComponentName): String =
+        JSONObject(snapshot(info, userId)).put("component", component.flattenToString())
+            .put("enabledSetting", ShizukuPackageInstallerUtils.componentEnabledSetting(component, userId)).toString()
+
+    private fun verified(result: ShellResult, applied: Boolean): OperationResult =
+        OperationResult(result.success && applied, if (!result.success) result.message
+            else context.getString(if (applied) R.string.operation_success else R.string.operation_not_applied))
 
     suspend fun reinstall(
         packageName: String,
@@ -192,6 +276,8 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         userId: Int,
         action: String,
         batchId: String,
+        undoOf: String = "",
+        snapshotter: (PackageInfo?, Int) -> String = { info, user -> snapshot(info, user) },
         operation: suspend (PackageInfo?) -> OperationResult,
     ): OperationResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
         LogUtils.i("PackageOps", "$action $packageName user=$userId batch=$batchId")
@@ -208,12 +294,12 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
                 context.getString(R.string.operation_shizuku_unavailable)
             }
             before = getPackageInfo(packageName, userId)
-            previousState = snapshot(before, userId)
+            previousState = snapshotter(before, userId)
         } catch (e: Exception) { preflightError = e }
         try {
             history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
                 .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
-                .setAction(action).setPreviousState(previousState).build())
+                .setAction(action).setPreviousState(previousState).setUndoOf(undoOf).build())
         } catch (e: Exception) {
             LogUtils.e("PackageOps", "Cannot persist operation before mutation", e)
             return@withContext OperationResult(false, context.getString(R.string.operation_history_failed))
@@ -227,7 +313,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
                 LogUtils.e("PackageOps", "$action failed for $packageName user=$userId", e.cause ?: e)
                 OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
             }
-            val after = try { snapshot(getPackageInfo(packageName, userId), userId) } catch (_: Exception) { "{}" }
+            val after = try { snapshotter(getPackageInfo(packageName, userId), userId) } catch (_: Exception) { "{}" }
             val changed = previousState != "{}" && after != "{}" && previousState != after
             val result = outcome.copy(changed = changed)
             try {
@@ -251,6 +337,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         put("suspended", app != null && app.flags and ApplicationInfo.FLAG_SUSPENDED != 0)
         if (info != null) put("enabledSetting", ShizukuPackageInstallerUtils.applicationEnabledSetting(info.packageName, userId))
         put("sourceDir", app?.sourceDir.orEmpty())
+        put("apkAvailable", app?.sourceDir?.let { File(it).isFile } == true)
         put("versionCode", info?.longVersionCode ?: 0)
     }.toString()
 }

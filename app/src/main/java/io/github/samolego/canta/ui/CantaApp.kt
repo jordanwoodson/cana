@@ -61,6 +61,7 @@ import io.github.samolego.canta.ui.dialog.NoWarrantyDialog
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
 import io.github.samolego.canta.ui.dialog.PackageActionDialogs
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
+import io.github.samolego.canta.ui.component.fab.PackageActionsFab
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.navigation.Screen
 import io.github.samolego.canta.ui.screen.LogsPage
@@ -293,13 +294,7 @@ private fun MainContent(
                             onBottomClick = { appListViewModel.requestAction(PackageAction.REINSTALL) },
                         )
                     } else {
-                        FloatingActionButton(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            modifier = Modifier.padding(16.dp).navigationBarsPadding(),
-                            onClick = { appListViewModel.requestAction(PackageAction.UNINSTALL) },
-                        ) {
-                            Icon(Icons.Default.Delete, stringResource(R.string.uninstall))
-                        }
+                        PackageActionsFab(appListViewModel)
                     }
                 }
             }
