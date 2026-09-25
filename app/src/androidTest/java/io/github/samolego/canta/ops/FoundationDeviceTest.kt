@@ -54,7 +54,8 @@ class FoundationDeviceTest {
             val update = services.shell.exec(listOf("pm", "install", "-r", "/data/local/tmp/cana-printspooler.apk"), 30_000)
             assertTrue(update.message, update.success)
             assertTrue(services.packageOps.canResetToFactory(name, userId))
-            val result = services.packageOps.uninstall(name, userId, resetToFactory = true)
+            val result = services.packageOps.uninstall(name, userId, resetToFactory = true,
+                approvedDowngradeUsers = setOf(otherUser))
             assertTrue(result.message, result.success)
             assertFalse(installed(name, userId))
             assertTrue(installed(name, otherUser))

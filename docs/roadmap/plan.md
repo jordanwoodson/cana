@@ -61,10 +61,10 @@ Files: new `ops/PackageOps.kt`, `ops/OperationResult.kt`, `ops/ShellRunner.kt`, 
 
 Files: `AppInfo.kt`, new update cleanup coordinator/policy, app list/banner/filter/FAB/info and uninstall dialogs.
 
-- [ ] Add updated-system flag and base+split APK sizes. Query uninstalled packages for each user.
-- [ ] Implement profile warning/skip, direct reset, verified selected-user uninstalled state, repair if resurrected, and install-existing fallback. Record every step and actual freed bytes.
-- [ ] Add uninstalled ExpandableFAB, banner, filter, app-info button; installed reset defaults only when no other profile uses package, with global warning and size.
-- [ ] Test decisions and failure propagation. On emulator update a harmless system APK, uninstall for selected user, clean and verify system codePath plus unchanged user install states. Commit phase.
+- [x] Add updated-system flag and base+split APK sizes. Query uninstalled packages for each user.
+- [x] Implement profile warning/skip, direct reset, verified selected-user uninstalled state, repair if resurrected, and install-existing fallback. Record every step and actual freed bytes.
+- [x] Add uninstalled ExpandableFAB, banner, filter, app-info button; installed reset defaults only when no other profile uses package, with global warning and size.
+- [x] Test decisions and failure propagation. On emulator update a harmless system APK, uninstall for selected user, clean and verify system codePath plus unchanged user install states. Commit phase.
 
 ### Task 5: Phase 3 safety and recovery
 

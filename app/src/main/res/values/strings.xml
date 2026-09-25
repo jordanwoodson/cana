@@ -196,4 +196,25 @@
     <string name="self_grants_description">Shizuku grants these once. Usage access and supported system settings then remain available when Shizuku stops.</string>
     <string name="self_grants_action">Grant through Shizuku</string>
     <string name="operation_failure_count">%1$d operations failed</string>
+    <string name="profile_missing">The selected profile is no longer available</string>
+    <string name="remove_updates">Remove updates</string>
+    <string name="leftover_updates">Leftover updates</string>
+    <string name="no_leftover_updates">No leftover update to remove</string>
+    <string name="leftover_updates_banner">%1$d apps · %2$s of updates still on disk</string>
+    <string name="update_profiles_changed">Another profile uses this app. Review the shared downgrade warning first.</string>
+    <string name="update_profile_state_changed">A profile installation state changed unexpectedly. Review logs and restore the app.</string>
+    <string name="update_shared_warning">Installed in %1$s. Removing updates also downgrades the app there. Play may update it again; no lasting space saving is expected. Leave this app unchecked to skip it.</string>
+    <string name="update_shared_uninstall_warning">Installed in %1$s. Resetting to factory also downgrades the app there. Play may update it again; no lasting space saving is expected.</string>
+    <string name="update_global_warning">Resetting to the factory version removes updates across the device.</string>
+    <string name="update_space_estimate">Estimated space reclaimed: %1$s</string>
+    <string name="action_user">Profile: user %1$d</string>
+    <string name="checking_update_profiles">Checking updates and other profiles…</string>
+    <string name="operation_skipped">Skipped</string>
+    <string name="operation_batch_result">%1$d succeeded · %2$d failed · %3$d skipped</string>
+    <string name="update_bytes_freed">Update APK space reclaimed: %1$s</string>
+    <string name="operation_results">Results</string>
+    <string name="more_actions">More actions</string>
+    <string name="import_action">Import</string>
+    <string name="create_action">Create</string>
+    <string name="uninstall_confirmation">Uninstall %1$d apps for this profile?</string>
 </resources>

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoDelete
 import androidx.compose.material.icons.filled.Delete
@@ -32,14 +31,14 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -54,16 +53,15 @@ import androidx.navigation.compose.rememberNavController
 import io.github.samolego.canta.R
 import io.github.samolego.canta.extension.addAll
 import io.github.samolego.canta.extension.showFor
-import io.github.samolego.canta.packageName
-import io.github.samolego.canta.ui.component.AppIconImage
 import io.github.samolego.canta.ui.component.AppList
 import io.github.samolego.canta.ui.component.CantaTopBar
 import io.github.samolego.canta.ui.component.fab.PresetEditFAB
 import io.github.samolego.canta.ui.dialog.ExplainBadgesDialog
 import io.github.samolego.canta.ui.dialog.NoWarrantyDialog
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
-import io.github.samolego.canta.ui.dialog.SuccessDialog
-import io.github.samolego.canta.ui.dialog.UninstallAppsDialog
+import io.github.samolego.canta.ui.dialog.PackageActionDialogs
+import io.github.samolego.canta.ui.component.fab.ExpandableFAB
+import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.navigation.Screen
 import io.github.samolego.canta.ui.screen.LogsPage
 import io.github.samolego.canta.ui.screen.PresetsPage
@@ -74,7 +72,6 @@ import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModelFactory
 import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
-import io.github.samolego.canta.util.showBiometricPrompt
 import kotlinx.coroutines.launch
 
 private const val secretTaps = 12
@@ -196,7 +193,6 @@ private fun MainContent(
     var selectedAppsType by remember { mutableStateOf(AppsType.INSTALLED) }
 
     val disableRiskDialog by settingsViewModel.disableRiskDialog.collectAsStateWithLifecycle()
-    val confirmBeforeUninstall by settingsViewModel.confirmBeforeUninstall.collectAsStateWithLifecycle()
 
     // Current active dialog
     var currentDialog by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
@@ -210,6 +206,9 @@ private fun MainContent(
         )
     }
 
+    currentDialog?.let { it() }
+    PackageActionDialogs(appListViewModel, settingsViewModel)
+
     val pagerState = rememberPagerState(pageCount = { AppsType.entries.size })
 
     LaunchedEffect(pagerState) {
@@ -219,7 +218,6 @@ private fun MainContent(
         }
     }
 
-    val cantaIcon = remember(context) { context.packageManager.getApplicationIcon(packageName) }
 
     var showExplainBadgeDialog by rememberSaveable { mutableStateOf(false) }
     var showProfilesMenu by remember { mutableStateOf(false) }
@@ -284,160 +282,23 @@ private fun MainContent(
                         onPresetEditFinish = onPresetEditFinish,
                     )
                 } else {
-                    FloatingActionButton(
-                        containerColor =
-                        if (selectedAppsType == AppsType.UNINSTALLED) {
-                            MaterialTheme.colorScheme.tertiaryContainer
-                        } else {
-
-                            MaterialTheme.colorScheme.errorContainer
-                        },
-                        shape = RoundedCornerShape(32.dp),
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .navigationBarsPadding(),
-                        onClick = {
-                            // Check if Canta is selected too
-                            // Super secret don't tell anyone you saw this
-                            // since this is an easter egg :P
-                            if (appListViewModel.selectedApps.contains(packageName)) {
-                                // Show easter egg toast
-                                Toast.makeText(
-                                    context,
-                                    "Even Cana can't touch this!",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-
-                                return@FloatingActionButton
-                            }
-
-                            val uninstallApps = {
-                                val uninstall = { resetToFactory: Boolean ->
-                                    val process = {
-                                        coroutineScope.launch {
-                                            val reinstall = selectedAppsType == AppsType.UNINSTALLED
-                                            val batch = appListViewModel.processSelected(context, reinstall, resetToFactory)
-                                            val uninstalled = batch.successCount
-                                            val failed = batch.failureCount
-                                            if (failed > 0) {
-                                                Toast.makeText(
-                                                    context,
-                                                    context.resources.getQuantityString(
-                                                        R.plurals.apps_failed_see_logs,
-                                                        failed,
-                                                        failed
-                                                    ),
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-
-                                            if (uninstalled > 0 && !settingsViewModel.hideSuccessDialog.value) {
-                                                currentDialog = {
-                                                    SuccessDialog(
-                                                        count = uninstalled,
-                                                        isReinstall = reinstall,
-                                                        onDismissRequest = {
-                                                            currentDialog = null
-                                                        }
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (settingsViewModel.authEnabled.value) {
-                                        showBiometricPrompt(context) { process() }
-                                    } else {
-                                        process()
-                                    }
-                                }
-
-                                // Show confirmation dialog.
-                                if (selectedAppsType == AppsType.INSTALLED && confirmBeforeUninstall) {
-                                    if (appListViewModel.selectedApps.isNotEmpty()) {
-                                        // TO-Do Consider refactoring dialog management.
-                                        // This `currentDialog`
-                                        // currentDialog(@Composable) could potentially be
-                                        // replaced by a simpler state
-                                        // Haven't touched it as for now due to its role in
-                                        // core uninstall flow.
-                                        currentDialog = {
-                                            var canResetAny by remember { mutableStateOf(false) }
-                                            val selected = appListViewModel.selectedApps.keys.toList()
-                                            val userId = appListViewModel.selectedUserId
-                                            LaunchedEffect(selected, userId) {
-                                                canResetAny = appListViewModel.canResetAny(selected, userId)
-                                            }
-
-                                            UninstallAppsDialog(
-                                                appCount =
-                                                appListViewModel
-                                                    .selectedApps
-                                                    .size,
-                                                canResetToFactory = canResetAny,
-                                                onDismiss = { currentDialog = null },
-                                                onAgree = { resetToFactory ->
-                                                    currentDialog = null
-                                                    uninstall(resetToFactory)
-                                                }
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    // Trigger uninstall
-                                    uninstall(false)
-                                }
-                            }
-
-                            // Show dialog before uninstalling if we are on the "installed"
-                            // tab
-                            // However, do not show it if user has disabled the dialog in
-                            // settings
-                            // or if we are on the "uninstalled" tab
-                            if (!ShizukuPermission.isCantaAuthorized()) {
-                                currentDialog = {
-                                    ShizukuRequirementDialog(
-                                        shizukuStatus =
-                                        ShizukuPermission.checkShizukuActive(
-                                            context.packageManager
-                                        ),
-                                        onClose = { proceed ->
-                                            currentDialog = null
-
-                                            if (proceed) {
-                                                uninstallApps()
-                                            }
-                                        }
-                                    )
-                                }
-                            } else {
-                                uninstallApps()
-                            }
-                        },
-                    ) {
-                        when (selectedAppsType) {
-                            AppsType.INSTALLED ->
-                                // Show Canta icon if only Canta is selected
-                                if (appListViewModel.selectedApps.contains(packageName)) {
-                                    AppIconImage(
-                                        appIconImage = cantaIcon,
-                                        contentDescription =
-                                        stringResource(R.string.app_name)
-                                    )
-                                } else {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription =
-                                        stringResource(R.string.uninstall)
-                                    )
-                                }
-
-                            AppsType.UNINSTALLED ->
-                                Icon(
-                                    Icons.Default.InstallMobile,
-                                    contentDescription =
-                                    stringResource(R.string.reinstall)
-                                )
+                    if (selectedAppsType == AppsType.UNINSTALLED) {
+                        ExpandableFAB(
+                            modifier = Modifier.padding(16.dp).navigationBarsPadding(),
+                            topIcon = Icons.Default.DeleteForever,
+                            topLabel = stringResource(R.string.remove_updates),
+                            bottomIcon = Icons.Default.InstallMobile,
+                            bottomLabel = stringResource(R.string.reinstall),
+                            onTopClick = { appListViewModel.requestAction(PackageAction.REMOVE_UPDATES) },
+                            onBottomClick = { appListViewModel.requestAction(PackageAction.REINSTALL) },
+                        )
+                    } else {
+                        FloatingActionButton(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.padding(16.dp).navigationBarsPadding(),
+                            onClick = { appListViewModel.requestAction(PackageAction.UNINSTALL) },
+                        ) {
+                            Icon(Icons.Default.Delete, stringResource(R.string.uninstall))
                         }
                     }
                 }
@@ -479,8 +340,6 @@ private fun MainContent(
                     .weight(1f)
                     .fillMaxWidth(),
             ) { page ->
-                // Show active dialog
-                currentDialog?.let { it() }
 
                 var isRefreshing by remember { mutableStateOf(false) }
 

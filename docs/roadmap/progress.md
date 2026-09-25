@@ -6,7 +6,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - 2026-09-25: inspected clean repository; no roadmap features implemented at start. Created `roadmap` branch from master.
 - Emulator launched as unified exec session `42132`, serial `emulator-5554`; cold boot in progress. ADB initially reports offline. No phone commands executed.
-- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phase 2 is next. Phases 2–7 and release remain pending.
+- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phase 2 implementation and emulator verification pass. Phases 3–7 and release remain pending.
 
 ## Interface preflight
 
@@ -42,7 +42,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 ### Remaining verification
 
 - Phase 0: offline first launch, category/menu interaction, persisted update settings, actual reset and both-profile isolation verified.
-- Phases 0–1 implementation and listed acceptance checks pass; Phases 2–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
+- Phases 0–2 implementation and listed acceptance checks pass; Phases 3–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
 
 ### Phase 1
 
@@ -66,3 +66,14 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 - `8c5ea38` fixes interrupted badge loading: dedicated emulator test reproduced stale metadata after cancellation (RED), then passed after explicit load-completeness tracking (GREEN, 5.021s). Upstream candidate.
 - Category menu Compose test: all five categories visible through scrolling, AOSP selectable and reflected in menu, 1/1 PASS (`/tmp/cana-phase0-category-ui.log`, 22.406s).
 - Phase 1 implementation commit: `1e5954c`. JVM suite remains 27/27, latest debug + instrumentation builds pass.
+
+### Phase 2
+
+- Added updated-system state and unique base/split APK byte accounting from MATCH_UNINSTALLED_PACKAGES, including other profiles. The uninstalled list has a leftover banner/filter, labeled expandable Reinstall/Remove updates actions, and an app-info cleanup button.
+- Cleanup checks every profile, defaults shared apps to skipped, requires explicit downgrade consent and rechecks at mutation time. Direct reset verifies both update removal and selected-user absence; fallback install/reset/remove also repairs the original state after a failed reset. All profile installed states are checked after cleanup.
+- Installed-app confirmation estimates reclaimable APK bytes, explains device-wide reset, and defaults reset on only if every updated selection is unused by other profiles. Requests capture the profile/packages before confirmation or authorization. Package mutations are serialized; history now stores actual freed bytes.
+- Ruling: report zero lasting reclamation when another profile uses the app, as requested by the spec. Otherwise count only the old update APK paths confirmed absent after cleanup; do not count application data or claim a free-storage delta.
+- Ten new JVM tests: seven assertions failed against stubs before implementation; **37/37 total pass**. Covers direct/fallback/repair failures, missing verification, exception recovery, skip, and unique base/split sizing. Logs `/tmp/cana-phase2-sequence-{red,green}.log`, `/tmp/cana-phase2-ui-build.log`.
+- Actual direct PackageInstaller reset on an already-uninstalled updated package: **1/1 PASS**, both profile directions, 32.437s (`/tmp/cana-phase2-direct-probe.log`). Android 15 supports direct removal; fallback is verified with deterministic failure tests.
+- Full cleanup integration: **1/1 PASS**, 48.993s (`/tmp/cana-phase2-cleanup-device.log`). Verifies shared-consent refusal, unchanged state on refusal, successful cleanup in both directions, AppInfo flags and readable APK size, durable history, no-update skip, unchanged installation state for both profiles, and exact freed bytes when both profiles are uninstalled. Print Spooler restored afterward.
+- Compose confirmation/actions: **2/2 PASS**, 65.543s (`/tmp/cana-phase2-ui.log`): both labeled actions work; shared work-profile cleanup starts unchecked, cannot confirm before selection, shows the downgrade warning and captured profile, then emits the exact approved peer ids. A compile-only import cleanup mistake was corrected before the successful build/test; an earlier stale-test-APK run was discarded.

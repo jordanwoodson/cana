@@ -23,6 +23,8 @@ data class AppInfo(
     val bloatData: BloatData?,
     /** Only set for apps of other profiles, which Canta's own [PackageManager] can't look up. */
     val applicationInfo: ApplicationInfo? = null,
+    val isUpdatedSystemApp: Boolean = false,
+    val updateSizeBytes: Long = 0,
 ) : Parcelable {
 
     val name: String
@@ -67,6 +69,12 @@ data class AppInfo(
                 isDisabled = isDisabled,
                 bloatData = bloatData,
                 applicationInfo = if (otherUser) packageInfo.applicationInfo else null,
+                isUpdatedSystemApp = packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0,
+                updateSizeBytes = updateApkSize(
+                    packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0,
+                    packageInfo.applicationInfo!!.sourceDir,
+                    packageInfo.applicationInfo!!.splitSourceDirs?.toList().orEmpty(),
+                ),
             )
         }
     }
