@@ -27,8 +27,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.UUID
+import org.json.JSONObject
 
-class AppListViewModel : ViewModel() {
+class AppListViewModel(
+    private val bloatListLoader: suspend (Context, Boolean) -> JSONObject = { context, refresh ->
+        BloatListRepository(context).load(refresh)
+    },
+) : ViewModel() {
     private val packageOps get() = CanaServices.getInstance().packageOps
     var isOperating by mutableStateOf(false)
         private set
@@ -119,6 +124,9 @@ class AppListViewModel : ViewModel() {
                 .filter { it.isSystemApp || !onlySystem }
     }
 
+    var needsReload by mutableStateOf(true)
+        private set
+
     /** Lists the users / profiles on the device through Shizuku. */
     suspend fun loadUsers(): Boolean {
         return withContext(Dispatchers.IO) {
@@ -151,6 +159,7 @@ class AppListViewModel : ViewModel() {
     ) = withContext(Dispatchers.Main) {
         val generation = ++loadGeneration
         val userId = selectedUserId
+        needsReload = true
         isLoading = true
         loadError = null
         apps = emptyList()
@@ -163,7 +172,7 @@ class AppListViewModel : ViewModel() {
             isLoading = false
             isLoadingBadges = true
             val bloatMap = withContext(Dispatchers.IO) {
-                val list = BloatListRepository(context).load(forceRefresh)
+                val list = bloatListLoader(context, forceRefresh)
                 val parsed = mutableMapOf<String, BloatData>()
                 for (key in list.keys()) {
                     list.optJSONObject(key)?.let { parsed[key] = BloatData.fromJson(it) }
@@ -173,6 +182,7 @@ class AppListViewModel : ViewModel() {
             }
             if (generation == loadGeneration && userId == selectedUserId) {
                 apps = apps.map { it.copy(bloatData = bloatMap[it.packageName]) }
+                needsReload = false
             }
         } catch (e: CancellationException) {
             throw e

@@ -80,7 +80,7 @@ fun AppList(
     }
 
     LaunchedEffect(Unit) {
-        if (appListModel.appList.isEmpty()) {
+        if (appListModel.needsReload) {
             appListModel.loadInstalled(context.packageManager, context)
         }
     }
