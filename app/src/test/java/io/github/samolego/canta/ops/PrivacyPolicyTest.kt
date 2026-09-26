@@ -12,7 +12,11 @@ class PrivacyPolicyTest {
         }
     }
     @Test fun appOpsParserPreservesDefaultsAndRejectsUnrecognizedOutput() {
-        assertEquals("default", PrivacyPolicy.appOpMode("No operations."))
+        assertEquals("allow", PrivacyPolicy.appOpMode("No operations."))
+        assertEquals("allow", PrivacyPolicy.appOpMode("No operations.\nDefault mode: allow\n"))
+        assertEquals("ignore", PrivacyPolicy.appOpMode("No operations.\nDefault mode: ignore"))
+        assertEquals("default", PrivacyPolicy.appOpMode("RUN_ANY_IN_BACKGROUND: default"))
+        assertTrue(runCatching { PrivacyPolicy.appOpMode("No operations.\nPermission denial") }.isFailure)
         assertEquals("ignore", PrivacyPolicy.appOpMode("RUN_ANY_IN_BACKGROUND: ignore; time=+10s"))
         assertEquals("allow", PrivacyPolicy.appOpMode("Uid mode: RUN_ANY_IN_BACKGROUND: allow\nRUN_ANY_IN_BACKGROUND: ignore"))
         assertTrue(runCatching { PrivacyPolicy.appOpMode("Permission denial") }.isFailure)

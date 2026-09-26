@@ -5,6 +5,17 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PresetJsonTest {
+    @Test fun exportedIdentityAllowsAnImportedRevisionToMatchTheExistingPreset() {
+        val preset = CantaPresetData("Original", "", 1, setOf("remove.me"),
+            uuid = "84809721-5876-4efe-a1b0-2c5124242500")
+        val restored = PresetJson.decode(PresetJson.encode(preset))
+        assertEquals(preset.uuid, restored.uuid)
+    }
+
+    @Test fun legacyImportsWithoutIdentityStillReceiveAnIdentity() {
+        val restored = PresetJson.decode("{\"name\":\"Legacy\",\"apps\":[]}")
+        assertTrue(restored.uuid.isNotBlank())
+    }
     @Test fun profileHintIsOptionalAndSurvivesRoundtripIncludingFutureKinds() {
         for (kind in listOf("WORK", "FUTURE_PROFILE")) {
             val preset = CantaPresetData("Profile", "", 1, setOf("test.app"), profileKind = kind)

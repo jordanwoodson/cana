@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_live_system_default">System default</string>
+    <string name="privacy_live_foreground_only">Foreground access only</string>
+    <string name="privacy_dashboard">Privacy dashboard</string>
+    <string name="privacy_dashboard_description">Review saved restrictions and their verified state in each profile.</string>
+    <string name="privacy_dashboard_empty">No saved network or metered restrictions. Open an app’s Privacy tab to review its controls.</string>
+    <string name="privacy_disconnected_title">Connect to verify privacy settings</string>
+    <string name="privacy_disconnected_body">Live state is unavailable while Shizuku is disconnected. Saved restrictions remain visible and can be forgotten.</string>
+    <string name="privacy_retry">Retry</string>
+    <string name="privacy_diagnostics">Technical details</string>
+    <string name="privacy_hide_diagnostics">Hide technical details</string>
+    <string name="privacy_live_unavailable">Live state unavailable</string>
+    <string name="privacy_live_blocked">Blocked</string>
+    <string name="privacy_live_allowed">Not blocked</string>
+    <string name="privacy_live_restricted">Restricted</string>
+    <string name="privacy_live_unrestricted">Not restricted</string>
+    <string name="privacy_permission_granted">Granted</string>
+    <string name="privacy_permission_denied">Denied</string>
+    <string name="privacy_permission_fixed">Managed by policy</string>
+    <string name="privacy_select_permissions">Select permissions to revoke</string>
+    <string name="privacy_revoke_selected">Revoke selected</string>
+    <string name="privacy_selected_permission_count">%1$d permissions selected</string>
+    <string name="privacy_saved_restriction">Saved restriction</string>
+    <string name="privacy_no_saved_restriction">No saved restriction</string>
+    <string name="privacy_status_pending">Waiting to apply</string>
+    <string name="privacy_status_verified">Last check verified</string>
+    <string name="privacy_status_review">Review required</string>
+    <string name="privacy_status_failed">Could not apply</string>
+    <string name="privacy_status_disconnected">Waiting for Shizuku</string>
+    <string name="privacy_review_required">Review this restriction again. The app identity or safety conditions changed, or this saved entry came from an older installation.</string>
+    <string name="privacy_review">Review</string>
+    <string name="privacy_forget">Forget saved restriction</string>
+    <string name="privacy_forget_explanation">Stop Cana from reapplying this saved restriction. This does not change any live UID rule, including an old or reassigned UID. Use Revert to restore a known live rule while the original app is available.</string>
+    <string name="privacy_forgotten">Saved restriction forgotten. Live rules were not changed.</string>
+    <string name="privacy_store_unavailable">Saved privacy settings could not be read. Retry before making changes.</string>
+</resources>

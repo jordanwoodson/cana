@@ -1,0 +1,9 @@
+<resources>
+    <string name="maintenance_loading_url">Loading saved URL…</string>
+    <string name="maintenance_url_description">Enter the address of a recommendation list. Save validates the address and updates future downloads. Editing or canceling leaves the current URL and cache metadata unchanged.</string>
+    <string name="maintenance_url_invalid">Enter a valid HTTP or HTTPS URL with a host, no credentials and no fragment. Maximum length: 4,096 characters.</string>
+    <string name="maintenance_url_default">Use default URL</string>
+    <string name="maintenance_url_save_failed">Could not save this URL. Your existing setting is unchanged. Try again.</string>
+    <string name="maintenance_expand">Expand</string>
+    <string name="maintenance_collapse">Collapse</string>
+</resources>

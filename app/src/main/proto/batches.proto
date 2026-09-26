@@ -1,0 +1,26 @@
+syntax = "proto3";
+option java_package = "io.github.samolego.canta.data.proto";
+option java_multiple_files = true;
+
+message PlannedBatchItem {
+  string key = 1;
+  string package_name = 2;
+  int32 user_id = 3;
+  string action = 4;
+  string status = 5;
+  string message = 6;
+  bool success = 7;
+  bool skipped = 8;
+  int64 freed_bytes = 9;
+}
+message PlannedBatch {
+  string id = 1;
+  string title = 2;
+  int64 created_ms = 3;
+  repeated PlannedBatchItem items = 4;
+  bool completed = 5;
+  bool stop_requested = 6;
+  bool interrupted = 7;
+  bool review_acknowledged = 8;
+}
+message PlannedBatches { repeated PlannedBatch batches = 1; }

@@ -42,9 +42,9 @@ icon in the top bar), which lists every user on the device through Shizuku. Pick
 that profile's apps, and uninstall / reinstall then act on that profile only
 (`pm uninstall --user <id>` / `pm install-existing --user <id>` semantics).
 
-* Uninstall / reinstall wait for the real result from Android. Failures (e.g. blocked by the
-  work profile's admin) are reported in a toast with the reason in *Logs*, instead of the app
-  being marked as uninstalled.
+* Uninstall / reinstall wait for Android's result and verify the resulting state. Failures
+  and unknown installer outcomes remain visible in History; an outstanding request blocks
+  conflicting package changes until it can be reconciled.
 * Every uninstall targets only the selected profile, including Cana's own profile.
   Removing a system app update is device-wide and requires review when other profiles use it.
 * Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
@@ -58,6 +58,10 @@ that profile's apps, and uninstall / reinstall then act on that profile only
 * Offline UAD recommendations, all list categories, tracker component inspection, privacy presets,
   OTA change review, APK-size sorting, and last-used sorting in Cana's own profile.
 * A separate System screen for Private DNS, captive checks, scanning, mobile data and Data Saver.
+* Exact preflight plans, persistent batch progress and stop controls, hidden-selection review,
+  grouped History, and dedicated app details.
+* A privacy dashboard, selected-permission controls, read-only profile comparison, reviewed
+  preset import diffs, and named saved filters and package collections.
 
 Android 15 shell-backed Shizuku cannot modify ordinary apps' components; those controls explain
 why they are unavailable. Metered and network blocks are saved and reapplied when Shizuku returns
@@ -93,7 +97,7 @@ with adb over Tailscale, with Tailscale on both the phone and your computer:
    computer*, usually:
    `adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh`
 5. Open Cana, tap the profile icon, grant the Shizuku permission and pick *Work profile*.
-6. Select apps and tap the trash button.
+6. Select apps, choose **Review actions**, and confirm the exact apps and profile in the plan.
 
 The adb equivalents, handy for checking what Cana did:
 

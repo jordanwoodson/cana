@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
 import org.lsposed.hiddenapibypass.HiddenApiBypass
+import io.github.samolego.canta.util.HiddenApiAccess
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
@@ -51,7 +52,7 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
             val allowUnsafe = SettingsStore.getInstance().allowUnsafeUninstallsFlow.first()
             names.associateWith { name ->
                 val data = metadata.optJSONObject(name)?.let(BloatData::fromJson)
-                val assessment = SafetyPolicy.assess(name, snapshot, data?.neededBy.orEmpty())
+                val assessment = SafetyPolicy.assess(name, snapshot, data?.neededBy.orEmpty(), userId)
                 if (removing && !allowUnsafe && data?.removal == RemovalRecommendation.UNSAFE)
                     assessment.copy(error = context.getString(R.string.unsafe_uninstall_blocked)) else assessment
             }
@@ -105,7 +106,7 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
     }
 
     internal fun activeAdmins(userId: Int): Set<String> {
-        HiddenApiBypass.addHiddenApiExemptions("Landroid/app/admin/IDevicePolicyManager")
+        HiddenApiAccess.ensureReady()
         val stub = Class.forName("android.app.admin.IDevicePolicyManager\$Stub")
         val service = stub.getMethod("asInterface", IBinder::class.java).invoke(null,
             ShizukuBinderWrapper(SystemServiceHelper.getSystemService(Context.DEVICE_POLICY_SERVICE)))

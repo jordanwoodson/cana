@@ -30,11 +30,11 @@ import io.github.samolego.canta.R
 fun ExpandableFAB(
     onBottomClick: () -> Unit,
     onTopClick: () -> Unit,
+    modifier: Modifier = Modifier,
     topIcon: ImageVector = Icons.Default.Download,
     bottomIcon: ImageVector = Icons.Default.Add,
     topLabel: String = stringResource(R.string.import_action),
-    bottomLabel: String = stringResource(R.string.create_action),
-    modifier: Modifier = Modifier
+    bottomLabel: String = stringResource(R.string.create_action)
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="recovery_pending_review">Android has not confirmed the previous operation. This package is paused in every profile. Reconnect and review History before retrying.</string>
+</resources>

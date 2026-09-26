@@ -2,6 +2,8 @@ package io.github.samolego.canta.ui.dialog
 
 import android.text.format.Formatter.formatFileSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +26,8 @@ import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 
 /** Requests contain immutable package/profile snapshots, including while authorization is pending. */
 @Composable
@@ -31,7 +35,7 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var outcome by remember { mutableStateOf<Pair<PackageAction, BatchResult>?>(null) }
-    val confirmBeforeUninstall by settings.confirmBeforeUninstall.collectAsStateWithLifecycle()
+    var undoRecords by remember { mutableStateOf<List<io.github.samolego.canta.data.proto.OperationRecord>?>(null) }
     val request = model.pendingAction
     if (request != null) key(request) {
         var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
@@ -41,14 +45,14 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
                 onClose = { if (it) authorized = true else model.pendingAction = null },
             )
         } else {
-            PackageActionConfirmation(request, model, confirmBeforeUninstall,
+            PackageActionConfirmation(request, model,
                 onDismiss = { model.pendingAction = null },
                 onAgree = { included, reset, approvals, warnings ->
                     model.pendingAction = null
                     val run = {
                         scope.launch { withPackageAuthentication(context) {
                             val batch = model.processRequest(context, request, included, reset, approvals, warnings)
-                            if (batch.failureCount > 0 || request.action == PackageAction.REMOVE_UPDATES || !settings.hideSuccessDialog.value) {
+                            if (batch.failureCount > 0 || batch.unknownCount > 0 || request.action == PackageAction.REMOVE_UPDATES || !settings.hideSuccessDialog.value) {
                                 outcome = request.action to batch
                             }
                         } }
@@ -64,7 +68,7 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
             title = { Text(stringResource(R.string.operation_results)) },
             text = {
                 Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.operation_batch_result, batch.successCount, batch.failureCount, batch.skippedCount))
+                    Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
                     if (action == PackageAction.REMOVE_UPDATES) Text(stringResource(R.string.update_bytes_freed, formatFileSize(context, batch.freedBytes)))
                     batch.results.filter { !it.success }.forEach { Text(it.message) }
                 }
@@ -73,58 +77,90 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
             dismissButton = {
                 batch.batchId?.let { id ->
                     TextButton(enabled = !model.isOperating, onClick = {
-                        scope.launch { withPackageAuthentication(context) { outcome = action to model.undoBatch(context, id) } }
+                        scope.launch {
+                            undoRecords = io.github.samolego.canta.ops.CanaServices.getInstance().history.records.first()
+                                .filter { it.batchId == id && it.changed }.asReversed()
+                            outcome = null
+                        }
                     }) { Text(stringResource(R.string.undo_action)) }
                 }
             })
     }
+    undoRecords?.let { records -> io.github.samolego.canta.ui.screen.UndoBatchDialog(records,
+        { undoRecords = null }) { result -> outcome = PackageAction.REINSTALL to result; undoRecords = null } }
 }
 
 @Composable
 internal fun PackageActionConfirmation(
     request: PackageActionRequest,
     model: AppListViewModel,
-    confirmUninstall: Boolean,
+    confirmUninstall: Boolean = true,
     onDismiss: () -> Unit,
     onAgree: (Set<String>, Boolean, Map<String, Set<Int>>, Map<String, Set<String>>) -> Unit,
 ) {
     val context = LocalContext.current
+    val unavailableMessage = stringResource(R.string.inventory_unavailable)
     var impacts by remember { mutableStateOf<List<UpdateImpact>?>(null) }
     var included by remember { mutableStateOf(request.apps.map { it.packageName }.toSet()) }
     var reset by remember { mutableStateOf(false) }
     var safety by remember { mutableStateOf<Map<String, SafetyAssessment>>(emptyMap()) }
-    var warningsAccepted by remember { mutableStateOf(false) }
+    var warningsAccepted by remember(included, reset) { mutableStateOf(false) }
+    var inspectionError by remember { mutableStateOf<String?>(null) }
     val cleanup = request.action == PackageAction.REMOVE_UPDATES
     LaunchedEffect(request) {
+        try {
         val inspected = if (request.action == PackageAction.REINSTALL) emptyList() else model.inspectUpdates(request)
         safety = if (request.action == PackageAction.REINSTALL) emptyMap() else model.inspectSafety(request)
         impacts = inspected
         if (cleanup) included = inspected.filter { it.updated && it.error == null && it.otherInstalledProfiles.isEmpty() }.map { it.packageName }.toSet()
-        else reset = inspected.isNotEmpty() && inspected.all { it.error == null && it.otherInstalledProfiles.isEmpty() }
-        included = included.filter { safety[it]?.protected != true && safety[it]?.error == null }.toSet()
-        if (request.action == PackageAction.REINSTALL ||
-            (!confirmUninstall && request.action == PackageAction.UNINSTALL && inspected.isEmpty() && safety.values.all { it.permits(emptySet()) })) {
-            onAgree(included, false, emptyMap(), emptyMap())
-        }
+
+        included = included.filter { pkg -> safety[pkg]?.protected != true && safety[pkg]?.error == null && inspected.none { it.packageName == pkg && it.error != null } }.toSet()
+        } catch (e: CancellationException) { throw e }
+        catch (e: Exception) { inspectionError = e.message ?: unavailableMessage }
     }
     val checked = impacts
     val warnings = if (cleanup) emptyMap() else safety.filter { it.key in included && it.value.warnings.isNotEmpty() }
     val title = request.action.label
+    val updateConsent = (cleanup || reset) && checked.orEmpty().any { it.packageName in included && it.otherInstalledProfiles.isNotEmpty() }
+    val needsConsent = warnings.isNotEmpty() || updateConsent
     AlertDialog(onDismissRequest = onDismiss,
-        title = { Text(stringResource(title)) },
+        title = { Text(stringResource(R.string.plan_title)) },
         text = {
             Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
                 Text(stringResource(R.string.action_user, request.userId))
-                if (checked == null) {
+                Text(stringResource(R.string.plan_summary, request.requestedPackages.size, included.size,
+                    request.requestedPackages.size - included.size))
+                Text(stringResource(when (request.action) {
+                    PackageAction.UNINSTALL -> R.string.plan_remove_data
+                    PackageAction.UNINSTALL_KEEP_DATA -> R.string.plan_keep_data
+                    PackageAction.REINSTALL -> R.string.plan_restore
+                    PackageAction.REMOVE_UPDATES -> R.string.plan_update_loss
+                    else -> R.string.plan_reversible
+                }))
+                inspectionError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                if (checked == null && inspectionError == null) {
                     Text(stringResource(R.string.checking_update_profiles))
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 } else {
-                    if (request.action == PackageAction.UNINSTALL) Text(stringResource(R.string.uninstall_confirmation, request.apps.size))
-                    if (request.action !in setOf(PackageAction.UNINSTALL, PackageAction.REINSTALL, PackageAction.REMOVE_UPDATES)) {
-                        Text(stringResource(R.string.action_app_count, request.apps.size))
-                        request.apps.forEach { Text(it.name, style = MaterialTheme.typography.bodySmall) }
+                    request.requestedPackages.forEach { pkg ->
+                        val app = request.apps.find { it.packageName == pkg }
+                        val assessment = safety[pkg]
+                        val eligible = app != null && assessment?.protected != true && assessment?.error == null && checked.orEmpty().none { it.packageName == pkg && it.error != null } &&
+                            (!cleanup || checked.orEmpty().any { it.packageName == pkg && it.updated && it.error == null })
+                        Row(Modifier.fillMaxWidth().toggleable(pkg in included, enabled = eligible, role = Role.Checkbox,
+                            onValueChange = { included = if (it) included + pkg else included - pkg }), verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(pkg in included, enabled = eligible, onCheckedChange = null)
+                            Column(Modifier.weight(1f)) {
+                                Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium)
+                                if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall)
+                                if (app == null) Text(stringResource(R.string.plan_unavailable), style = MaterialTheme.typography.bodySmall)
+                                else if (pkg !in included) Text(stringResource(R.string.plan_excluded), style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
                     }
-                    checked.filter { it.error != null }.forEach { Text("${it.packageName}: ${it.error}", color = MaterialTheme.colorScheme.error) }
+                    if (included.isEmpty()) Text(stringResource(R.string.plan_empty))
+                    checked.orEmpty().filter { it.error != null }.forEach { Text("${it.packageName}: ${it.error}", color = MaterialTheme.colorScheme.error) }
                     safety.filterValues { it.protected || it.error != null }.forEach { (name, assessment) ->
                         Text(assessment.error ?: stringResource(R.string.safety_protected, name), color = MaterialTheme.colorScheme.error)
                     }
@@ -139,35 +175,24 @@ internal fun PackageActionConfirmation(
                             }, warning.detail))
                         }
                     }
-                    if (warnings.isNotEmpty()) {
+                    if (needsConsent) {
                         Row(Modifier.fillMaxWidth().clickable { warningsAccepted = !warningsAccepted }, verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(warningsAccepted, { warningsAccepted = it })
                             Text(stringResource(R.string.safety_acknowledge))
                         }
                     }
-                    if (checked.any { it.updated }) {
+                    if (checked.orEmpty().any { it.updated }) {
                         Text(stringResource(R.string.update_global_warning))
                         Text(stringResource(R.string.update_space_estimate,
-                            formatFileSize(context, checked.filter { !cleanup || it.packageName in included }.sumOf { it.reclaimableBytes })))
+                            formatFileSize(context, checked.orEmpty().filter { !cleanup || it.packageName in included }.sumOf { it.reclaimableBytes })))
                         if (!cleanup) {
                             Row(Modifier.fillMaxWidth().clickable { reset = !reset }, verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(checked = reset, onCheckedChange = { reset = it })
                                 Text(stringResource(R.string.reset_to_factory_version))
                             }
                         }
-                        checked.filter { it.updated }.forEach { impact ->
+                        checked.orEmpty().filter { it.updated }.forEach { impact ->
                             Column {
-                                if (cleanup) {
-                                    val selectable = safety[impact.packageName]?.let { !it.protected && it.error == null } ?: false
-                                    Row(Modifier.fillMaxWidth().clickable(enabled = selectable) {
-                                        included = if (impact.packageName in included) included - impact.packageName else included + impact.packageName
-                                    }, verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(impact.packageName in included, enabled = selectable, onCheckedChange = {
-                                            included = if (it) included + impact.packageName else included - impact.packageName
-                                        })
-                                        Text(request.apps.first { it.packageName == impact.packageName }.name)
-                                    }
-                                }
                                 if (impact.otherInstalledProfiles.isNotEmpty()) {
                                     Text(impact.packageName, style = MaterialTheme.typography.labelMedium)
                                     Text(stringResource(if (cleanup) R.string.update_shared_warning else R.string.update_shared_uninstall_warning,
@@ -176,17 +201,17 @@ internal fun PackageActionConfirmation(
                                 }
                             }
                         }
-                    } else if (cleanup && checked.none { it.error != null }) Text(stringResource(R.string.no_leftover_updates))
+                    } else if (cleanup && checked.orEmpty().none { it.error != null }) Text(stringResource(R.string.no_leftover_updates))
                 }
             }
         },
         confirmButton = {
-            TextButton(enabled = checked != null && checked.none { it.error != null } && included.isNotEmpty() &&
-                (warnings.isEmpty() || warningsAccepted), onClick = {
+            TextButton(enabled = checked != null && checked.none { it.packageName in included && it.error != null } && included.isNotEmpty() &&
+                (!needsConsent || warningsAccepted), onClick = {
                 onAgree(included, reset, checked.orEmpty().associate { impact ->
                     impact.packageName to impact.otherInstalledProfiles.map { it.id }.toSet()
                 }, warnings.mapValues { (_, report) -> report.warnings.map { it.key }.toSet() })
-            }) { Text(stringResource(title)) }
+            }) { Text(stringResource(R.string.plan_execute)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )

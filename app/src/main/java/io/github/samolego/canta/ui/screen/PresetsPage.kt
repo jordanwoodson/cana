@@ -58,6 +58,7 @@ import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
 import io.github.samolego.canta.ui.dialog.preset.ImportPresetDialog
 import io.github.samolego.canta.ui.dialog.preset.PresetCreateDialog
+import io.github.samolego.canta.ui.dialog.preset.PresetImportReviewDialog
 import io.github.samolego.canta.ui.dialog.preset.PresetEditDialog
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
@@ -101,6 +102,7 @@ fun PresetsPage(
                                 currentDialog = {
                                     ImportDialog(
                                             presetViewModel = presetViewModel,
+                                            appListViewModel = appListViewModel,
                                             hideDialog = { currentDialog = null },
                                             context = context,
                                     )
@@ -111,7 +113,9 @@ fun PresetsPage(
             }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            if (presetViewModel.isLoading) {
+            if (presetViewModel.libraryError != null) {
+                Text(stringResource(R.string.preset_library_error), modifier = Modifier.padding(24.dp), color = MaterialTheme.colorScheme.error)
+            } else if (presetViewModel.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -122,6 +126,7 @@ fun PresetsPage(
                             currentDialog = {
                                 ImportDialog(
                                         presetViewModel = presetViewModel,
+                                        appListViewModel = appListViewModel,
                                         hideDialog = { currentDialog = null },
                                         context = context,
                                 )
@@ -204,55 +209,34 @@ fun PresetsPage(
     }
 
     currentDialog?.let { it() }
+    presetViewModel.importReview?.let { review ->
+        val importedText = stringResource(R.string.preset_import_saved)
+        PresetImportReviewDialog(review, presetViewModel.checkingImport, presetViewModel.isLoading,
+            presetViewModel.importError,
+            onConfirm = { presetViewModel.confirmImport { Toast.makeText(context, importedText, Toast.LENGTH_SHORT).show() } },
+            onDismiss = presetViewModel::cancelImport)
+    }
 }
 
 @Composable
 private fun ImportDialog(
-        hideDialog: () -> Unit,
-        presetViewModel: PresetsViewModel,
-        context: Context
+    hideDialog: () -> Unit,
+    presetViewModel: PresetsViewModel,
+    appListViewModel: AppListViewModel,
+    context: Context,
 ) {
     val importFailedText = stringResource(R.string.import_failed)
+    val review: (CantaPresetData) -> Unit = { preset ->
+        val profile = appListViewModel.selectedProfile
+            ?: appListViewModel.users.firstOrNull { it.id == appListViewModel.selectedUserId }
+        presetViewModel.prepareImport(preset, context, appListViewModel.selectedUserId, profile?.name, profile?.kind?.name)
+        hideDialog()
+    }
+    val failure = { Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT).show() }
     ImportPresetDialog(
-            onDismiss = hideDialog,
-            onImportFromClipboard = {
-                presetViewModel.importFromClipboard(
-                        context = context,
-                        onSuccess = { preset ->
-                            hideDialog()
-                            presetViewModel.saveImportedPreset(
-                                    preset = preset,
-                                    onError = {
-                                        Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT)
-                                            .show()
-                                    }
-                            )
-                        },
-                        onError = {
-                            Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT)
-                                    .show()
-                        }
-                )
-            },
-            onImportFromText = { jsonText ->
-                presetViewModel.importFromJson(
-                        jsonString = jsonText,
-                        onSuccess = { preset ->
-                            hideDialog()
-                            presetViewModel.saveImportedPreset(
-                                preset = preset,
-                                onError = {
-                                    Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-                            )
-                        },
-                        onError = {
-                            Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT)
-                                    .show()
-                        }
-                )
-            }
+        onDismiss = hideDialog,
+        onImportFromClipboard = { presetViewModel.importFromClipboard(context, review, failure) },
+        onImportFromText = { presetViewModel.importFromJson(it, review, failure) },
     )
 }
 

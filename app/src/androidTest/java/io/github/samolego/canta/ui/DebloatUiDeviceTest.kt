@@ -5,7 +5,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.samolego.canta.extension.add
-import io.github.samolego.canta.ui.component.fab.PackageActionsFab
+import io.github.samolego.canta.ui.component.SelectionActionBar
 import io.github.samolego.canta.ui.dialog.ComponentsDialog
 import io.github.samolego.canta.ui.theme.CantaTheme
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
@@ -33,12 +33,13 @@ class DebloatUiDeviceTest {
             model.loadInstalled(context.packageManager, context)
             model.onlySystem = false
             model.selectedApps.add(name)
-            model.selectedFilter = Filter("Hidden", { false })
+            model.searchQuery = "no app matches this query"
             assertEquals(PackageAction.DISABLE, model.defaultAction)
         }
-        compose.setContent { CantaTheme { PackageActionsFab(model) } }
+        compose.setContent { CantaTheme { SelectionActionBar(model, AppsType.INSTALLED) } }
+        compose.onNodeWithText("1 selected · 1 hidden by this view").assertIsDisplayed()
+        compose.onNodeWithText("Review actions").performClick()
         compose.onNodeWithText("Disable").assertIsDisplayed()
-        compose.onNodeWithContentDescription("More actions").performClick()
         for (action in listOf("Enable", "Suspend", "Unsuspend", "Uninstall keeping data", "Uninstall")) {
             compose.onNodeWithText(action).assertIsDisplayed()
         }

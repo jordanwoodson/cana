@@ -15,12 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
@@ -28,6 +29,11 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -53,10 +59,8 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.component.CanaWordmark
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
-import io.github.samolego.canta.ui.component.SettingsTextItem
 import io.github.samolego.canta.ui.component.SelfGrantSettings
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
-import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
 import io.github.samolego.canta.util.showBiometricPrompt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,11 +73,9 @@ fun SettingsScreen(
     val context = LocalContext.current
     val autoUpdateBloatList by settingsViewModel.autoUpdateBloatList.collectAsStateWithLifecycle()
     val unmeteredOnly by settingsViewModel.bloatUnmeteredOnly.collectAsStateWithLifecycle()
-    val confirmBeforeUninstall by
-            settingsViewModel.confirmBeforeUninstall.collectAsStateWithLifecycle()
+    val urlEditor by settingsViewModel.bloatListUrlEditorState.collectAsStateWithLifecycle()
 
     var advancedSettingsExpanded by remember { mutableStateOf(false) }
-    var bloatListUrl by remember { mutableStateOf(settingsViewModel.bloatListUrl.value.let { if (it.isEmpty()) DEFAULT_BLOAT_URL else it }) }
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
     val hideSuccessDialog by settingsViewModel.hideSuccessDialog.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
@@ -123,19 +125,6 @@ fun SettingsScreen(
                 checked = unmeteredOnly,
                 onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
             )
-
-            // Confirm before uninstall
-            SettingsItem(
-                title = stringResource(R.string.confirm_uninstall),
-                description = stringResource(R.string.confirm_uninstall_description),
-                icon = Icons.Default.Delete,
-                isSwitch = true,
-                checked = confirmBeforeUninstall,
-                onCheckedChange = {
-                    settingsViewModel.saveConfirmBeforeUninstall(it)
-                }
-            )
-
 
             SettingsItem(
                 title = stringResource(R.string.hide_success_dialog),
@@ -197,7 +186,7 @@ fun SettingsScreen(
                         imageVector =
                                 if (advancedSettingsExpanded) Icons.Default.ExpandLess
                                 else Icons.Default.ExpandMore,
-                        contentDescription = if (advancedSettingsExpanded) "Collapse" else "Expand",
+                        contentDescription = stringResource(if (advancedSettingsExpanded) R.string.maintenance_collapse else R.string.maintenance_expand),
                         tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -209,8 +198,8 @@ fun SettingsScreen(
             ) {
                 Column {
                     SettingsItem(
-                        title = stringResource(R.string.allow_unsafe_selections),
-                        description = stringResource(R.string.allow_unsafe_uninstalls_description),
+                        title = stringResource(R.string.allow_unsafe_removal),
+                        description = stringResource(R.string.allow_unsafe_removal_description),
                         icon = Icons.Default.Close,
                         isSwitch = true,
                         checked = allowUnsafe,
@@ -219,17 +208,11 @@ fun SettingsScreen(
                         }
                     )
 
-                    // Bloat List URL
-                    SettingsTextItem(
-                            title = stringResource(R.string.bloat_list_url),
-                            description = stringResource(R.string.bloat_list_url_description),
-                            icon = Icons.Default.Link,
-                            keyboardType = KeyboardType.Uri,
-                            value = bloatListUrl,
-                            onValueChange = {
-                                bloatListUrl = it
-                                settingsViewModel.saveBloatListUrl(it)
-                            },
+                    SettingsItem(
+                        title = stringResource(R.string.bloat_list_url),
+                        description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
+                        icon = Icons.Default.Link,
+                        onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
                     )
 
                 }
@@ -278,5 +261,39 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+
+    if (urlEditor.editing) {
+        AlertDialog(
+            onDismissRequest = settingsViewModel::cancelBloatListUrlEdit,
+            title = { Text(stringResource(R.string.bloat_list_url)) },
+            text = {
+                Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(R.string.maintenance_url_description))
+                    OutlinedTextField(
+                        value = urlEditor.draft,
+                        onValueChange = settingsViewModel::editBloatListUrl,
+                        label = { Text(stringResource(R.string.bloat_list_url)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                        singleLine = true,
+                        isError = urlEditor.invalid,
+                        enabled = !urlEditor.saving,
+                        supportingText = { if (urlEditor.invalid) Text(stringResource(R.string.maintenance_url_invalid)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    TextButton(onClick = settingsViewModel::resetBloatListUrlDraft, enabled = !urlEditor.saving) {
+                        Text(stringResource(R.string.maintenance_url_default))
+                    }
+                    if (urlEditor.saveFailed) Text(stringResource(R.string.maintenance_url_save_failed), color = MaterialTheme.colorScheme.error)
+                    if (urlEditor.saving) LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+            },
+            confirmButton = { Button(onClick = settingsViewModel::saveBloatListUrlDraft, enabled = !urlEditor.saving) {
+                Text(stringResource(R.string.save))
+            } },
+            dismissButton = { TextButton(onClick = settingsViewModel::cancelBloatListUrlEdit, enabled = !urlEditor.saving) {
+                Text(stringResource(R.string.cancel))
+            } },
+        )
     }
 }

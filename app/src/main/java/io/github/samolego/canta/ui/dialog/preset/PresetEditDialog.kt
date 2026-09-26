@@ -19,6 +19,7 @@ import io.github.samolego.canta.util.CantaPresetData
 
 @Composable
 private fun PresetDialog(
+    title: String,
     initialName: String,
     initialDescription: String,
     capturePrivacy: Boolean = false,
@@ -37,7 +38,7 @@ private fun PresetDialog(
         onDismissRequest = { if (!busy) onDismiss() },
         title = {
             Text(
-                text = stringResource(R.string.create_preset),
+                text = title,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -115,6 +116,7 @@ fun PresetCreateDialog(
     val context = LocalContext.current
     val presetSaveErrorText = stringResource(R.string.preset_save_error)
     PresetDialog(
+        title = stringResource(R.string.create_preset),
         initialName = "",
         initialDescription = "",
         capturePrivacy = true,
@@ -129,7 +131,7 @@ fun PresetCreateDialog(
                 description = description,
                 privacyUserId = if (includePrivacy) appListViewModel.selectedUserId else null,
                 profileKind = kind,
-                apps = appListViewModel.appList.filter { it.isUninstalled }.map { it.packageName }
+                apps = appListViewModel.allApps.filter { it.isUninstalled }.map { it.packageName }
                     .toSet(),
                 onSuccess = { closeDialog() },
                 onError = {
@@ -154,6 +156,7 @@ fun PresetEditDialog(
     val context = LocalContext.current
     val presetSaveErrorText = stringResource(R.string.preset_save_error)
     PresetDialog(
+        title = stringResource(R.string.edit),
         initialName = preset.name,
         initialDescription = preset.description,
         profileKind = preset.profileKind,

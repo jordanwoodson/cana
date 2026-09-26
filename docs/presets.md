@@ -1,81 +1,27 @@
 ---
 title: Cana - Presets
-description: Learn how to use presets to manage app uninstall lists across devices.
+description: Review, save, and apply package and privacy configurations.
 ---
-
 # Presets
 
-Presets are a powerful feature in Cana that allows you to create, manage, and share collections of apps for uninstallation. This feature is particularly useful for applying the same set of app removals across multiple devices or sharing your bloatware removal configurations with others.
+A preset contains a name, description, stable identity, package removals, optional privacy controls, and an optional profile-kind hint. Saving or importing a preset does not apply its actions.
 
-## What are presets?
+## Create and edit
 
-A preset is a saved collection of apps that you want to uninstall. Each preset contains:
+Open **Presets** from the menu. Create a preset from the removed apps in the current profile, optionally including supported privacy settings. This capture uses the profile's full inventory, even when the main list is filtered. Review and edit the package list before sharing it.
 
-- **Name**: A descriptive name for your preset (e.g., "Samsung Bloatware")
-- **Description**: Optional details about what the preset removes
-- **App List**: The specific apps (package names) to be uninstalled
-- **Creation Date**: When the preset was created
-- **Version**: Format version for compatibility
+## Import and export
 
-## Creating presets
+Export copies JSON to the clipboard. Import accepts clipboard or pasted JSON and opens a review before saving. The review shows added/removed actions, privacy differences, profile mismatches, and package availability.
 
-### From Uninstalled Apps
+If an imported identity already exists, **Update** replaces that preset only after confirmation. If the saved preset changes while review is open, Cana requests another review. **Cancel** leaves the existing preset unchanged. Older JSON without an identity is imported as a new preset.
 
-The easiest way to create a preset is from apps you've already uninstalled:
+Missing packages remain in the saved preset so it can be used on another device. Their absence is visible in review; it is not treated as proof that a profile could be inspected when access failed.
 
-1. **Uninstall the apps** you want to include in your preset
-2. Navigate to the **Presets** tab in Cana
-3. Tap the **Create Preset** button
-4. Enter a **name** for your preset (required)
-5. Add an optional **description** explaining what the preset removes
-6. Tap **Save**
+## Apply
 
-::: tip
-The preset will automatically capture all currently uninstalled apps on your device. Make sure you've uninstalled exactly the apps you want before creating the preset.
-:::
+Choose **Apply preset** and review the target profile or profiles, exact actions, unavailable packages, and safety warnings. No actions run until you confirm and complete any configured device authentication.
 
-## Managing Presets
+Progress remains available outside the dialog. **Stop after current item** leaves subsequent items unstarted. History records per-item outcomes and recovery details. If the process closes, unfinished work is shown for review and is never automatically replayed.
 
-### Viewing Your Presets
-
-When you navigate to the Presets tab, you'll see a comprehensive list of all your saved presets. Each preset entry displays the preset name and description, the creation date showing when it was originally made, the number of apps included in that preset, and an action menu that provides various management options for each individual preset.
-
-### Applying Presets
-
-To use a preset on your current device:
-
-1. Find the preset you want to apply
-2. Tap the **Apply Preset** option
-3. Cana will select all available apps from the preset
-4. Review the selected apps in the main app list
-5. Uninstall the selected apps as usual
-
-::: warning Important
-When applying presets, only apps that exist on your current device will be selected. Apps that aren't installed or don't exist on your device will be skipped.
-:::
-
-## Import & Export
-
-
-Sharing and importing presets is simple and flexible in Cana. To **export** a preset, find it in your presets list and tap the **Share** option to copy it as JSON to your clipboard, which you can then paste and share with others. To **import** presets, tap **Import Preset** and choose either the **Clipboard** tab to import directly from copied JSON data, or the **Text** tab to manually paste preset data into the text field before tapping **Import**.
-
-### JSON Format
-
-Presets are exported in JSON format for easy sharing. Here's what a preset JSON looks like:
-
-```json
-{
-  "name": "Samsung Bloatware",
-  "description": "Removes Samsung's duplicate apps and unnecessary services",
-  "createdDate": 1699123456789,
-  "version": "1.0",
-  "apps": [
-    "com.samsung.android.bixby.agent",
-    "com.samsung.android.app.spage"
-  ]
-}
-```
-
----
-
-Presets make Cana even more powerful by allowing you to systematically manage app removal across devices. Whether you're setting up multiple devices, sharing your expertise, or simply want to backup your uninstall preferences, presets provide a robust solution for that case.
+Uninstalling can delete app data. Reinstall and recovery cannot recreate deleted data, removed APK versions, or unavailable APK files. Profile administrator restrictions and Android's permission rules still apply.

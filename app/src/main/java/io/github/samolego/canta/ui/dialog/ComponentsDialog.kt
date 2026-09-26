@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -18,14 +19,19 @@ import io.github.samolego.canta.data.SettingsStore
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
+import io.github.samolego.canta.util.withPackageAuthentication
+import io.github.samolego.canta.ui.screen.UndoBatchDialog
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 @Composable
-fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
+fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) = ComponentsDialog(packageName, userId, false, onDismiss)
+
+@Composable
+fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss: () -> Unit) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val services = CanaServices.getInstance()
     val scope = rememberCoroutineScope()
     var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
@@ -39,6 +45,7 @@ fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
     var revision by remember { mutableIntStateOf(0) }
     var busy by remember { mutableStateOf(false) }
     var lastRecord by remember { mutableStateOf<OperationRecord?>(null) }
+    var undoReview by remember { mutableStateOf<OperationRecord?>(null) }
     var pending by remember { mutableStateOf<AppComponent?>(null) }
     var sourceDialog by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
@@ -47,9 +54,7 @@ fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
         catch (e: CancellationException) { throw e }
         catch (e: Exception) { message = e.message }
     }
-    AlertDialog(onDismissRequest = { if (!busy) onDismiss() },
-        title = { Text(stringResource(R.string.components)) },
-        text = {
+    val content: @Composable () -> Unit = {
             Column(Modifier.heightIn(max = 560.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(packageName, style = MaterialTheme.typography.labelMedium)
                 Text(stringResource(R.string.action_user, userId))
@@ -87,22 +92,20 @@ fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
                     TextButton(onClick = { sourceDialog = true }) { Text(stringResource(R.string.tracker_source)) }
                 }
                 lastRecord?.let { record ->
-                    TextButton(enabled = !busy, onClick = {
-                        scope.launch {
-                            busy = true
-                            try {
-                                val result = services.packageOps.undo(record)
-                                message = result.message
-                                if (result.success) lastRecord = null
-                                revision++
-                            } finally { busy = false }
-                        }
-                    }) { Text(stringResource(R.string.undo_action)) }
+                    TextButton(enabled = !busy, onClick = { undoReview = record }) { Text(stringResource(R.string.undo_action)) }
                 }
             }
-        },
-        confirmButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.close)) } },
-    )
+    }
+    if (embedded) content() else AlertDialog(onDismissRequest = { if (!busy) onDismiss() },
+        title = { Text(stringResource(R.string.components)) }, text = content,
+        confirmButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.close)) } })
+    undoReview?.let { record -> UndoBatchDialog(listOf(record), { undoReview = null }) { result ->
+        message = result.results.joinToString("\n") { it.message }
+        if (result.successCount > 0) lastRecord = null
+        undoReview = null
+        revision++
+    } }
+
     pending?.let { component ->
         var assessment by remember(component) { mutableStateOf<SafetyAssessment?>(null) }
         var accepted by remember(component) { mutableStateOf(false) }
@@ -111,6 +114,8 @@ fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
         AlertDialog(onDismissRequest = { pending = null }, title = { Text(stringResource(if (component.enabled) R.string.disable_app else R.string.enable_app)) },
             text = {
                 Column {
+                    Text(packageName)
+                    Text(stringResource(R.string.action_user, userId))
                     Text(component.name.className)
                     if (report == null) LinearProgressIndicator()
                     else {
@@ -131,15 +136,19 @@ fun ComponentsDialog(packageName: String, userId: Int, onDismiss: () -> Unit) {
                     (!component.enabled || report.warnings.isEmpty() || accepted), onClick = {
                     pending = null
                     scope.launch {
+                        withPackageAuthentication(context) {
                         busy = true
                         try {
-                            val batch = UUID.randomUUID().toString()
-                            val result = services.packageOps.setComponentEnabled(component.name, userId, !component.enabled,
-                                report!!.warnings.map { it.key }.toSet(), batch)
-                            message = result.message
-                            lastRecord = services.history.records.first().lastOrNull { it.batchId == batch && it.changed }
+                            val approved = report!!.warnings.map { it.key }.toSet()
+                            val result = services.batches.run(resources.getString(R.string.components),
+                                listOf(BatchItem(component.name.flattenToString(), packageName, userId, "component"))) { _, batch ->
+                                services.packageOps.setComponentEnabled(component.name, userId, !component.enabled, approved, batch)
+                            }
+                            message = result.results.joinToString("\n") { it.message }
+                            lastRecord = services.history.state.first().records.lastOrNull { it.batchId == result.batchId && it.changed }
                             revision++
                         } finally { busy = false }
+                        }
                     }
                 }) { Text(stringResource(R.string.ok)) }
             }, dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.cancel)) } })

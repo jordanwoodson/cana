@@ -31,7 +31,7 @@ import java.io.File
 /** All mutations capture an explicit user and journal their before/after state. */
 class PackageOps(context: Context, private val history: HistoryStore, private val safety: SafetyInspector, private val shell: ShellRunner) {
     private val context = context.applicationContext
-    private val mutationMutex = Mutex()
+    private val mutationMutex = history.mutationMutex
 
     suspend fun inspectUpdates(packageName: String, userId: Int): UpdateImpact = withContext(Dispatchers.IO) {
         try { inspectUpdatesNow(packageName, userId) }
@@ -97,7 +97,8 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             },
             uninstall = { uninstallStep(packageName, userId, it) },
         )
-        if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed))
+        if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed),
+            outcomeUnknown = result.outcomeUnknown, installerRequestId = result.requestId)
         else {
             val after = getPackageInfo(packageName, userId)?.applicationInfo
             val removed = after == null || after.flags and ApplicationInfo.FLAG_INSTALLED == 0
@@ -128,6 +129,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
     suspend fun setComponentEnabled(component: ComponentName, userId: Int, enabled: Boolean,
         approvedWarnings: Set<String> = emptySet(), batchId: String = UUID.randomUUID().toString(),
     ): OperationResult = recorded(component.packageName, userId, "component", batchId,
+        intendedState = JSONObject().put("component", component.flattenToString()).put("enabledSetting", if (enabled) 1 else 2).toString(),
         snapshotter = { info, user -> componentSnapshot(info, user, component) }) { before ->
         check(Shizuku.getUid() != 2000 || (before?.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_TEST_ONLY != 0) {
             context.getString(R.string.component_requires_root)
@@ -150,9 +152,20 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         if (known.any { it.undoOf == record.id && it.completed && (it.success || it.recoveryComplete) }) {
             return OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
         }
-        val prior = runCatching { JSONObject(record.previousState) }.getOrDefault(JSONObject())
+        val prior = runCatching { SnapshotState.read(record.previousState) }.getOrDefault(JSONObject())
         val component = prior.optString("component").takeIf { it.isNotBlank() }?.let(ComponentName::unflattenFromString)
+        val keys = when (record.action) {
+            "disable", "enable", "component" -> listOf("enabledSetting")
+            "suspend", "unsuspend" -> listOf("suspended")
+            "uninstall", "uninstall_keep_data", "reinstall", "remove_updates" -> listOf("installed", "enabledSetting")
+            else -> emptyList()
+        }
+        val intended = JSONObject().apply {
+            keys.filter { prior.has(it) }.forEach { put(it, prior.get(it)) }
+            if (component != null) put("component", component.flattenToString())
+        }.toString()
         return recorded(record.packageName, record.userId, record.action, batchId, undoOf = record.id,
+            intendedState = intended,
             snapshotter = { info, user -> if (component != null) componentSnapshot(info, user, component) else snapshot(info, user) }) {
             val plan = RestoreScript.plan(record)
             // A removed update payload needs a manual APK reinstall, not another shell mutation.
@@ -168,12 +181,6 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             val results = plan.commands.map { shell.exec(it) }
             val after = JSONObject(if (component != null) componentSnapshot(getPackageInfo(record.packageName, record.userId), record.userId, component)
                 else snapshot(getPackageInfo(record.packageName, record.userId), record.userId))
-            val keys = when (record.action) {
-                "disable", "enable", "component" -> listOf("enabledSetting")
-                "suspend", "unsuspend" -> listOf("suspended")
-                "uninstall", "uninstall_keep_data", "reinstall", "remove_updates" -> listOf("installed", "enabledSetting")
-                else -> emptyList()
-            }
             val matches = keys.isNotEmpty() && keys.filter { prior.has(it) }.all { prior.get(it) == after.opt(it) }
             val recovered = results.all { it.success } && matches
             val success = recovered && plan.notes.isEmpty()
@@ -198,7 +205,8 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         batchId: String = UUID.randomUUID().toString(),
     ): OperationResult = recorded(packageName, userId, "reinstall", batchId) {
         val result = installExistingStep(packageName, userId)
-        if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed))
+        if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed),
+            outcomeUnknown = result.outcomeUnknown, installerRequestId = result.requestId)
         else {
             val installed = getPackageInfo(packageName, userId)?.applicationInfo?.let {
                 it.flags and ApplicationInfo.FLAG_INSTALLED != 0
@@ -240,17 +248,52 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             installExisting = { installExistingStep(packageName, userId) },
             uninstallForUser = { uninstallStep(packageName, userId, 4) },
         )
+        if (result.outcomeUnknown) return@recorded OperationResult(false,
+            context.getString(R.string.recovery_pending_review), outcomeUnknown = true, installerRequestId = result.requestId)
         val preserved = profilesBefore.all { (id, installed) -> isInstalled(packageName, id) == installed }
         val success = result.success && preserved
         val freed = if (impact.otherInstalledProfiles.isEmpty()) paths.filterKeys { !File(it).exists() }.values.sum() else 0
         OperationResult(success,
             if (!preserved) context.getString(R.string.update_profile_state_changed)
             else result.message ?: context.getString(if (success) R.string.operation_success else R.string.operation_failed),
-            freedBytes = freed)
+            freedBytes = freed, outcomeUnknown = result.outcomeUnknown, installerRequestId = result.requestId)
     }
 
     private fun isInstalled(packageName: String, userId: Int): Boolean =
         getPackageInfo(packageName, userId)?.applicationInfo?.let { it.flags and ApplicationInfo.FLAG_INSTALLED != 0 } == true
+
+    /** Reconcile callbacks and observed target states without executing any package command. */
+    suspend fun reconcilePending(): BatchResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
+        val results = mutableListOf<OperationResult>()
+        val known = history.records.first()
+        for (record in known.filter { !it.completed && it.packageName.isNotBlank() &&
+            it.action in setOf("uninstall", "uninstall_keep_data", "reinstall", "remove_updates", "disable", "enable", "suspend", "unsuspend", "component") }) {
+            val after = runCatching {
+                val component = SnapshotState.read(record.previousState).optString("component").takeIf { it.isNotBlank() }?.let(ComponentName::unflattenFromString)
+                val info = getPackageInfo(record.packageName, record.userId)
+                if (component != null) componentSnapshot(info, record.userId, component) else snapshot(info, record.userId)
+            }.getOrNull()
+            val terminal = PackageInstallerResult.terminalResult(record.installerRequestId)
+            val settled = after?.let { PendingPackageRecovery.settle(record, it, terminal,
+                PackageInstallerResult.isAwaiting(record.installerRequestId)) }
+            if (settled == null) {
+                val message = context.getString(R.string.recovery_pending_review)
+                history.markPending(record.id, message, after ?: "{}", installerRequestId = record.installerRequestId)
+                results += OperationResult(false, message, changed = true, outcomeUnknown = true)
+            } else {
+                val message = terminal?.message ?: context.getString(if (settled) R.string.operation_success else R.string.operation_not_applied)
+                val original = record.undoOf.takeIf { it.isNotBlank() }?.let { originalId ->
+                    known.firstOrNull { it.id == originalId } ?: history.allRecords().firstOrNull { it.id == originalId }
+                }
+                val result = PendingPackageRecovery.finish(record, after!!, settled, message, original)
+                history.complete(record.id, result.success, result.message, after, result.changed,
+                    recoveryComplete = result.recoveryComplete)
+                PackageInstallerResult.forget(record.installerRequestId)
+                results += result
+            }
+        }
+        BatchResult(results)
+    } }
 
     internal fun installExistingStep(packageName: String, userId: Int): PackageInstallerResult.Result {
         LogUtils.i("PackageOps", "install-existing $packageName user=$userId")
@@ -283,10 +326,15 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         action: String,
         batchId: String,
         undoOf: String = "",
+        intendedState: String = "",
         snapshotter: (PackageInfo?, Int) -> String = { info, user -> snapshot(info, user) },
         operation: suspend (PackageInfo?) -> OperationResult,
     ): OperationResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
         LogUtils.i("PackageOps", "$action $packageName user=$userId batch=$batchId")
+        // Resetting updates can affect every profile, so uncertainty gates the package globally.
+        if (history.records.first().any { it.packageName == packageName && !it.completed }) {
+            return@withContext OperationResult(false, context.getString(R.string.recovery_pending_review), outcomeUnknown = true)
+        }
         val id = UUID.randomUUID().toString()
         var before: PackageInfo? = null
         var previousState = "{}"
@@ -303,9 +351,19 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             previousState = snapshotter(before, userId)
         } catch (e: Exception) { preflightError = e }
         try {
+            val intended = intendedState.ifBlank { when (action) {
+                "uninstall", "uninstall_keep_data" -> "{\"installed\":false}"
+                "reinstall" -> "{\"installed\":true}"
+                "remove_updates" -> "{\"installed\":false,\"updatedSystemApp\":false}"
+                "enable" -> "{\"enabledSetting\":1}"
+                "disable" -> "{\"enabledSetting\":3}"
+                "suspend" -> "{\"suspended\":true}"
+                "unsuspend" -> "{\"suspended\":false}"
+                else -> ""
+            } }
             history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
                 .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
-                .setAction(action).setPreviousState(previousState).setUndoOf(undoOf).build())
+                .setAction(action).setPreviousState(previousState).setUndoOf(undoOf).setIntendedState(intended).build())
         } catch (e: Exception) {
             LogUtils.e("PackageOps", "Cannot persist operation before mutation", e)
             return@withContext OperationResult(false, context.getString(R.string.operation_history_failed))
@@ -323,7 +381,9 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             val result = packageOutcome(previousState, after, outcome, context.getString(R.string.operation_state_unavailable))
             val changed = result.changed
             try {
-                history.complete(id, result.success, result.message, after ?: "{}", changed, result.freedBytes, result.recoveryComplete)
+                if (result.outcomeUnknown) history.markPending(id, context.getString(R.string.recovery_pending_review),
+                    after ?: "{}", changed, result.installerRequestId)
+                else history.complete(id, result.success, result.message, after ?: "{}", changed, result.freedBytes, result.recoveryComplete)
             } catch (e: Exception) {
                 LogUtils.e("PackageOps", "Cannot persist result; operation remains pending", e)
                 return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
@@ -334,7 +394,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         }
     } }
 
-    private fun snapshot(info: PackageInfo?, userId: Int): String = JSONObject().apply {
+    private fun snapshot(info: PackageInfo?, userId: Int): String = SnapshotState.version(JSONObject()).apply {
         val app = info?.applicationInfo
         put("installed", app != null && app.flags and ApplicationInfo.FLAG_INSTALLED != 0)
         put("updatedSystemApp", app != null && app.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0)

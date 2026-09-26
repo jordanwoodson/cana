@@ -10,7 +10,8 @@ class ShellUserService : IShellService.Stub() {
     override fun exec(argv: Array<String>, timeoutMs: Long): ShellResult {
         if (argv.firstOrNull() == "cana-privacy") {
             return try {
-                val path = PrivacyPlatform.packageInfo("io.github.jordanwoodson.cana", android.os.Process.myUid() / 100_000)
+                val command = PrivacyCommand.parse(argv.drop(1))
+                val path = PrivacyPlatform.packageInfo("io.github.jordanwoodson.cana", command.ownerUserId)
                     .applicationInfo!!.sourceDir
                 val output = ProcessRunner.exec(listOf("/system/bin/app_process", "/system/bin",
                     "io.github.samolego.canta.ops.PrivacyRecovery") + argv.drop(1), timeoutMs,

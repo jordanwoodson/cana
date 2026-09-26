@@ -2,9 +2,8 @@ package io.github.samolego.canta.util.shizuku
 
 import android.content.Context
 import android.os.IBinder
-import io.github.samolego.canta.util.LogUtils
+import io.github.samolego.canta.util.HiddenApiAccess
 import io.github.samolego.canta.util.apps.UserProfile
-import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -14,8 +13,6 @@ import rikka.shizuku.SystemServiceHelper
  * profile it runs in.
  */
 object ShizukuUserUtils {
-    private const val TAG = "ShizukuUserUtils"
-
     private const val SHELL_UID = 2000
 
     // See frameworks/base/core/java/android/content/pm/UserInfo.java
@@ -30,10 +27,7 @@ object ShizukuUserUtils {
     private const val DISALLOW_UNINSTALL_APPS = "no_uninstall_apps"
 
     private val USER_MANAGER: Any by lazy {
-        HiddenApiBypass.addHiddenApiExemptions(
-            "Landroid/os/IUserManager",
-            "Landroid/content/pm/UserInfo",
-        )
+        HiddenApiAccess.ensureReady()
 
         Class.forName("android.os.IUserManager\$Stub")
             .getMethod("asInterface", IBinder::class.java)
@@ -95,13 +89,8 @@ object ShizukuUserUtils {
     }
 
     private fun hasUserRestriction(userManager: Any, restriction: String, userId: Int): Boolean {
-        return try {
-            userManager.javaClass
-                .getMethod("hasUserRestriction", String::class.java, Int::class.javaPrimitiveType)
-                .invoke(userManager, restriction, userId) as Boolean
-        } catch (e: Exception) {
-            LogUtils.w(TAG, "Failed to check '$restriction' for user $userId: ${e.cause ?: e}")
-            false
-        }
+        return userManager.javaClass
+            .getMethod("hasUserRestriction", String::class.java, Int::class.javaPrimitiveType)
+            .invoke(userManager, restriction, userId) as Boolean
     }
 }

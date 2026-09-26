@@ -20,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +33,13 @@ import io.github.samolego.canta.util.RemovalRecommendation
 @Composable
 fun RemovalBadge(type: RemovalRecommendation) {
     AppBadge(
-        label = type.name,
+        label = stringResource(when (type) {
+            RemovalRecommendation.RECOMMENDED -> R.string.risk_recommended
+            RemovalRecommendation.ADVANCED -> R.string.risk_advanced
+            RemovalRecommendation.EXPERT -> R.string.risk_expert
+            RemovalRecommendation.UNSAFE -> R.string.risk_unsafe
+            RemovalRecommendation.SYSTEM -> R.string.risk_system
+        }),
         icon = type.icon,
         color = type.badgeColor
     )
@@ -45,7 +53,7 @@ fun SystemBadge() {
 @Composable
 fun DisabledBadge() {
     AppBadge(
-        label = "DISABLED",
+        label = stringResource(R.string.filter_disabled),
         icon = Icons.Default.DisabledByDefault,
         color = MaterialTheme.colorScheme.tertiary,
     )
@@ -57,7 +65,7 @@ fun SuspendedBadge() = AppBadge(stringResource(R.string.suspended_badge), Icons.
 @Composable
 fun CantaBadge() {
     AppBadge(
-        label = "CANTA",
+        label = stringResource(R.string.app_name),
         icon = Icons.Default.RestoreFromTrash,
         color = Color.Red.copy(alpha = 0.7f),
     )
@@ -72,6 +80,7 @@ private fun AppBadge(
     val contrastColor = color.getContrastColor()
     Row(
         modifier = Modifier
+            .semantics(mergeDescendants = true) {}
             .padding(all = 4.dp)
             .background(
                 color,
@@ -86,7 +95,7 @@ private fun AppBadge(
                 .padding(vertical = 2.dp)
                 .size(16.dp)
                 .align(alignment = Alignment.CenterVertically),
-            contentDescription = label,
+            contentDescription = null,
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
@@ -94,17 +103,14 @@ private fun AppBadge(
             modifier = Modifier
                 .padding(end = 8.dp)
                 .align(alignment = Alignment.CenterVertically),
-            style = TextStyle(
-                fontSize = 8.sp,
-                color = contrastColor,
-            )
+            style = MaterialTheme.typography.labelMedium,
+            color = contrastColor,
         )
     }
 }
 
 private fun Color.getContrastColor(): Color {
-    val luminance = (0.113 * red + 0.587 * green + 0.114 * blue)
-    return if (luminance > 0.5) Color.Black else Color.White
+    return if (luminance() > 0.179) Color.Black else Color.White
 }
 
 @Preview

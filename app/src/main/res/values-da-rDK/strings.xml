@@ -2,38 +2,22 @@
 <resources>
     <string name="cancel">Afbryd</string>
     <string name="ok">OK</string>
-    <string name="are_you_sure_to_uninstall_apps">Sikker på, at %1$s apps skal afinstalleres?</string>
     <string name="copy_package_name_to_clipboard">Kopiér pakkenavn til udklipsholder</string>
     <string name="no_description_available">Ingen beskrivelse tilgængelig</string>
     <string name="uninstall">Afinstallation</string>
     <string name="reinstall">Geninstallation</string>
     <string name="only_system">Kun system</string>
-    <string name="no_apps_found">Ingen apps fundet</string>
     <string name="loading_apps">Indlæser apps</string>
     <string name="badge_info">Mærkeinfo</string>
     <string name="got_it">Forstået</string>
-    <string name="loading_badges">Indlæser badges...</string>
     <string name="logs">Logger</string>
     <string name="back">Tilbage</string>
     <string name="copy_logs">Kopiér logger</string>
     <string name="log_copied">Log kopieret til udklipsholder</string>
-    <plurals name="clear_selected_apps">
-        <item quantity="one">Ryd %d valg</item>
-        <item quantity="other">Ryd %d valg</item>
-    </plurals>
     <plurals name="num_selected_apps">
         <item quantity="one">%d app valgt</item>
         <item quantity="other">%d apps valgt</item>
     </plurals>
-    <plurals name="success_uninstalled">
-        <item quantity="one">%d app er nu afinstalleret!</item>
-        <item quantity="other">%d apps er nu afinstalleret!</item>
-    </plurals>
-    <plurals name="success_reinstalled">
-        <item quantity="one">%d app er nu geninstalleret!</item>
-        <item quantity="other">%d apps er nu geninstalleret!</item>
-    </plurals>
-    <string name="copy">Kopiér</string>
     <string name="app_settings">App-info</string>
     <string name="close">Luk</string>
     <string name="canta_description">Do more. Because you can.\n\nCana gives you more control over your Android apps. Choose a personal, work, or other user profile, then use Shizuku to remove unwanted apps without root. Android and profile administrator restrictions still apply.\n\nBuilt on Canta by samolego. Special thanks to %s.</string>
@@ -41,27 +25,19 @@
     <string name="auto_update_bloat_list">Auto-opdatér bloatware-liste</string>
     <string name="auto_update_bloat_list_description">Hent automatisk en ny version af app bloat info. Dette garanterer opdaterede badges og app-beskrivelser.</string>
     <string name="settings">Indstillinger</string>
-    <string name="confirm_uninstall">Bekræft afinstallationer</string>
     <string name="app_version">App-version: %s</string>
-    <string name="bloatware_list_version">Seneste bloatware-liste</string>
     <string name="no_warranty_content">Denne app leverer app-fjernelsesanbefalinger baseret på tredjepartsoplysninger. Disse anbefalinger er informative af natur og garanterer ikke sikkerhed eller kompatibilitet med nogen specifik enhed. Afinstallering af system-apps kan forårsage uventede problemer, herunder, men ikke begrænset til: Mistet funktionalitet, systemustabilitet, enheds-bootloops, datatab mv. App-udvikleren er ikke ansvarlig for evt. skader forårsaget på nogen enhed som konsekvens af at følge de givne anbefalinger.</string>
     <string name="disclaimer">Ansvarsfraskrivelse - Ingen garanti</string>
     <string name="proceed_at_own_risk">Ved at klikke på \"Fortsæt\", accepterer man at bruge denne app på egen risiko.</string>
     <string name="never_show_again">Vis ikke denne besked igen</string>
     <string name="proceed">Fortsæt</string>
-    <string name="confirm_uninstall_description">Om dialogen til bekræftelse af afinstallationshandlingen skal vises.</string>
-    <string name="select_all">Vælg alle</string>
-    <string name="select_all_tip">Tryk %d gange mere for at aktivere valg af alle funktioner.</string>
-    <string name="select_all_enabled">Vælg alle er slået til for filtertypen \"Anbefalet\".</string>
-    <string name="uninstall_options_title">Afinstallationsindstillinger</string>
-    <string name="uninstall_app">Afinstallere app</string>
     <string name="reset_to_factory_version">Nulstil til fabriksversion</string>
     <string name="import_preset">Importere forvalg</string>
     <string name="import_preset_description">Importér et forvalg fra udklipsholderen, eller indsæt JSON-tekst direkte.</string>
     <string name="clipboard">Udklipsholder</string>
     <string name="import_preset_clipboard_description">Importér forvalg fra udklipsholder. Sørg for, at der er kopieret en gyldig Cana forvalgs-JSON.</string>
     <string name="paste_preset_json">Indsæt forvalgs-JSON</string>
-    <string name="paste_preset_json_here">Indsæt JSON-forvalg hér ...</string>
+    <string name="paste_preset_json_here">Indsæt JSON-forvalg hér …</string>
     <string name="enter_valid_json">Angiv gyldig JSON</string>
     <string name="import_button">Importér</string>
     <string name="create_preset">Opret forvalg</string>
@@ -70,7 +46,7 @@
     <string name="preset_name_missing_error">Navn er obligatorisk</string>
     <string name="preset_name_placeholder">f.eks. Samsung Bloatware</string>
     <string name="optional_description">Beskrivelse (valgfrit)</string>
-    <string name="preset_description_placeholder">Beskriv, hvad dette forvalg fjerner...</string>
+    <string name="preset_description_placeholder">Beskriv, hvad dette forvalg fjerner…</string>
     <string name="save">Gem</string>
     <string name="import_preset_clipboard">Importere fra udklipsholder</string>
     <string name="presets">Forvalg</string>
@@ -94,17 +70,11 @@
     <string name="grant_shizuku_permission_to_canta">Tildel Cana-tilladelse i Shizuku</string>
     <string name="shizuku_required">Shizuku er obligatorisk</string>
     <string name="shizuku_requirement_description">Cana bruger Shizuku til at afinstallere apps uden at kræve root-adgang. Shizuku giver en sikker måde at få adgang til systemniveau-SDK\'er.</string>
-    <string name="commits_url">Commits URL</string>
-    <string name="commits_url_description">Hvorfra man får commit-info til opdateringer fra</string>
-    <string name="reset_to_default">Nulstil til standard</string>
     <string name="advanced_settings">Avancerede indstillinger</string>
     <string name="click_to_expand">Klik for at udvide</string>
     <string name="bloat_list_url">Bloat-liste URL</string>
-    <string name="bloat_list_url_description">Hvorfra man får badges og beskrivelser.</string>
     <string name="allow_unsafe_selections">Tillad usikre valg</string>
     <string name="allow_unsafe_uninstalls_description">Hvorvidt apps markeret som usikre må vælges (anvendelse af forvalg omgår allerede dette).</string>
-    <string name="donate">Donere</string>
-    <string name="success">Udført %1$s!</string>
     <string name="hide_success_dialog">Skjul udført-dialog</string>
     <string name="hide_success_dialog_description">Skjuler udført-dialogen efter afinstallation/geninstallation.</string>
     <string name="auth_required">Godkendelse kræves</string>

@@ -10,7 +10,8 @@ on:
 
 jobs:
   buildAndroid:
-    permissions: write-all
+    permissions:
+      contents: read
     name: 🤖📦 Build Android APK
     runs-on: ubuntu-latest
     steps:
@@ -44,7 +45,7 @@ jobs:
 
       - name: 🤖📦 Create Android release
         run: |
-          ./gradlew app:assembleRelease
+          ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
 
       - name: 📝 Generate build date
         id: date

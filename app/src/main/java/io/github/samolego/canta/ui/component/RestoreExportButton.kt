@@ -15,7 +15,6 @@ import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ops.RestoreScript
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -28,7 +27,7 @@ fun RestoreExportButton() {
         if (uri != null) scope.launch {
             val message = try {
                 withContext(Dispatchers.IO) {
-                    val script = RestoreScript.generate(CanaServices.getInstance().history.records.first())
+                    val script = RestoreScript.generate(CanaServices.getInstance().history.allRecords())
                     checkNotNull(context.contentResolver.openOutputStream(uri, "wt")).bufferedWriter().use { it.write(script) }
                 }
                 resources.getString(R.string.restore_export_saved)

@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -63,7 +64,6 @@ import io.github.samolego.canta.ui.dialog.NoWarrantyDialog
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
 import io.github.samolego.canta.ui.dialog.PackageActionDialogs
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
-import io.github.samolego.canta.ui.component.fab.PackageActionsFab
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.navigation.Screen
 import io.github.samolego.canta.ui.screen.LogsPage
@@ -77,7 +77,6 @@ import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import kotlinx.coroutines.launch
 
-private const val secretTaps = 12
 
 @Composable
 fun CantaApp(
@@ -90,10 +89,25 @@ fun CantaApp(
     val appListViewModel = viewModel<AppListViewModel>()
     val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory())
     val presetViewModel = viewModel<PresetsViewModel>()
-    var versionTapCounter by remember { mutableIntStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
 
-    NavHost(navController = navController, startDestination = Screen.Main.route) {
+    Column(Modifier.fillMaxSize()) {
+    io.github.samolego.canta.ui.component.BatchProgressBanner { navController.navigate(Screen.History.route) { launchSingleTop = true } }
+    NavHost(navController = navController, startDestination = Screen.Main.route, modifier = Modifier.weight(1f)) {
+        composable(Screen.AppDetail.route) { entry ->
+            val target = io.github.samolego.canta.ops.AppTarget(entry.arguments!!.getString("packageName")!!,
+                entry.arguments!!.getString("userId")!!.toInt())
+            io.github.samolego.canta.ui.screen.AppDetailPage(target, { navController.navigateUp() }) { action ->
+                appListViewModel.requestAction(action, listOf(target.packageName), target.userId)
+                navController.popBackStack(Screen.Main.route, inclusive = false)
+            }
+        }
+        composable(Screen.Privacy.route) {
+            io.github.samolego.canta.ui.screen.PrivacyDashboardPage { navController.navigateUp() }
+        }
+        composable(Screen.Comparison.route) {
+            io.github.samolego.canta.ui.screen.ProfileComparisonPage { navController.navigateUp() }
+        }
         composable(Screen.Main.route) {
             val presetSaveError = stringResource(R.string.preset_save_error)
             MainContent(
@@ -123,7 +137,7 @@ fun CantaApp(
                         )
                     }
                 },
-                enableSelectAll = versionTapCounter >= secretTaps,
+                enableSelectAll = true,
                 appListViewModel = appListViewModel,
                 settingsViewModel = settingsViewModel,
             )
@@ -141,28 +155,7 @@ fun CantaApp(
             SettingsScreen(
                 onNavigateBack = { navController.navigateUp() },
                 settingsViewModel = settingsViewModel,
-                onVersionTap = {
-                    versionTapCounter += 1
-                    coroutineScope.launch {
-                        if (versionTapCounter > 6 && versionTapCounter < secretTaps) {
-                            // Show quick toast
-                            val remainingTaps = secretTaps - versionTapCounter
-                            val message =
-                                optionalTextArgument(resources.getString(R.string.select_all_tip), remainingTaps)
-                            val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
-                            toast.showFor(500)
-                        } else if (versionTapCounter >= secretTaps) {
-                            // Enable select all functionality with quick toast
-                            val toast =
-                                Toast.makeText(
-                                    context,
-                                    resources.getString(R.string.select_all_enabled),
-                                    Toast.LENGTH_SHORT
-                                )
-                            toast.showFor(500)
-                        }
-                    }
-                }
+                onVersionTap = {},
             )
         }
 
@@ -182,6 +175,7 @@ fun CantaApp(
             )
         }
     }
+}
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -224,7 +218,6 @@ private fun MainContent(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             selectedAppsType = AppsType.entries[page]
-            appListViewModel.selectedFilter = Filter.any
         }
     }
 
@@ -280,33 +273,11 @@ private fun MainContent(
                 ExplainBadgesDialog(onDismissRequest = { showExplainBadgeDialog = false })
             }
         },
+        bottomBar = {
+            if (!presetEditMode) io.github.samolego.canta.ui.component.SelectionActionBar(appListViewModel, selectedAppsType)
+        },
         floatingActionButton = {
-            AnimatedVisibility(
-                // Make the FAB hidden if no apps are selected
-                visible = appListViewModel.selectedApps.isNotEmpty() && !appListViewModel.isOperating,
-                enter = fadeIn() + scaleIn(),
-                exit = fadeOut() + scaleOut()
-            ) {
-                if (presetEditMode) {
-                    PresetEditFAB(
-                        onPresetEditFinish = onPresetEditFinish,
-                    )
-                } else {
-                    if (selectedAppsType == AppsType.UNINSTALLED) {
-                        ExpandableFAB(
-                            modifier = Modifier.padding(16.dp).navigationBarsPadding(),
-                            topIcon = Icons.Default.DeleteForever,
-                            topLabel = stringResource(R.string.remove_updates),
-                            bottomIcon = Icons.Default.InstallMobile,
-                            bottomLabel = stringResource(R.string.reinstall),
-                            onTopClick = { appListViewModel.requestAction(PackageAction.REMOVE_UPDATES) },
-                            onBottomClick = { appListViewModel.requestAction(PackageAction.REINSTALL) },
-                        )
-                    } else {
-                        PackageActionsFab(appListViewModel)
-                    }
-                }
-            }
+            if (presetEditMode && appListViewModel.selectedApps.isNotEmpty()) PresetEditFAB(onPresetEditFinish = onPresetEditFinish)
         },
         floatingActionButtonPosition = FabPosition.End,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -329,16 +300,15 @@ private fun MainContent(
                         onClick = {
                             coroutineScope.launch {
                                 pagerState.animateScrollToPage(currentTab.ordinal)
-                                appListViewModel.selectedFilter = Filter.any
-                            }
+                                                }
                             selectedAppsType = currentTab
                         },
-                        icon = {
-                            Icon(currentTab.icon, contentDescription = currentTab.toString())
-                        },
+                        text = { Text(stringResource(if (currentTab == AppsType.INSTALLED) R.string.tab_installed else R.string.tab_removed)) },
+                        icon = { Icon(currentTab.icon, contentDescription = null) },
                     )
                 }
             }
+            io.github.samolego.canta.ui.component.ActiveFilterChips(appListViewModel)
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -367,6 +337,7 @@ private fun MainContent(
                         appListModel = appListViewModel,
                         settingsViewModel = settingsViewModel,
                         enableSelectAll = enableSelectAll,
+                        onOpenDetails = { pkg, user -> navigateToPage(Screen.AppDetail.path(pkg, user)) },
                     )
                 }
             }

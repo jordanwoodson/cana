@@ -20,8 +20,20 @@ message OperationRecord {
   int64 freed_bytes = 14;
   // Reversible recovery finished; manual data/APK obligations may still remain.
   bool recovery_complete = 15;
+  // The platform accepted a request but has not reported a terminal result.
+  bool outcome_unknown = 16;
+  string installer_request_id = 17;
+  // Journal insertion order is independent of wall clock changes.
+  int64 sequence_number = 18;
+  // Minimal expected post-state, persisted before mutation for interrupted verification.
+  string intended_state = 19;
 }
 
 message OperationHistory {
   repeated OperationRecord records = 1;
+  string installation_id = 2;
+  // Restored/legacy operational records remain available for review, never live undo.
+  repeated OperationRecord quarantined_records = 3;
+  int64 archived_count = 4;
+  int64 next_sequence = 5;
 }

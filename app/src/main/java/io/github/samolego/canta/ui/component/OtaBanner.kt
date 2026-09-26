@@ -52,6 +52,7 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
     val context = LocalContext.current
     val services = CanaServices.getInstance()
     val scope = rememberCoroutineScope()
+    val batchTitle = stringResource(R.string.ota_reapply)
     var selected by remember { mutableStateOf(changes.filter { it.returned }.toSet()) }
     var reports by remember { mutableStateOf<Map<Int, Map<String, SafetyAssessment>>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -90,7 +91,7 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (busy || reports == null && error == null) LinearProgressIndicator()
             result?.let { batch ->
-                Text(stringResource(R.string.privacy_results, batch.successCount, batch.failureCount))
+                Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
                 batch.results.forEach { Text(it.message, style = MaterialTheme.typography.bodySmall) }
             }
             TextButton(enabled = !busy, onClick = { scope.launch { services.management.dismiss(changes); services.ota.check(); onDismiss() } }) {
@@ -104,12 +105,15 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
                 val approved = reports!!.mapValues { (_, values) -> values.values.flatMap { it.warnings }.map { it.key }.toSet() }
                 scope.launch {
                     try { withPackageAuthentication(context) {
-                        val batch = UUID.randomUUID().toString()
-                        result = BatchResult(captured.map { change ->
+                        result = services.batches.run(batchTitle, captured.map {
+                            BatchItem("${it.userId}:${it.packageName}", it.packageName, it.userId, "uninstall")
+                        }) { change, batch ->
                             val operation = services.packageOps.uninstall(change.packageName, change.userId, batchId = batch, approvedWarnings = approved[change.userId].orEmpty())
+                            try { services.ota.check() }
+                            catch (e: CancellationException) { throw e }
+                            catch (e: Exception) { io.github.samolego.canta.util.LogUtils.e("OTA", "Post-operation check failed", e) }
                             operation.copy(message = "${change.packageName} · user ${change.userId}: ${operation.message}")
-                        }, batch)
-                        services.ota.check()
+                        }
                     } } finally { busy = false }
                 }
             }) { Text(stringResource(R.string.ota_reapply)) }

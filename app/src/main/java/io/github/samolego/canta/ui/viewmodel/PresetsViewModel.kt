@@ -11,8 +11,15 @@ import androidx.lifecycle.viewModelScope
 import io.github.samolego.canta.data.PresetStore
 import io.github.samolego.canta.util.CantaPresetData
 import io.github.samolego.canta.util.LogUtils
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
+import io.github.samolego.canta.data.PresetImportResult
+import io.github.samolego.canta.extension.getAllPackagesInfo
+import io.github.samolego.canta.ops.PresetImportReview
+import io.github.samolego.canta.ops.PresetPreview
+import io.github.samolego.canta.ops.PresetProfileInventory
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 
 class PresetsViewModel : ViewModel() {
@@ -29,23 +36,80 @@ class PresetsViewModel : ViewModel() {
     val presets: List<CantaPresetData>
         get() = _presets.value
 
-    var isLoading by mutableStateOf(false)
+    private var saving by mutableStateOf(false)
+    private var libraryLoading by mutableStateOf(true)
+    val isLoading: Boolean get() = saving || libraryLoading
+
+    var libraryError by mutableStateOf<String?>(null)
+        private set
+    var importReview by mutableStateOf<PresetImportReview?>(null)
+        private set
+    var checkingImport by mutableStateOf(false)
+        private set
+    var importError by mutableStateOf<PresetImportResult?>(null)
         private set
 
     fun initialize(context: Context) {
-        presetStore = PresetStore(context)
-        // Collect presets flow and update state
+        if (::presetStore.isInitialized) return
+        presetStore = PresetStore.getInstance(context.applicationContext)
+        libraryLoading = true
         viewModelScope.launch {
-            presetStore.migratePresetsIfNeeded()
-            presetStore.presetsFlow.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList()
-            )
-                .collect { presetsList ->
-                    _presets.value = presetsList
-                    LogUtils.i(TAG, "Loaded ${presetsList.size} presets")
+            presetStore.initialize().collect { state ->
+                _presets.value = state.presets
+                libraryError = state.error
+                libraryLoading = !state.loaded && state.error == null
+            }
+        }
+    }
+
+    fun prepareImport(preset: CantaPresetData, context: Context, userId: Int, profileName: String?, profileKind: String?) {
+        if (isLoading || libraryError != null) return
+        val inventory = PresetProfileInventory(userId, profileName, profileKind)
+        val review = PresetPreview.reviewImport(preset, presets, listOf(inventory))
+        importReview = review
+        importError = null
+        checkingImport = true
+        val applicationContext = context.applicationContext
+        viewModelScope.launch {
+            val checked = try {
+                val state = io.github.samolego.canta.ops.CanaServices.getInstance().inventory.snapshot(userId)
+                if (!state.loaded || state.stale || state.error != null) inventory else inventory.copy(
+                    installedPackages = state.apps.filterNot { it.isUninstalled }.map { it.packageName }.toSet(),
+                    knownPackages = state.apps.map { it.packageName }.toSet())
+            } catch (e: CancellationException) { throw e }
+            catch (_: Exception) { inventory }
+            if (importReview === review) {
+                importReview = review.copy(profiles = PresetPreview.forProfiles(review.preset, listOf(checked)))
+                checkingImport = false
+            }
+        }
+    }
+
+    fun cancelImport() {
+        if (isLoading) return
+        importReview = null
+        importError = null
+        checkingImport = false
+    }
+
+    fun confirmImport(onSuccess: () -> Unit) {
+        val reviewed = importReview ?: return
+        if (isLoading || checkingImport || libraryError != null) return
+        saving = true
+        viewModelScope.launch {
+            try {
+                when (val outcome = presetStore.saveReviewedImport(reviewed)) {
+                    PresetImportResult.SAVED -> { importReview = null; importError = null; onSuccess() }
+                    PresetImportResult.REVIEW_CHANGED -> {
+                        val current = presetStore.presetsFlow.first()
+                        importReview = PresetPreview.reviewImport(reviewed.preset, current, emptyList()).copy(profiles = reviewed.profiles)
+                        importError = outcome
+                    }
+                    PresetImportResult.FAILED -> importError = outcome
                 }
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { importError = PresetImportResult.FAILED }
+            finally { saving = false }
         }
     }
 
@@ -59,7 +123,7 @@ class PresetsViewModel : ViewModel() {
         onError: () -> Unit
     ) {
         if (isLoading) return
-        isLoading = true
+        saving = true
         viewModelScope.launch {
             try {
                 val lockdown = privacyUserId?.let { io.github.samolego.canta.ops.CanaServices.getInstance().presets.captureLockdown(it) }.orEmpty()
@@ -68,7 +132,7 @@ class PresetsViewModel : ViewModel() {
                 if (presetStore.savePreset(preset)) onSuccess() else onError()
             } catch (e: kotlinx.coroutines.CancellationException) { throw e }
             catch (e: Exception) { LogUtils.e(TAG, "Cannot capture or save preset", e); onError() }
-            finally { isLoading = false }
+            finally { saving = false }
         }
     }
 
@@ -174,13 +238,4 @@ class PresetsViewModel : ViewModel() {
         }
     }
 
-    fun saveImportedPreset(preset: CantaPresetData, onError: (() -> Unit)? = null) {
-        viewModelScope.launch {
-            val success = presetStore.savePreset(preset)
-            if (!success) {
-                LogUtils.e(TAG, "Failed to save imported preset")
-                onError?.invoke()
-            }
-        }
-    }
 }

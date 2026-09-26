@@ -14,6 +14,9 @@ import androidx.core.content.ContextCompat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.ConcurrentHashMap
+import java.util.UUID
 
 /**
  * Waits for the status PackageInstaller reports through an [IntentSender], so that failures (e.g.
@@ -29,7 +32,13 @@ object PackageInstallerResult {
         Handler(HandlerThread("CanaInstallerResult").apply { start() }.looper)
     }
 
-    data class Result(val success: Boolean, val message: String?)
+    data class Result(val success: Boolean, val message: String?, val outcomeUnknown: Boolean = false, val requestId: String = "")
+    private val outstanding = ConcurrentHashMap<String, InstallerCompletion>()
+    /** A late callback requests read-only reconciliation, never a replay. */
+    @Volatile var onLateCompletion: (() -> Unit)? = null
+    fun terminalResult(requestId: String): Result? = outstanding[requestId]?.terminalResult()
+    fun isAwaiting(requestId: String): Boolean = outstanding[requestId]?.terminalResult() == null && outstanding.containsKey(requestId)
+    fun forget(requestId: String) { outstanding.remove(requestId) }
 
     /**
      * Calls [action] with an [IntentSender] to pass to PackageInstaller and blocks until the
@@ -38,30 +47,38 @@ object PackageInstallerResult {
     fun await(context: Context, action: (IntentSender) -> Unit): Result {
         val requestCode = requestCodes.incrementAndGet()
         val intentAction = "${context.packageName}.INSTALLER_RESULT.$requestCode"
-        val latch = CountDownLatch(1)
-        var result = Result(false, "No result from PackageInstaller within ${TIMEOUT_SECONDS}s")
+        val requestId = UUID.randomUUID().toString()
+        val completion = InstallerCompletion(requestId)
+        outstanding[requestId] = completion
+        val returnedUnknown = AtomicBoolean(false)
+        val unregistered = AtomicBoolean(false)
+        var callbackIntent: PendingIntent? = null
+        var dispatched = false
 
         val receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
+            override fun onReceive(receiverContext: Context, intent: Intent) {
                 val status = intent.getIntExtra(
                     PackageInstaller.EXTRA_STATUS,
                     PackageInstaller.STATUS_FAILURE
                 )
-                result = Result(
+                if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) return
+                completion.complete(Result(
                     success = status == PackageInstaller.STATUS_SUCCESS,
                     message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE),
-                )
-                latch.countDown()
+                ))
+                if (unregistered.compareAndSet(false, true)) context.unregisterReceiver(this)
+                callbackIntent?.cancel()
+                if (returnedUnknown.get()) runCatching { onLateCompletion?.invoke() }
             }
         }
-        ContextCompat.registerReceiver(
+        try { ContextCompat.registerReceiver(
             context,
             receiver,
             IntentFilter(intentAction),
             null,
             handler,
             ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        ) } catch (e: Exception) { outstanding.remove(requestId); throw e }
 
         try {
             // Must be mutable so PackageInstaller can fill in the status extras
@@ -76,12 +93,49 @@ object PackageInstallerResult {
                 Intent(intentAction).setPackage(context.packageName),
                 PendingIntent.FLAG_UPDATE_CURRENT or mutable
             )
+            callbackIntent = pendingIntent
 
-            action(pendingIntent.intentSender)
-            latch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            dispatched = true
+            try { action(pendingIntent.intentSender) }
+            catch (e: Exception) {
+                returnedUnknown.set(true)
+                return Result(false, e.message, outcomeUnknown = true, requestId = requestId)
+            }
+            val result = completion.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            if (result.outcomeUnknown) {
+                returnedUnknown.set(true)
+                if (completion.terminalResult() != null) runCatching { onLateCompletion?.invoke() }
+            } else {
+                outstanding.remove(requestId)
+                pendingIntent.cancel()
+            }
             return result
         } finally {
-            context.unregisterReceiver(receiver)
+            // Keep the receiver for an outstanding request so a late terminal result can be reconciled.
+            if (!dispatched || completion.terminalResult() != null) {
+                if (unregistered.compareAndSet(false, true)) context.unregisterReceiver(receiver)
+                callbackIntent?.cancel()
+            }
+            if (!dispatched) outstanding.remove(requestId)
         }
+    }
+}
+
+/** Injectable completion boundary: timeout does not mean Android stopped the request. */
+internal class InstallerCompletion(private val requestId: String) {
+    private val latch = CountDownLatch(1)
+    @Volatile private var result: PackageInstallerResult.Result? = null
+    @Synchronized fun complete(value: PackageInstallerResult.Result) {
+        if (result != null) return
+        require(!value.outcomeUnknown)
+        result = value
+        latch.countDown()
+    }
+    fun terminalResult(): PackageInstallerResult.Result? = result
+    fun await(timeout: Long, unit: TimeUnit): PackageInstallerResult.Result {
+        try { latch.await(timeout, unit) }
+        catch (_: InterruptedException) { Thread.currentThread().interrupt() }
+        return result ?: PackageInstallerResult.Result(false, "PackageInstaller is still pending; review recovery before retrying",
+            outcomeUnknown = true, requestId = requestId)
     }
 }

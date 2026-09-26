@@ -24,6 +24,12 @@ fun MoreOptionsMenu(
             onDismissRequest = onDismiss,
             modifier = Modifier.width(200.dp)
     ) {
+        DropdownMenuItem(text = { Text(stringResource(R.string.privacy_dashboard)) }, onClick = {
+            navigateToPage(Screen.Privacy.route); onDismiss()
+        })
+        DropdownMenuItem(text = { Text(stringResource(R.string.comparison_title)) }, onClick = {
+            navigateToPage(Screen.Comparison.route); onDismiss()
+        })
         DropdownMenuItem(text = { Text(stringResource(R.string.system_controls)) }, onClick = {
             navigateToPage(Screen.System.route); onDismiss()
         })

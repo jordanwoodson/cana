@@ -23,6 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import io.github.samolego.canta.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -104,7 +108,9 @@ fun AppTile(
                 },
                 leadingContent = { AppIconImage(appInfo) },
                 trailingContent = {
+                    val selectionLabel = stringResource(if (isSelected) R.string.app_deselect_description else R.string.app_select_description, appInfo.name)
                     Checkbox(
+                            modifier = Modifier.semantics { contentDescription = selectionLabel },
                             checked = isSelected,
                             onCheckedChange = onCheckChanged,
                             enabled = enabled,
@@ -118,26 +124,6 @@ fun AppTile(
                 }
         )
     }
-}
-
-
-@Composable
-fun SelectedAppTile(
-    modifier: Modifier = Modifier,
-    appInfo: AppInfo,
-    onCheckChanged: (Boolean) -> Unit,
-    onShowDialog: () -> Unit,
-) {
-    AppTile(
-        modifier = modifier,
-        appInfo = appInfo,
-        isSelected = true,
-        showBorder = false,
-        onCheckChanged = onCheckChanged,
-        onShowDialog = onShowDialog,
-        checkedColor = MaterialTheme.colorScheme.error,
-        checkedBackgroundColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f),
-    )
 }
 
 @Composable
@@ -157,7 +143,7 @@ fun AppIconImage(
     if (appIcon != null) {
         AppIconImage(
                 appIconImage = appIcon,
-                contentDescription = appInfo.name,
+                contentDescription = null,
         )
     }
 }
@@ -165,7 +151,7 @@ fun AppIconImage(
 @Composable
 fun AppIconImage(
         appIconImage: Drawable,
-        contentDescription: String,
+        contentDescription: String?,
 ) {
     val context = LocalContext.current
     AsyncImage(

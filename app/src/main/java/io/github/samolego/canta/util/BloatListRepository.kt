@@ -16,6 +16,17 @@ import java.security.MessageDigest
 class BloatListRepository(context: Context) {
     private val context = context.applicationContext
 
+    /** Atomic cache replacement makes this safe without waiting behind a network refresh. */
+    suspend fun cached(): JSONObject = withContext(Dispatchers.IO) {
+        val snapshot = SettingsStore.getInstance().bloatUpdateSettings()
+        val url = snapshot.bloatListUrl.ifBlank { DEFAULT_BLOAT_URL }
+        val key = MessageDigest.getInstance("SHA-256").digest(url.toByteArray())
+            .joinToString("") { "%02x".format(it) }
+        BloatListCache(File(context.filesDir, "uad-$key.json")) {
+            context.assets.open("uad_lists.json").bufferedReader().use { it.readText() }
+        }.load().data
+    }
+
     suspend fun load(forceRefresh: Boolean = false): JSONObject = withContext(Dispatchers.IO) {
         refreshLock.withLock {
             val settings = SettingsStore.getInstance()

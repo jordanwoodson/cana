@@ -36,10 +36,12 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
     var profiles by remember { mutableStateOf<List<UserProfile>>(emptyList()) }
     var allProfiles by remember { mutableStateOf(false) }
     val targets = if (allProfiles) profiles.map { it.id } else listOf(userId)
+    var previews by remember { mutableStateOf<List<PresetProfilePreview>?>(null) }
     var warnings by remember { mutableStateOf<Map<Int, Map<String, SafetyAssessment>>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var accepted by remember { mutableStateOf(false) }
     var shared by remember { mutableStateOf(false) }
+    var reviewedPrivacyKeys by remember { mutableStateOf<Map<Int, Set<String>>>(emptyMap()) }
     var busy by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<BatchResult?>(null) }
     LaunchedEffect(Unit) {
@@ -47,18 +49,36 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
         catch (e: CancellationException) { throw e }
         catch (e: Exception) { error = e.message ?: e.toString() }
     }
-    LaunchedEffect(preset, targets) {
-        warnings = null; accepted = false; shared = false
+    LaunchedEffect(preset, targets, profiles) {
+        warnings = null; previews = null; error = null; accepted = false; shared = false; reviewedPrivacyKeys = emptyMap()
         try {
-            warnings = targets.associateWith { user ->
+            previews = PresetPreview.forProfiles(preset, targets.map { user ->
+                val profile = profiles.find { it.id == user }
+                val inventory = services.inventory.snapshot(user)
+                val available = inventory.loaded && !inventory.stale && inventory.error == null
+                PresetProfileInventory(user, profile?.name, profile?.kind?.name,
+                    if (available) inventory.apps.filterNot { it.isUninstalled }.map { it.packageName }.toSet() else null,
+                    if (available) inventory.apps.map { it.packageName }.toSet() else null)
+            })
+            var sharedFound = false
+            val privacyKeys = mutableMapOf<Int, MutableSet<String>>()
+            val reportsByUser = targets.associateWith { user ->
                 val reports = services.safety.inspect(preset.apps.toList(), user, removing = true).toMutableMap()
                 for (entry in preset.lockdown) {
                     val privacy = services.privacy.assess(entry.packageName, user)
-                    if (privacy.size > 1) shared = true
-                    reports.putAll(privacy)
+                    if (privacy.size > 1) sharedFound = true
+                    privacyKeys.getOrPut(user) { mutableSetOf() }.addAll(PrivacyOps.approvalKeys(entry.packageName, user, privacy))
+                    privacy.forEach { (pkg, report) ->
+                        val existing = reports[pkg]
+                        reports[pkg] = SafetyAssessment(existing?.protected == true || report.protected,
+                            (existing?.warnings.orEmpty() + report.warnings).distinctBy { it.key }, existing?.error ?: report.error)
+                    }
                 }
                 reports
             }
+            reviewedPrivacyKeys = privacyKeys.mapValues { it.value.toSet() }
+            warnings = reportsByUser
+            shared = sharedFound
         } catch (e: CancellationException) { throw e }
         catch (e: Exception) { error = e.message ?: e.toString() }
     }
@@ -68,17 +88,14 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
         text = { Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(preset.name)
             Text(stringResource(R.string.preset_target_users, targets.joinToString()))
-            preset.profileKind?.let { Text(stringResource(R.string.preset_profile_hint, it)) }
             if (result == null && profiles.size > 1) Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(allProfiles, { allProfiles = it }, enabled = !busy)
                 Text(stringResource(R.string.preset_all_profiles))
             }
-            if (kindMismatch) Text(stringResource(R.string.preset_profile_mismatch))
-            for (pkg in preset.apps) Text(stringResource(R.string.preset_remove_entry, pkg))
-            for (entry in preset.lockdown) {
-                Text(entry.packageName)
-                entry.actions().forEach { Text(stringResource(it.title), style = MaterialTheme.typography.bodySmall) }
-            }
+            PresetActionsContent(preset)
+            previews?.let { PresetProfilePreviewContent(it) }
+            if (preset.apps.isNotEmpty()) Text(stringResource(R.string.plan_remove_data))
+            Text(stringResource(R.string.plan_reversible))
             if (preset.lockdown.any { it.blockNetwork }) Text(stringResource(R.string.privacy_network_description))
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (busy || warnings == null && error == null) LinearProgressIndicator()
@@ -88,20 +105,21 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
                 assessment.error?.let { Text(it) }
                 assessment.warnings.forEach { Text("$name: ${it.kind} · ${it.detail}") }
             } }
-            if (shared) Text(stringResource(R.string.privacy_shared_uid, warnings!!.values.flatMap { it.keys }.distinct().joinToString()))
+            if (shared) Text(stringResource(R.string.privacy_shared_uid, warnings.orEmpty().values.flatMap { it.keys }.distinct().joinToString()))
             if (needsConsent && result == null) Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(accepted, { accepted = it }); Text(stringResource(R.string.safety_acknowledge))
             }
             result?.let { batch ->
-                Text(stringResource(R.string.privacy_results, batch.successCount, batch.failureCount))
+                Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
                 batch.results.forEach { Text(it.message, style = MaterialTheme.typography.bodySmall) }
             }
         } }, confirmButton = {
             if (result != null) TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
-            else TextButton(enabled = !busy && warnings != null && error == null && (!needsConsent || accepted), onClick = {
+            else TextButton(enabled = !busy && targets.isNotEmpty() && (preset.apps.isNotEmpty() || preset.lockdown.isNotEmpty()) &&
+                previews?.all { it.inventoryAvailable } == true && warnings != null && error == null && (!needsConsent || accepted), onClick = {
                 busy = true
                 val capturedUsers = targets.toList()
-                val approved = warnings!!.mapValues { (_, reports) -> reports.values.flatMap { it.warnings }.map { it.key }.toSet() + if (accepted) setOf("shared-uid") else emptySet() }
+                val approved = warnings!!.mapValues { (user, reports) -> reports.values.flatMap { it.warnings }.map { it.key }.toSet() + if (accepted) reviewedPrivacyKeys[user].orEmpty() else emptySet() }
                 scope.launch {
                     try { withPackageAuthentication(context) { result = services.presets.apply(preset, capturedUsers, approved) } }
                     finally { busy = false }

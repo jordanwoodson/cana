@@ -7,6 +7,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
 import io.github.samolego.canta.R
 import io.github.samolego.canta.util.optionalTextArgument
@@ -25,6 +26,8 @@ import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import io.github.samolego.canta.ops.BatchItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
@@ -34,22 +37,24 @@ import java.util.UUID
 import org.json.JSONObject
 
 class AppListViewModel(
-    private val bloatListLoader: suspend (Context, Boolean) -> JSONObject = { context, refresh ->
-        BloatListRepository(context).load(refresh)
-    },
+    private val bloatListLoader: (suspend (Context, Boolean) -> JSONObject)? = null,
 ) : ViewModel() {
     private val packageOps get() = CanaServices.getInstance().packageOps
     var isOperating by mutableStateOf(false)
         private set
     var pendingAction by mutableStateOf<PackageActionRequest?>(null)
 
+    init { viewModelScope.launch {
+        CanaServices.getInstance().batches.active.collect { isOperating = it != null }
+    } }
+
     val leftoverUpdates by derivedStateOf { apps.filter { it.isUninstalled && it.isUpdatedSystemApp } }
 
-    fun requestAction(action: PackageAction, packages: List<String> = selectedApps.keys.toList()) {
+    fun requestAction(action: PackageAction, packages: List<String> = selectedApps.keys.toList(), userId: Int = selectedUserId) {
         if (isOperating) return
-        val selected = apps.filter { it.packageName in packages &&
+        val selected = inventory.state(userId).apps.filter { it.packageName in packages &&
             it.isUninstalled == (action in setOf(PackageAction.REINSTALL, PackageAction.REMOVE_UPDATES)) }
-        if (selected.isNotEmpty()) pendingAction = PackageActionRequest(action, selectedUserId, selected)
+        if (packages.isNotEmpty()) pendingAction = PackageActionRequest(action, userId, selected, packages.distinct())
     }
 
     suspend fun inspectUpdates(request: PackageActionRequest): List<UpdateImpact> =
@@ -68,46 +73,37 @@ class AppListViewModel(
         resetToFactory: Boolean,
         approvedDowngrades: Map<String, Set<Int>>,
         approvedWarnings: Map<String, Set<String>> = emptyMap(),
-    ): BatchResult = withContext(Dispatchers.Main) {
-        val packages = request.apps.filter { it.packageName in included }
-        if (isOperating) return@withContext BatchResult(packages.map {
-            OperationResult(false, context.getString(R.string.operation_busy))
-        })
-        isOperating = true
-        val batchId = UUID.randomUUID().toString()
-        try {
-            val results = packages.map { app ->
-                when (request.action) {
-                    PackageAction.REINSTALL -> packageOps.reinstall(app.packageName, request.userId, batchId)
-                    PackageAction.UNINSTALL -> packageOps.uninstall(app.packageName, request.userId, resetToFactory,
-                        batchId, approvedDowngrades[app.packageName].orEmpty(), approvedWarnings[app.packageName].orEmpty())
-                    PackageAction.REMOVE_UPDATES -> packageOps.removeUpdates(app.packageName, request.userId,
-                        approvedDowngrades[app.packageName].orEmpty(), batchId)
-                    PackageAction.UNINSTALL_KEEP_DATA -> packageOps.uninstall(app.packageName, request.userId,
-                        batchId = batchId, approvedWarnings = approvedWarnings[app.packageName].orEmpty(), keepData = true)
-                    PackageAction.DISABLE, PackageAction.ENABLE -> packageOps.setEnabled(app.packageName, request.userId,
-                        request.action == PackageAction.ENABLE, approvedWarnings[app.packageName].orEmpty(), batchId)
-                    PackageAction.SUSPEND, PackageAction.UNSUSPEND -> packageOps.setSuspended(app.packageName, request.userId,
-                        request.action == PackageAction.SUSPEND, approvedWarnings[app.packageName].orEmpty(), batchId)
-                }.also { if (it.success && request.userId == selectedUserId) selectedApps.remove(app.packageName) }
-            }
-            if (request.userId == selectedUserId) loadInstalled(context.packageManager, context)
-            BatchResult(results + request.apps.filter { it.packageName !in included }.map {
-                OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
-            }, batchId)
-        } finally { isOperating = false }
+    ): BatchResult {
+        val appContext = context.applicationContext
+        val targets = request.requestedPackages.toList()
+        val eligible = request.apps.map { it.packageName }.toSet()
+        val checked = included.toSet()
+        val downgrades = approvedDowngrades.mapValues { it.value.toSet() }
+        val warnings = approvedWarnings.mapValues { it.value.toSet() }
+        return CanaServices.getInstance().batches.run(appContext.getString(request.action.label),
+            targets.map { BatchItem(it, it, request.userId, request.action.name.lowercase()) }) { item, batchId ->
+            val pkg = item.packageName
+            if (pkg !in checked || pkg !in eligible) OperationResult(true,
+                "$pkg: ${appContext.getString(R.string.operation_skipped)}", skipped = true)
+            else when (request.action) {
+                PackageAction.REINSTALL -> packageOps.reinstall(pkg, item.userId, batchId)
+                PackageAction.UNINSTALL -> packageOps.uninstall(pkg, item.userId, resetToFactory,
+                    batchId, downgrades[pkg].orEmpty(), warnings[pkg].orEmpty())
+                PackageAction.REMOVE_UPDATES -> packageOps.removeUpdates(pkg, item.userId, downgrades[pkg].orEmpty(), batchId)
+                PackageAction.UNINSTALL_KEEP_DATA -> packageOps.uninstall(pkg, item.userId,
+                    batchId = batchId, approvedWarnings = warnings[pkg].orEmpty(), keepData = true)
+                PackageAction.DISABLE, PackageAction.ENABLE -> packageOps.setEnabled(pkg, item.userId,
+                    request.action == PackageAction.ENABLE, warnings[pkg].orEmpty(), batchId)
+                PackageAction.SUSPEND, PackageAction.UNSUSPEND -> packageOps.setSuspended(pkg, item.userId,
+                    request.action == PackageAction.SUSPEND, warnings[pkg].orEmpty(), batchId)
+            }.also { if (it.success && !it.skipped && item.userId == selectedUserId) selectedApps.remove(pkg) }
+        }
     }
 
-    suspend fun undoBatch(context: Context, batchId: String): BatchResult = withContext(Dispatchers.Main) {
-        if (isOperating) return@withContext BatchResult(listOf(OperationResult(false, context.getString(R.string.operation_busy))))
-        isOperating = true
-        try {
-            val records = CanaServices.getInstance().history.records.first().filter { it.batchId == batchId && it.changed }.asReversed()
-            val undoBatch = UUID.randomUUID().toString()
-            val results = records.map { packageOps.undo(it, undoBatch) }
-            loadInstalled(context.packageManager, context)
-            BatchResult(results)
-        } finally { isOperating = false }
+    suspend fun undoBatch(context: Context, batchId: String): BatchResult {
+        val services = CanaServices.getInstance()
+        val records = services.history.records.first().filter { it.batchId == batchId && it.changed }.asReversed()
+        return services.undo.undo(records)
     }
 
     val defaultAction: PackageAction get() {
@@ -119,17 +115,13 @@ class AppListViewModel(
         }
     }
 
-    companion object {
-        private const val TAG = "AppListViewModel"
-        private var apps by mutableStateOf<List<AppInfo>>(emptyList())
-        private var loadGeneration = 0L
-
-        /**
-         * Profile whose apps are shown and modified, null = the one Canta runs in.
-         * Kept next to [apps] so the two can never get out of sync.
-         */
-        private var selectedUser by mutableStateOf<UserProfile?>(null)
-    }
+    companion object { private const val TAG = "AppListViewModel" }
+    private var customInventory: io.github.samolego.canta.ops.InventoryRepository? = null
+    private val inventory get() = customInventory ?: CanaServices.getInstance().inventory
+    private val inventoryState get() = inventory.state(selectedUserId)
+    val allApps: List<AppInfo> get() = inventoryState.apps
+    private val apps: List<AppInfo> get() = allApps
+    private var selectedUser by mutableStateOf<UserProfile?>(null)
 
     /** Users / profiles on the device, filled by [loadUsers]. */
     var users by mutableStateOf<List<UserProfile>>(emptyList())
@@ -142,25 +134,46 @@ class AppListViewModel(
     val selectedProfile: UserProfile?
         get() = selectedUser
 
-    var loadError by mutableStateOf<String?>(null)
-        private set
+    val loadError: String? get() = inventoryState.error
 
     var selectedApps = mutableStateSetOf<String>()
 
     var searchQuery by mutableStateOf("")
     var onlySystem by mutableStateOf(true)
-    var isLoading by mutableStateOf(false)
-        private set
-    var isLoadingBadges by mutableStateOf(false)
-        private set
+    val isLoading: Boolean get() = inventoryState.loading
+    val isLoadingBadges: Boolean get() = inventoryState.loadingMetadata
 
-    var selectedFilter by mutableStateOf(Filter.any)
+    var activeFilterIds by mutableStateOf<Set<String>>(emptySet())
+    var collectionPackages by mutableStateOf<Set<String>>(emptySet())
+    private var appliedViewUserId: Int? = null
+    var selectedFilter: Filter
+        get() = activeFilterIds.lastOrNull()?.let(Filter::fromId) ?: Filter.any
+        set(value) { activeFilterIds = if (value == Filter.any) emptySet() else setOf(value.id) }
+    fun toggleFilter(filter: Filter) {
+        activeFilterIds = if (filter.id in activeFilterIds) activeFilterIds - filter.id else
+            activeFilterIds.filterNot { Filter.fromId(it)?.group == filter.group }.toSet() + filter.id
+        if (filter == Filter.user && filter.id in activeFilterIds) onlySystem = false
+    }
+    fun clearFilters() {
+        activeFilterIds = emptySet(); collectionPackages = emptySet(); onlySystem = false; searchQuery = ""
+        appliedViewUserId = null
+    }
+    fun applySavedView(view: io.github.samolego.canta.data.SavedView) {
+        require(view.appliesTo(selectedUserId))
+        appliedViewUserId = view.userId
+        searchQuery = view.query
+        activeFilterIds = view.filterIds.filter { id ->
+            Filter.fromId(id)?.let { it != Filter.unused || usageAvailable } == true
+        }.toSet()
+        onlySystem = view.onlySystem
+        collectionPackages = view.packages
+        sortOrder = AppSort.entries.find { it.name == view.sort && (it != AppSort.LAST_USED || usageAvailable) } ?: AppSort.NAME
+    }
     var sortOrder by mutableStateOf(AppSort.NAME)
-    var usageAvailable by mutableStateOf(false)
-        private set
+    val usageAvailable: Boolean get() = inventoryState.usageAvailable
 
     val selectedAppsSorted by derivedStateOf {
-        sortedList.filter { selectedApps.contains(it.packageName) }
+        apps.filter { selectedApps.contains(it.packageName) }.sortedWith(nameComparator)
     }
 
     private val nameComparator = compareBy(Collator.getInstance(Locale.getDefault()), AppInfo::name)
@@ -170,7 +183,8 @@ class AppListViewModel(
             AppSort.SIZE -> compareByDescending<AppInfo> { it.apkSizeBytes }.then(nameComparator)
             AppSort.LAST_USED -> compareByDescending<AppInfo> { it.lastUsed ?: Long.MIN_VALUE }.then(nameComparator)
         }
-        apps.filter { selectedFilter.shouldShow(it) }.sortedWith(comparator)
+        apps.filter { app -> activeFilterIds.mapNotNull(Filter::fromId).all { it.shouldShow(app) } &&
+            (collectionPackages.isEmpty() || app.packageName in collectionPackages) }.sortedWith(comparator)
     }
 
     val appList by derivedStateOf {
@@ -182,8 +196,7 @@ class AppListViewModel(
                 .filter { it.isSystemApp || !onlySystem }
     }
 
-    var needsReload by mutableStateOf(true)
-        private set
+    val needsReload: Boolean get() = inventoryState.stale
 
     /** Lists the users / profiles on the device through Shizuku. */
     suspend fun loadUsers(): Boolean {
@@ -206,6 +219,10 @@ class AppListViewModel(
         if (changed) {
             LogUtils.i(TAG, "Switching to user ${user.id} (${user.kind})")
             selectedApps.clear()
+            if (appliedViewUserId != null && appliedViewUserId != user.id) {
+                clearFilters()
+                sortOrder = AppSort.NAME
+            }
             loadInstalled(packageManager, context)
         }
     }
@@ -214,56 +231,18 @@ class AppListViewModel(
         packageManager: PackageManager,
         context: Context,
         forceRefresh: Boolean = false,
-    ) = withContext(Dispatchers.Main) {
-        val generation = ++loadGeneration
-        val userId = selectedUserId
-        needsReload = true
-        isLoading = true
-        loadError = null
-        apps = emptyList()
-        usageAvailable = false
-        try {
-            val packages = withContext(Dispatchers.IO) {
-                val loaded = packageManager.getAllPackagesInfo(userId)
-                val usage = runCatching { io.github.samolego.canta.ops.UsageRepository(context.applicationContext).lastUsed(userId) }.getOrNull()
-                loaded.map { it.copy(lastUsed = if (usage == null || it.isUninstalled) null else usage[it.packageName] ?: 0L) } to (usage != null)
-            }
-            if (generation != loadGeneration || userId != selectedUserId) return@withContext
-            apps = packages.first
-            usageAvailable = packages.second
-            if (!usageAvailable) {
-                if (sortOrder == AppSort.LAST_USED) sortOrder = AppSort.NAME
-                if (selectedFilter == Filter.unused) selectedFilter = Filter.any
-            }
-            isLoading = false
-            isLoadingBadges = true
-            val bloatMap = withContext(Dispatchers.IO) {
-                val list = bloatListLoader(context, forceRefresh)
-                val parsed = mutableMapOf<String, BloatData>()
-                for (key in list.keys()) {
-                    list.optJSONObject(key)?.let { parsed[key] = BloatData.fromJson(it) }
-                }
-                parsed[packageName] = cantaBloatData(context)
-                parsed
-            }
-            if (generation == loadGeneration && userId == selectedUserId) {
-                apps = apps.map { it.copy(bloatData = bloatMap[it.packageName]) }
-                needsReload = false
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            LogUtils.e(TAG, "Failed to load packages or list for user $userId", e.cause ?: e)
-            if (generation == loadGeneration && userId == selectedUserId) {
-                loadError = (e.cause ?: e).toString()
-            }
-        } finally {
-            if (generation == loadGeneration) {
-                isLoading = false
-                isLoadingBadges = false
-            }
+    ) {
+        if (bloatListLoader != null && customInventory == null) {
+            customInventory = io.github.samolego.canta.ops.InventoryRepository(context.applicationContext, viewModelScope, bloatListLoader)
+        }
+        val user = selectedUserId
+        inventory.refresh(user, forceRefresh)
+        if (user == selectedUserId && !usageAvailable) {
+            if (sortOrder == AppSort.LAST_USED) sortOrder = AppSort.NAME
+            activeFilterIds -= Filter.unused.id
         }
     }
+
 
 
 }
@@ -276,16 +255,9 @@ enum class PackageAction(val label: Int) {
     UNSUSPEND(R.string.unsuspend_app), UNINSTALL_KEEP_DATA(R.string.uninstall_keep_data),
 }
 
-data class PackageActionRequest(val action: PackageAction, val userId: Int, val apps: List<AppInfo>)
-
-private fun cantaBloatData(context: Context): BloatData {
-    return BloatData(
-            installData = null,
-            description =
-                    optionalTextArgument(
-                            context.getString(R.string.canta_description),
-                            "Universal Debloater Alliance (https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation)"
-                    ),
-            removal = null,
-    )
-}
+data class PackageActionRequest(
+    val action: PackageAction,
+    val userId: Int,
+    val apps: List<AppInfo>,
+    val requestedPackages: List<String> = apps.map { it.packageName },
+)
