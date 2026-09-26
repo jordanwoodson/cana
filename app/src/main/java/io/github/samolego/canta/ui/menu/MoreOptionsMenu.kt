@@ -24,6 +24,9 @@ fun MoreOptionsMenu(
             onDismissRequest = onDismiss,
             modifier = Modifier.width(200.dp)
     ) {
+        DropdownMenuItem(text = { Text(stringResource(R.string.system_controls)) }, onClick = {
+            navigateToPage(Screen.System.route); onDismiss()
+        })
         DropdownMenuItem(text = { Text(stringResource(R.string.history)) }, onClick = {
             navigateToPage(Screen.History.route); onDismiss()
         })

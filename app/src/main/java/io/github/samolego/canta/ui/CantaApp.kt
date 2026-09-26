@@ -131,6 +131,9 @@ fun CantaApp(
         composable(route = Screen.History.route) {
             io.github.samolego.canta.ui.screen.HistoryPage(onNavigateBack = { navController.navigateUp() })
         }
+        composable(route = Screen.System.route) {
+            io.github.samolego.canta.ui.screen.SystemPage(onNavigateBack = { navController.navigateUp() })
+        }
         composable(route = Screen.Settings.route) {
             SettingsScreen(
                 onNavigateBack = { navController.navigateUp() },

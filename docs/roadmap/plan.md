@@ -107,9 +107,9 @@ Files: new history page/undo coordinator, OTA detector/store/notification receiv
 
 Files: new System screen/view model/repository and navigation, system-action history types.
 
-- [ ] Probe private DNS, captive portal endpoint/default/off, scanning/mobile data and global Data Saver; verify current GrapheneOS URLs from primary sources.
-- [ ] Show live values, custom DNS/presets, warnings for off, and revert to captured previous values. Use self-granted API when available; shell when needed.
-- [ ] Test commands/validation/restore; emulator change/readback/revert for each toggle. Commit phase.
+- [x] Probe private DNS, captive portal endpoint/default/off, scanning/mobile data and global Data Saver; verify current GrapheneOS URLs from primary sources.
+- [x] Show live values, custom DNS/presets, warnings for off, and revert to captured previous values. Use self-granted API when available; shell when needed.
+- [x] Test commands/validation/restore; emulator change/readback/revert for each toggle. Commit phase.
 
 ### Task 10: audit and release
 

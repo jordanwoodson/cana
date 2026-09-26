@@ -48,7 +48,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                 ElevatedCard(Modifier.fillMaxWidth().clickable { expanded = !expanded }) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(record.packageName.ifBlank { stringResource(R.string.device_wide) }, style = MaterialTheme.typography.titleSmall)
-                        Text("${record.action} · " + stringResource(R.string.action_user, record.userId))
+                        Text("${record.action} · " + if (record.action == "system") stringResource(R.string.device_wide) else stringResource(R.string.action_user, record.userId))
                         Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(record.timestampMs)), style = MaterialTheme.typography.bodySmall)
                         Text(if (!record.completed) stringResource(R.string.history_pending) else record.resultMessage,
                             color = if (record.completed && !record.success) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
