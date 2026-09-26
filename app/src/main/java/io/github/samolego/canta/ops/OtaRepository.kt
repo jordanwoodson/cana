@@ -43,7 +43,7 @@ class OtaRepository(private val context: Context, val store: ManagementStore, pr
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { LogUtils.e("OtaRepository", "Cannot inventory user $user", e); null }
         }
-        val updated = store.observe(Build.FINGERPRINT, inventories, history.records.first())
+        val updated = store.observe(Build.FINGERPRINT, inventories, history.allRecords())
         val notifications = context.getSystemService(NotificationManager::class.java)
         if (updated.pendingCount == 0) { notifications.cancel(NOTIFICATION_ID); return@withLock }
         if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return@withLock

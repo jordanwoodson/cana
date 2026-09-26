@@ -35,7 +35,7 @@ class SystemDeviceTest {
             try {
                 assertTrue("$control: ${result.message}", result.success)
                 assertTrue(record.completed && record.changed && record.success)
-                assertEquals(before.toString(), record.previousState)
+                assertTrue(SnapshotState.equal(before.toString(), record.previousState))
                 assertEquals(control.name, JSONObject(record.afterState).getString("control"))
                 val batch = services.undo.undo(listOf(record))
                 assertEquals(batch.toString(), 1, batch.successCount)

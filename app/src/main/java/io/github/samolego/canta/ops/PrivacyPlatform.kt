@@ -5,7 +5,9 @@ import android.os.Build
 import android.os.IBinder
 import org.json.JSONObject
 import org.lsposed.hiddenapibypass.HiddenApiBypass
+import io.github.samolego.canta.util.HiddenApiAccess
 import rikka.shizuku.SystemServiceHelper
+import java.security.MessageDigest
 
 /** Runs only inside the shell UserService/PC recovery process, using the caller's real uid.
  * The connectivity shell command resolves appIds, not profile UIDs. This narrow adapter
@@ -17,23 +19,36 @@ internal object PrivacyPlatform {
     private fun invoke(type: String, name: String, method: String, vararg args: Any): Any? =
         HiddenApiBypass.invoke(Class.forName(type), service(type, name), method, *args)
 
-    fun packageInfo(pkg: String, user: Int): PackageInfo {
-        HiddenApiBypass.addHiddenApiExemptions("Landroid/content/pm/", "Landroid/net/", "Landroid/permission/")
-        val flags: Any = if (Build.VERSION.SDK_INT >= 33) 0L else 0
+    fun packageInfo(pkg: String, user: Int, queryFlags: Int = 0): PackageInfo {
+        HiddenApiAccess.ensureReady()
+        val flags: Any = if (Build.VERSION.SDK_INT >= 33) queryFlags.toLong() else queryFlags
         return invoke("android.content.pm.IPackageManager", "package", "getPackageInfo", pkg, flags, user) as? PackageInfo
             ?: error("Package is not installed in user $user")
     }
 
-    fun exec(args: List<String>): String {
-        require(args.size in 4..5)
+    fun exec(rawArgs: List<String>): String {
+        val command = PrivacyCommand.parse(rawArgs)
+        val args = command.arguments
+        require(args.size in 4..6)
         val action = args[0]
         val pkg = args[1]
         val user = args[2].toInt()
         require(user >= 0 && pkg.isNotBlank())
         val info = packageInfo(pkg, user)
         return when (action) {
+            "identity-get" -> {
+                val signed = packageInfo(pkg, user, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES)
+                val signers = requireNotNull(signed.signingInfo).apkContentsSigners.map { signature ->
+                    MessageDigest.getInstance("SHA-256").digest(signature.toByteArray()).joinToString("") { "%02x".format(it) }
+                }.sorted()
+                HiddenApiAccess.ensureReady()
+                val serial = invoke("android.os.IUserManager", "user", "getUserSerialNumber", user) as Int
+                check(serial >= 0 && signed.firstInstallTime > 0 && signers.isNotEmpty()) { "Package identity is unavailable" }
+                JSONObject().put("identity", listOf(pkg, user, serial, signed.applicationInfo!!.uid % 100_000,
+                    signed.firstInstallTime, signers.joinToString(",")).joinToString(":" )).toString()
+            }
             "desired-set", "metered-desired-set", "metered-set" -> {
-                require(args.size == 5)
+                require(args.size == 5 || action != "metered-set" && args.size == 6)
                 val appId = info.applicationInfo!!.uid % 100_000
                 require(appId == args[3].toInt()) { "App UID changed; inspect this package again" }
                 val uid = PrivacyPolicy.uid(user, appId)
@@ -44,9 +59,10 @@ internal object PrivacyPlatform {
                 }
                 if (action != "metered-set") {
                     val blocked = args[4].toBooleanStrict()
-                    val output = command("/system/bin/content", "call", "--user", "0", "--uri", "content://io.github.jordanwoodson.cana.recovery",
+                    val extras = args.getOrNull(5)?.let { listOf("--extra", "consent:s:$it") }.orEmpty()
+                    val output = command(*(listOf("/system/bin/content", "call", "--user", "${PrivacyCommand.parse(rawArgs).ownerUserId}", "--uri", "content://io.github.jordanwoodson.cana.recovery",
                         "--method", if (action == "desired-set") "network-desired" else "metered-desired", "--extra", "package:s:$pkg", "--extra", "user:i:$user",
-                        "--extra", "appId:i:$appId", "--extra", "blocked:b:$blocked")
+                        "--extra", "appId:i:$appId", "--extra", "blocked:b:$blocked") + extras).toTypedArray())
                     check(output.contains("restored=true")) { output.ifBlank { "Cana could not restore the desired network state" } }
                     output
                 } else {

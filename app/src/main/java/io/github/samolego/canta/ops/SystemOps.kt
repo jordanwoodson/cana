@@ -76,7 +76,7 @@ class SystemOps(private val context: Context, private val shell: ShellRunner, pr
         }
     }
     private fun verified(expected: JSONObject, actual: JSONObject): OperationResult {
-        val success = expected.toString() == actual.toString()
+        val success = SnapshotState.equal(expected, actual)
         return OperationResult(success, context.getString(if (success) R.string.operation_success else R.string.operation_not_applied))
     }
 }

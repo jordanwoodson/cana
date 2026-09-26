@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_recovery_counts">Recovery: %1$d restored · %2$d changes not restored</string>
+    <string name="history_store_unavailable">Operation history is unavailable. Changes require a readable recovery journal. Restart Cana to retry; do not clear app data.</string>
+    <string name="batch_outcome_counts">%1$d succeeded · %2$d failed · %3$d skipped · %4$d awaiting verification</string>
+    <string name="history_quarantined">%1$d records belong to an earlier or unverified installation. They remain saved for review and cannot be used for automatic recovery.</string>
+    <string name="history_forget_network">Forget saved network block</string>
+    <string name="history_forget_metered">Forget saved metered restriction</string>
+    <string name="batch_progress">%1$s · %2$d of %3$d</string>
+    <string name="batch_stop">Stop after current item</string>
+    <string name="batch_stopping">Stopping after the current item…</string>
+    <string name="batch_stopped_item">Not started: batch stopped</string>
+    <string name="batch_interrupted">Unfinished work needs review</string>
+    <string name="batch_interrupted_description">Cana closed before this batch finished. Check each result and the current app state. No unfinished items were replayed.</string>
+    <string name="batch_queued">Waiting to start</string>
+    <string name="batch_running">In progress</string>
+    <string name="batch_review">Review History</string>
+    <string name="batch_reviewed">Mark reviewed</string>
+    <string name="history_diagnostics">Technical details</string>
+    <string name="plan_title">Review changes</string>
+    <string name="plan_execute">Apply reviewed changes</string>
+    <string name="plan_summary">%1$d selected · %2$d included · %3$d will be skipped</string>
+    <string name="plan_unavailable">Skipped: missing from this profile or incompatible with this action</string>
+    <string name="plan_excluded">Skipped: excluded from this plan</string>
+    <string name="plan_remove_data">Removing an app can delete its data in this profile. Reinstalling does not restore deleted data.</string>
+    <string name="plan_keep_data">App data will be kept where Android supports it. Restoring the app may require the same signing identity.</string>
+    <string name="plan_restore">Restore installation for this profile. Previously deleted app data cannot be recovered by Cana.</string>
+    <string name="plan_reversible">Cana records the previous state for recovery. Review History after applying these changes.</string>
+    <string name="plan_update_loss">Removing updates changes the shared app version across profiles. The exact previous version may need to be downloaded again.</string>
+    <string name="plan_empty">No eligible changes. Close this review and update your selection.</string>
+    <string name="batch_storage_failed">The batch could not be fully saved. Review History and the current app state before retrying.</string>
+    <string name="batch_store_unavailable">Saved batch progress could not be read. Restart Cana to retry. No unfinished actions were replayed.</string>
+    <string name="batch_stop_failed">Could not save the stop request. Check progress and try again.</string>
+    <string name="batch_operation_failed">Operation failed</string>
+</resources>

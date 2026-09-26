@@ -77,7 +77,8 @@ class PrivacyRebootDeviceTest {
         assertFalse(Shizuku.pingBinder())
         val state = services.privacy.load(pkg, 10)
         assertTrue(state.desiredBlock)
-        assertTrue(state.errors.containsKey(PrivacyAction.NETWORK))
+        assertFalse(state.connected)
+        assertFalse(state.values.containsKey(PrivacyAction.NETWORK))
     }
     @Test fun recoveryEndpointRejectsUnprivilegedCallers() {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))

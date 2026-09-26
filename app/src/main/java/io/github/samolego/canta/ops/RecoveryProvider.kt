@@ -22,7 +22,7 @@ class RecoveryProvider : ContentProvider() {
         require(Regex("[A-Za-z][A-Za-z0-9_.]*").matches(pkg))
         val blocked = extras.getBoolean("blocked")
         val result = runBlocking { CanaServices.getInstance().privacy.restoreDesired(pkg, user, appId, blocked,
-            if (method == "metered-desired") PrivacyAction.METERED else PrivacyAction.NETWORK) }
+            if (method == "metered-desired") PrivacyAction.METERED else PrivacyAction.NETWORK, extras.getString("consent")) }
         return Bundle().apply { putBoolean("restored", result.success); putString("message", result.message) }
     }
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? = null

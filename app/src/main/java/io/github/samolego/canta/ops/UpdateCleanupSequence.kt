@@ -19,12 +19,15 @@ internal object UpdateCleanupSequence {
         fun state() = try { readState() } catch (_: Exception) { null }
 
         var result = attempt(reset)
+        if (result.outcomeUnknown) return result
         var installedForFallback = false
         if (!result.success) {
             val install = attempt(installExisting)
+            if (install.outcomeUnknown) return install
             // Even a failed callback may have changed state; always inspect and repair below.
             installedForFallback = install.success
             result = if (install.success) attempt(reset) else install
+            if (result.outcomeUnknown) return result
         }
         val afterReset = state()
         if (afterReset?.installed == true || (afterReset == null && installedForFallback)) {

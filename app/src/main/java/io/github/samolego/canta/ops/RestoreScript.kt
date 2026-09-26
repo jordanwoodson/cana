@@ -10,13 +10,17 @@ object RestoreScript {
 
     fun plan(record: OperationRecord): RestorePlan = try {
         require(record.userId >= 0)
-        val before = JSONObject(record.previousState)
-        val after = runCatching { JSONObject(record.afterState) }.getOrDefault(JSONObject())
+        val before = SnapshotState.read(record.previousState)
+        val after = runCatching { SnapshotState.read(record.afterState) }.getOrDefault(JSONObject())
         val user = record.userId.toString()
         val pkg = record.packageName
         val commands = mutableListOf<List<String>>()
         val notes = mutableListOf<String>()
         fun command(vararg args: String) { commands += args.toList() }
+        fun desired(verb: String, field: String) {
+            val args = listOf("cana-privacy", verb, pkg, user, before.getInt("appId").toString(), before.getBoolean(field).toString())
+            commands += args + before.optString("savedConsent").takeIf { it.isNotEmpty() }?.let { listOf(it) }.orEmpty()
+        }
         fun enabled(target: String) {
             val verb = when (before.getInt("enabledSetting")) {
                 0 -> "default-state"; 1 -> "enable"; 2 -> "disable"; 3 -> "disable-user"; 4 -> "disable-until-used"
@@ -50,17 +54,18 @@ object RestoreScript {
             "metered", "metered_reapply" -> {
                 val appId = before.getInt("appId")
                 PrivacyPolicy.uid(record.userId, appId)
-                if (before.has("desiredMetered")) command("cana-privacy", "metered-desired-set", pkg, user, appId.toString(), before.getBoolean("desiredMetered").toString())
+                if (before.has("desiredMetered")) desired("metered-desired-set", "desiredMetered")
                 command("cana-privacy", "metered-set", pkg, user, appId.toString(), before.getInt("meteredPolicy").toString())
             }
-            "metered_desired_restore" -> command("cana-privacy", "metered-desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredMetered").toString())
-            "network_desired_restore" -> command("cana-privacy", "desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredBlock").toString())
+            "metered_desired_restore" -> desired("metered-desired-set", "desiredMetered")
+            "network_desired_restore" -> desired("desired-set", "desiredBlock")
+            "network_forget", "metered_forget" -> Unit // Forgetting old identity is intentionally not reversed.
             "network", "network_reapply" -> {
                 if (before.has("networkRule")) {
                     PrivacyPolicy.uid(record.userId, before.getInt("appId"))
                     val rule = before.getInt("networkRule")
                     require(rule in 0..2)
-                    if (before.has("desiredBlock")) command("cana-privacy", "desired-set", pkg, user, before.getInt("appId").toString(), before.getBoolean("desiredBlock").toString())
+                    if (before.has("desiredBlock")) desired("desired-set", "desiredBlock")
                     command("cana-privacy", "network-set", pkg, user, before.getInt("appId").toString(), rule.toString())
                 } else {
                     require(record.userId == 0) { "Legacy networking records are only safe in the system user" }
@@ -111,7 +116,8 @@ object RestoreScript {
         RestorePlan(emptyList(), listOf("Cannot safely reconstruct ${record.action} for ${record.packageName}: ${e.message}"))
     }
 
-    fun generate(records: List<OperationRecord>): String {
+    fun generate(records: List<OperationRecord>, ownerUserId: Int = 0): String {
+        require(ownerUserId >= 0)
         val steps = records.asReversed().filter { it.changed || !it.completed }.map { it to plan(it) }
         val manual = steps.sumOf { it.second.notes.size }
         return buildString {
@@ -120,9 +126,9 @@ object RestoreScript {
             append("failures=0\nmanual_steps=$manual\n")
             append("run() {\n  \"\$@\"\n  result=\$?\n  if [ \"\$result\" -ne 0 ]; then\n    failures=\$((failures + 1))\n    printf '%s\\n' \"Recovery command failed (\$result): \$*\" >&2\n  fi\n}\n")
             if (steps.any { it.second.commands.any { command -> command.firstOrNull() == "cana-privacy" } }) {
-                append("cana_privacy() {\n  cana_apk=\$(pm path --user 0 io.github.jordanwoodson.cana | sed -n 's/^package://p' | head -n 1)\n")
+                append("cana_privacy() {\n  cana_owner=\$1; shift\n  cana_apk=\$(pm path --user \"\$cana_owner\" io.github.jordanwoodson.cana | sed -n 's/^package://p' | head -n 1)\n")
                 append("  [ -r \"\$cana_apk\" ] || { printf '%s\\n' 'Install Cana to use per-profile network recovery.' >&2; return 1; }\n")
-                append("  CLASSPATH=\"\$cana_apk\" app_process /system/bin io.github.samolego.canta.ops.PrivacyRecovery \"\$@\"\n}\n")
+                append("  CLASSPATH=\"\$cana_apk\" app_process /system/bin io.github.samolego.canta.ops.PrivacyRecovery --owner-user \"\$cana_owner\" \"\$@\"\n}\n")
 
             }
             for ((record, plan) in steps) {
@@ -130,7 +136,9 @@ object RestoreScript {
                 comment("${record.action}: ${record.packageName} (user ${record.userId})")
                 plan.notes.forEach { comment("MANUAL: $it") }
                 plan.commands.forEach { command ->
-                    val argv = if (command.firstOrNull() == "cana-privacy") listOf("cana_privacy") + command.drop(1) else command
+                    val owner = runCatching { SnapshotState.read(record.previousState).optInt("ownerUserId", ownerUserId) }.getOrDefault(ownerUserId)
+                    require(owner >= 0)
+                    val argv = if (command.firstOrNull() == "cana-privacy") listOf("cana_privacy", owner.toString()) + command.drop(1) else command
                     append("run ").append(argv.joinToString(" ", transform = ::quote)).append('\n')
                 }
             }

@@ -6,8 +6,15 @@ message NetworkBlock {
   string package_name = 1;
   int32 user_id = 2;
   int32 app_id = 3;
+  string identity = 4;
+  string safety_conditions = 5;
+  repeated string approvals = 6;
+  string status = 7;
+  string status_message = 8;
+  int64 checked_at_ms = 9;
 }
 message PrivacyDesiredState {
   repeated NetworkBlock network_blocks = 1;
   repeated NetworkBlock metered_blocks = 2;
+  string installation_id = 3;
 }

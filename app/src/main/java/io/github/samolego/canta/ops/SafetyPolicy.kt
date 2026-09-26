@@ -1,7 +1,7 @@
 package io.github.samolego.canta.ops
 
-data class SafetyWarning(val kind: String, val detail: String) {
-    val key: String get() = "$kind:$detail"
+data class SafetyWarning(val kind: String, val detail: String, val packageName: String = "", val userId: Int = 0) {
+    val key: String get() = "$userId:$packageName:$kind:$detail"
 }
 data class SafetyAssessment(val protected: Boolean = false, val warnings: List<SafetyWarning> = emptyList(), val error: String? = null) {
     fun permits(approved: Set<String>): Boolean = !protected && error == null && warnings.all { it.key in approved }
@@ -22,13 +22,13 @@ internal object SafetyPolicy {
     fun keyboardPackages(default: String, enabled: String): Set<String> =
         (listOf(default) + enabled.split(':')).filter { '/' in it }.map { it.substringBefore('/') }.toSet()
 
-    fun assess(name: String, snapshot: SafetySnapshot, neededBy: List<String>): SafetyAssessment = SafetyAssessment(
+    fun assess(name: String, snapshot: SafetySnapshot, neededBy: List<String>, userId: Int = 0): SafetyAssessment = SafetyAssessment(
         protected = name in snapshot.protectedPackages,
         warnings = buildList {
-            snapshot.roles.filterValues { name in it }.keys.sorted().forEach { add(SafetyWarning("role", it)) }
-            if (name in snapshot.keyboards) add(SafetyWarning("keyboard", name))
-            if (name in snapshot.admins) add(SafetyWarning("admin", name))
-            neededBy.distinct().filter { it in snapshot.installedPackages }.sorted().forEach { add(SafetyWarning("dependent", it)) }
+            snapshot.roles.filterValues { name in it }.keys.sorted().forEach { add(SafetyWarning("role", it, name, userId)) }
+            if (name in snapshot.keyboards) add(SafetyWarning("keyboard", name, name, userId))
+            if (name in snapshot.admins) add(SafetyWarning("admin", name, name, userId))
+            neededBy.distinct().filter { it in snapshot.installedPackages }.sorted().forEach { add(SafetyWarning("dependent", it, name, userId)) }
         },
     )
 }

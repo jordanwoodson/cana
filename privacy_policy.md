@@ -1,36 +1,36 @@
 # Privacy Policy for Cana
 
-## Introduction
-This Privacy Policy describes how Cana ("we", "our", or "app") handles information.
-Cana is a FOSS (Free and Open Source Software) debloater app powered by Shizuku that allows users to uninstall applications without root access.
+Updated September 26, 2026.
 
-## Information Collection and Use
-Cana does not collect, store, transmit, or share any personal information.
-The app functions entirely on your device and does not connect to any servers or third-party services for data processing.
+Cana manages Android apps and profiles locally using Shizuku. Cana has no analytics SDK, advertising SDK, developer account system, or developer-operated collection endpoint.
 
-## App Permissions
-Cana requires the following permissions:
+## Information on your device
 
-- **Shizuku API access**: Required to perform app uninstallation functions without root access. The Shizuku API allows Cana to execute commands with elevated privileges.
-- **Package visibility**: Required to see and interact with other installed applications on your device.
+Cana reads package names, app versions, installation state, profile identifiers, and the permission or system settings needed for the controls you use. If you enable usage access, it can read app usage timestamps for sorting and filtering. It stores preferences, presets, saved views, desired privacy rules, and operation/recovery history in its private app storage. Diagnostic logs can contain package names, profile IDs, command results, and errors; the in-app log is bounded and kept in memory.
 
-These permissions are used solely for the core functionality of the app and not for data collection.
+Android protects this storage using its app sandbox. Operational history, pending batches, privacy rules, and management snapshots are excluded from Android backup and device transfer. Portable preferences, presets, and saved views may be included if Android backup is enabled. Installation identity checks keep older restored operational records from being silently reapplied.
 
-## Third-Party Libraries & Data Sources
-Cana uses the following third-party libraries:
+## Network requests
 
-- **Shizuku**: An API that enables apps to perform operations that typically require elevated permissions. We do not share any data with Shizuku developers. For more information about Shizuku's privacy practices, please visit [https://shizuku.rikka.app/](https://shizuku.rikka.app/).
+Recommendation descriptions and badges can be downloaded from the Universal Debloater Alliance dataset. Tracker definitions can be downloaded from the configured tracker source. Cana keeps cached/bundled data for offline use. Automatic recommendation updates and unmetered-only behavior are configurable; a manual refresh may also make a request.
 
-Cana also uses **Universal Android Debloater**'s information about apps (app descriptions and badges).
+These downloads contact GitHub or the source URL you configure. The destination and network providers receive normal request information, such as your IP address, requested URL, and cache validation headers. Cana does not attach your installed-app inventory, operation history, or usage timestamps to these downloads. A custom URL can itself contain information you entered. Links opened in an external browser follow that browser and destination's policies.
 
-## Data Storage
-Cana may store information on your device, e.g. app descriptions, versions etc.
-This information **never leaves your device** and is **not** accessible to us or any third parties.
+## Permissions and elevated access
 
-## Changes to This Privacy Policy
-If needed, we may update our Privacy Policy from time to time.
-Thus, you are advised to review this page periodically for any changes.
-We will notify you of any changes by posting the new Privacy Policy on this page.
+- Package visibility lists apps that Cana can inspect.
+- Shizuku grants elevated access for supported package, profile, permission, and system operations. Android and administrator restrictions still apply.
+- Internet and network-state access support data downloads and update preferences.
+- Optional usage access supports last-used sorting/filtering; optional secure-settings access supports the System controls.
+- Boot/package events schedule checks for desired rules and system-update changes. Notifications are optional.
+- Optional device authentication is handled by Android. Cana does not receive biometric templates or device credentials.
 
-## Contact Us
-If you have any questions or suggestions about this Privacy Policy, do not hesitate to contact us through our [GitHub repository](https://github.com/jordanwoodson/cana).
+## Export and sharing
+
+Presets, logs, and recovery scripts leave the app only when you copy, export, or share them. Those exports can reveal package names, profile identifiers, settings, or operation results. The destination you choose controls the exported copy. Cana cannot delete copies you share with other apps or people.
+
+## Deletion and contact
+
+You can delete presets and saved views in Cana. Uninstalling Cana or clearing its storage removes its local records and recovery information. Android settings already changed by Cana may remain in effect; review or restore them before deleting the records you need for recovery.
+
+Questions or corrections can be raised in the [Cana repository](https://github.com/jordanwoodson/cana). If you post a diagnostic report there, it is shared with GitHub and anyone who can access the report.

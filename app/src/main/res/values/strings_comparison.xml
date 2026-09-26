@@ -1,0 +1,36 @@
+<resources>
+    <string name="comparison_title">Compare profiles</string>
+    <string name="comparison_description">Compare app state across selected profiles. This screen is read-only.</string>
+    <string name="comparison_privacy_description">Privacy shows saved network choices, not verified enforcement. Runtime permissions and background activity are not checked here.</string>
+    <string name="comparison_profiles">Profiles to compare</string>
+    <string name="comparison_choose_profiles">Choose profiles above to compare their apps.</string>
+    <string name="comparison_one_profile">Select another profile to compare side by side.</string>
+    <string name="comparison_one_available">Only one profile is currently available.</string>
+    <string name="comparison_profiles_unavailable">The profile list could not be refreshed. Check Shizuku and profile access, then retry.</string>
+    <string name="comparison_privacy_unavailable">Saved privacy choices could not be read.</string>
+    <string name="comparison_inventory_unavailable">Some selected profiles could not be read. Their app states are marked unavailable.</string>
+    <string name="comparison_loading">Reading profiles and app state…</string>
+    <string name="comparison_search">Search app name or package</string>
+    <string name="comparison_clear_search">Clear search</string>
+    <string name="comparison_no_matches">No apps match your search.</string>
+    <string name="comparison_no_apps">No apps or saved network restrictions were found in the selected profiles.</string>
+    <string name="comparison_no_inventory">No app inventory is available for the selected profiles.</string>
+    <string name="comparison_refresh">Refresh comparison</string>
+    <string name="comparison_retry">Retry</string>
+    <string name="comparison_app">App</string>
+    <string name="comparison_profile">%1$s · user %2$d</string>
+    <string name="comparison_cell_context">%1$s · %2$s</string>
+    <string name="comparison_installed">Installed</string>
+    <string name="comparison_removed">Removed</string>
+    <string name="comparison_absent">Not present</string>
+    <string name="comparison_unavailable">Unavailable</string>
+    <string name="comparison_disabled">Disabled</string>
+    <string name="comparison_suspended">Suspended</string>
+    <string name="comparison_privacy_unknown">Saved privacy: unavailable</string>
+    <string name="comparison_privacy_none">No saved network restrictions</string>
+    <string name="comparison_saved_network">Saved: block all network access</string>
+    <string name="comparison_saved_metered">Saved: deny metered background data</string>
+    <string name="comparison_package_count">%1$d apps shown</string>
+    <string name="comparison_scroll_hint">Scroll sideways to see every selected profile.</string>
+    <string name="comparison_details">Technical details</string>
+</resources>

@@ -8,6 +8,7 @@ object PresetJson {
     fun encode(preset: CantaPresetData): String = JSONObject().apply {
         put("name", preset.name); put("description", preset.description); put("createdDate", preset.createdDate)
         put("version", preset.version); put("apps", JSONArray(preset.apps.toList()))
+        if (preset.uuid.isNotBlank()) put("uuid", preset.uuid)
         preset.profileKind?.let { put("profileKind", it) }
         if (preset.lockdown.isNotEmpty()) put("lockdown", JSONArray().apply {
             preset.lockdown.forEach { entry -> put(JSONObject().put("packageName", entry.packageName)
@@ -39,7 +40,9 @@ object PresetJson {
         require(settings.none { it.packageName in removed }) { "A removed app cannot also be locked down" }
         return CantaPresetData(json.getString("name").also { require(it.isNotBlank() && it.length <= 256) },
             json.optString("description", ""), json.optLong("createdDate", 0), removed,
-            json.optString("version", "1.0"), UUID.randomUUID().toString(), settings,
+            json.optString("version", "1.0"), json.optString("uuid").takeIf { it.isNotBlank() }
+                ?.also { require(it.length <= 128 && Regex("[A-Za-z0-9_-]+").matches(it)) }
+                ?: UUID.randomUUID().toString(), settings,
             json.optString("profileKind").takeIf { it.isNotBlank() }?.also { require(it.length <= 64 && Regex("[A-Z_]+").matches(it)) })
     }
 }

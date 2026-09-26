@@ -38,7 +38,7 @@ class PrivacyCapabilityDeviceTest {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         withTimeout(30_000) { while (!Shizuku.pingBinder()) delay(100) }
         assertEquals(PackageManager.PERMISSION_GRANTED, Shizuku.checkSelfPermission())
-        HiddenApiBypass.addHiddenApiExemptions("Landroid/net/", "Landroid/permission/")
+        io.github.samolego.canta.util.HiddenApiAccess.ensureReady()
         val permissionType = "android.permission.IPermissionManager"
         val permissionManager = binder(permissionType, "permissionmgr")
         val connectivityType = "android.net.IConnectivityManager"

@@ -1,86 +1,40 @@
 ---
 title: Cana - Settings
-description: Configure Cana settings for optimal use
+description: Configure recommendations, reviewed actions, and appearance.
 ---
 # Settings
 
-Cana offers several configuration options to customize your experience. This page explains each setting and how it affects app functionality.
+## Recommendations and custom sources
 
-## Available Settings
+Cana shows cached or bundled app recommendations first. **Auto-update Bloat List**
+refreshes the recommendations in the background when enabled. Community risk
+labels are guidance; they do not guarantee that removal is safe on every device.
 
-<div class="screenshot-container">
-  <img src="/images/phoneScreenshots/screenshot-settings.png" alt="Settings screen" class="phone-screenshot">
-  <div class="screenshot-caption">
-    Cana settings screen
-  </div>
-</div>
+To change a custom list URL, edit it and press **Save**. The address must use HTTPS
+or HTTP and contain a host. Cancel leaves the stored source and cache settings
+unchanged. Downloads contact the selected source; see the [privacy policy](https://github.com/jordanwoodson/cana/blob/roadmap/privacy_policy.md).
 
-### Auto-update Bloat List
+## Reviewed actions
 
-**Description:** When enabled, Cana automatically checks for and downloads the latest app classification data from the [Universal Debloater Alliance](https://github.com/Universal-Debloater-Alliance/universal-android-preinstalled-lists) repository.
+Every package action opens a review of the exact apps, profile, exclusions,
+shared effects, and recovery limits. Filtering does not clear selections, so
+check the total and hidden counts before proceeding. Review is always required.
 
-- **Enabled (Default):** Ensures you have the most up-to-date information about apps, including newly identified bloatware and revised safety recommendations.
-- **Disabled:** Cana will use only the locally stored bloat list data without checking for updates.
+**Allow removal of Unsafe apps** permits reviewed removal of apps classified
+Unsafe, including actions in presets. It does not override Cana's protected-app
+checks, Android administrator restrictions, or required safety acknowledgments.
+Disabling an app is a separate action and can still affect device functions.
 
-::: tip
-Enable this setting to ensure you have the most accurate information about which apps are safe to remove.
-:::
+If device authentication is enabled, Cana requests authentication before applying
+a reviewed change. Hiding successful result dialogs does not hide failed or
+unverified outcomes; History retains the results.
 
-### Confirm Before Uninstall
+## Selection and appearance
 
-**Description:** Shows a confirmation dialog before uninstalling selected apps.
+**Select visible** is available directly in the app list. It selects only apps in
+the current view; the selection bar also counts selected apps hidden by filters.
+Use **Clear selection** to remove all selected targets. No version-tapping shortcut
+is needed.
 
-- **Enabled (Default):** Displays a confirmation dialog showing the number of apps you're about to uninstall, helping prevent accidental removals.
-- **Disabled:** Immediately proceeds with uninstallation when you tap the trash icon, without asking for confirmation.
-
-::: warning
-We recommend keeping this enabled to avoid accidentally uninstalling important apps.
-:::
-
-## Advanced Settings
-
-Cana includes advanced settings for power users who need more control over the app's behavior.
-
-### Allow Unsafe Selections
-
-**Description:** Controls whether you can select apps that are marked with the 🟣 **Unsafe** badge for uninstallation.
-You can bypass this restriction by using presets, too.
-
-- **Disabled (Default):** Apps marked as unsafe cannot be selected for uninstallation, protecting you from accidentally removing critical system components.
-- **Enabled:** Allows selection of unsafe apps, giving experienced users full control over what they can uninstall.
-
-::: danger IMPORTANT
-Enabling this setting allows you to select apps that could break vital system functionality. Only enable this if you understand the risks and know exactly what you're doing. There's a high chance you'll experience bootlooping!
-:::
-
-### Bloat List URL
-
-**Description:** Specifies the source URL where Cana downloads app classification data, badges, and descriptions.
-
-- **Default:** Points to the Universal Debloater Alliance repository
-- **Custom:** You can specify an alternative source that follows the same data format
-
-This setting allows organizations or advanced users to maintain their own app classification databases.
-
-### Commits URL
-
-**Description:** Defines where Cana checks for updates to the bloat list data.
-
-- **Default:** Points to the commits API of the Universal Debloater Alliance repository
-- **Custom:** Can be changed to track updates from alternative sources
-
-This works in conjunction with the "Auto-update Bloat List" setting to determine when new data is available.
-
-::: tip ADVANCED USAGE
-The Bloat List URL and Commits URL settings are primarily intended for developers testing custom app databases.
-:::
-
-## Hidden Features
-
-### Select All
-
-For advanced users, Cana includes a hidden "Select All" feature that can be enabled by tapping the version number in Settings multiple times. This feature adds a "Select All" option when having "recommended" filter applied.
-
-::: warning CAUTION
-Use this feature carefully, as mass uninstallation could affect device functionality.
-:::
+Theme and dynamic colors follow the appearance options in Settings. Android's
+font-size setting applies to labels and controls.

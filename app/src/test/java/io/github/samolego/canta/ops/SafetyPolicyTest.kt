@@ -21,7 +21,7 @@ class SafetyPolicyTest {
         val state = SafetySnapshot(roles = mapOf("HOME" to setOf("app"), "SMS" to setOf("app")),
             keyboards = setOf("app"), admins = setOf("app"), installedPackages = setOf("dependent", "app"))
         val report = SafetyPolicy.assess("app", state, listOf("dependent", "absent", "dependent"))
-        assertEquals(setOf("role:HOME", "role:SMS", "keyboard:app", "admin:app", "dependent:dependent"), report.warnings.map { it.key }.toSet())
+        assertEquals(setOf("0:app:role:HOME", "0:app:role:SMS", "0:app:keyboard:app", "0:app:admin:app", "0:app:dependent:dependent"), report.warnings.map { it.key }.toSet())
         assertFalse(report.permits(emptySet()))
         assertFalse(report.permits(setOf("role:HOME")))
         assertTrue(report.permits(report.warnings.map { it.key }.toSet()))

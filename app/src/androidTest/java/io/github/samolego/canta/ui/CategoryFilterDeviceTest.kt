@@ -21,7 +21,6 @@ class CategoryFilterDeviceTest {
     @Test fun allCategoriesAreReachableAndSelectionUpdatesTheMenu() {
         val model = AppListViewModel()
         compose.setContent { CantaTheme { FiltersMenu(true, {}, model) } }
-        compose.onNodeWithText("Any").performClick()
         for (category in listOf("Google", "OEM", "Carrier", "AOSP", "Misc")) {
             compose.onNodeWithText(category).performScrollTo().assertIsDisplayed()
         }

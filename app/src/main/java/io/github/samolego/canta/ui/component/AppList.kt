@@ -37,10 +37,10 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import io.github.samolego.canta.R
 import io.github.samolego.canta.extension.add
 import io.github.samolego.canta.ui.AppsType
-import io.github.samolego.canta.ui.dialog.AppInfoDialog
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.RemovalRecommendation
@@ -53,26 +53,12 @@ fun AppList(
         appListModel: AppListViewModel,
         settingsViewModel: SettingsViewModel,
         enableSelectAll: Boolean = false,
+        onOpenDetails: (String, Int) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
-    var showAppDialog by remember { mutableStateOf<AppInfo?>(null) }
-    var componentTarget by remember { mutableStateOf<Pair<String, Int>?>(null) }
-    var privacyTarget by remember { mutableStateOf<Pair<String, Int>?>(null) }
-
     val appList by remember {
         derivedStateOf {
             appListModel.appList.filter {
-                when (appType) {
-                    AppsType.INSTALLED -> !it.isUninstalled
-                    AppsType.UNINSTALLED -> it.isUninstalled
-                }
-            }
-        }
-    }
-
-    val selectedAppList by remember {
-        derivedStateOf {
-            appListModel.selectedAppsSorted.filter {
                 when (appType) {
                     AppsType.INSTALLED -> !it.isUninstalled
                     AppsType.UNINSTALLED -> it.isUninstalled
@@ -92,32 +78,6 @@ fun AppList(
                 .fillMaxWidth()
                 .fillMaxHeight(),
     ) {
-        if (showAppDialog != null) {
-            AppInfoDialog(
-                    appInfo = showAppDialog!!,
-                    onDismiss = { showAppDialog = null },
-                    onRemoveUpdates = {
-                        appListModel.requestAction(io.github.samolego.canta.ui.viewmodel.PackageAction.REMOVE_UPDATES,
-                            listOf(showAppDialog!!.packageName))
-                        showAppDialog = null
-                    },
-                    onComponents = {
-                        componentTarget = showAppDialog!!.packageName to appListModel.selectedUserId
-                        showAppDialog = null
-                    },
-                    onPrivacy = {
-                        privacyTarget = showAppDialog!!.packageName to appListModel.selectedUserId
-                        showAppDialog = null
-                    },
-            )
-        }
-        componentTarget?.let { (name, user) ->
-            io.github.samolego.canta.ui.dialog.ComponentsDialog(name, user) { componentTarget = null }
-        }
-        privacyTarget?.let { (name, user) ->
-            io.github.samolego.canta.ui.dialog.PrivacyDialog(name, user) { privacyTarget = null }
-        }
-
         if (appListModel.isLoading) {
             LoadingAppsInfo()
         } else {
@@ -133,79 +93,27 @@ fun AppList(
                     ) { Text(stringResource(R.string.remove_updates)) }
                 }
             }
+            if (appListModel.loadError != null && appListModel.allApps.isNotEmpty()) {
+                val scope = androidx.compose.runtime.rememberCoroutineScope()
+                Column(Modifier.padding(16.dp)) {
+                    Text(stringResource(R.string.inventory_unavailable), color = MaterialTheme.colorScheme.error)
+                    androidx.compose.material3.TextButton(onClick = { scope.launch { appListModel.loadInstalled(context.packageManager, context) } }) {
+                        Text(stringResource(R.string.inventory_retry))
+                    }
+                }
+            }
             if (appListModel.isLoadingBadges) {
                 LoadingBadgesIndicator()
             }
-            if (appType == AppsType.UNINSTALLED ||
-                            enableSelectAll &&
-                                    appListModel.selectedFilter.removalRecommendation ==
-                                            RemovalRecommendation.RECOMMENDED
-            ) {
+            if (appList.isNotEmpty()) {
                 SelectAllOption(
-                        onCheckedChange = {
-                            if (!it) {
-                                appListModel.selectedApps.clear()
-                            } else {
-                                appList.map { it.packageName }.forEach {
-                                    appListModel.selectedApps.add(it)
-                                }
-                            }
-                        }
-                )
-            }
-
-            if (selectedAppList.isNotEmpty()) {
-                Dropdown(
-                    modifier = Modifier.padding(8.dp),
-                    headerBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                        header = {exp ->
-                        DropdownHeader(
-                                title = stringResource(R.string.selected_apps),
-                                subtitle = pluralStringResource(R.plurals.num_selected_apps, selectedAppList.size, selectedAppList.size),
-                                expanded = exp
-                        )
+                    summary = io.github.samolego.canta.ops.SelectionSummary.of(appListModel.selectedApps.keys.toSet(), appList.map { it.packageName }.toSet()),
+                    enabled = !appListModel.isOperating,
+                    onToggle = {
+                        val next = io.github.samolego.canta.ops.SelectionSummary.toggleVisible(appListModel.selectedApps.keys.toSet(), appList.map { it.packageName }.toSet())
+                        appListModel.selectedApps.clear()
+                        next.forEach { appListModel.selectedApps.add(it) }
                     },
-                    content = {
-                        LazyColumn {
-                            item {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth().padding(all = 8.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            selectedAppList.forEach { appListModel.selectedApps.remove(it.packageName) }
-                                        }
-                                    ) {
-                                        Text(
-                                            pluralStringResource(
-                                                R.plurals.clear_selected_apps,
-                                                selectedAppList.size,
-                                                selectedAppList.size
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                            items(selectedAppList) { appInfo ->
-                                Box(
-                                    modifier = Modifier.padding(vertical = 2.dp).padding(horizontal = 16.dp)
-                                ) {
-                                    SelectedAppTile(
-                                        appInfo = appInfo,
-                                        onCheckChanged = {
-                                            appListModel.selectedApps.remove(appInfo.packageName)
-                                        },
-                                        onShowDialog = { showAppDialog = appInfo },
-                                    )
-                                }
-                            }
-                            item {
-                                Spacer(modifier = Modifier.height(64.dp))
-                            }
-                        }
-                    }
                 )
             }
 
@@ -228,7 +136,7 @@ fun AppList(
                                         appListModel.selectedApps.remove(appInfo.packageName)
                                     }
                                 },
-                                onShowDialog = { showAppDialog = appInfo }
+                                onShowDialog = { onOpenDetails(appInfo.packageName, appListModel.selectedUserId) }
                         )
                     }
                     item { Spacer(modifier = Modifier.height(64.dp)) }
@@ -240,11 +148,26 @@ fun AppList(
                             .fillMaxHeight(),
                         contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        appListModel.loadError?.let { stringResource(R.string.apps_load_failed, it) }
-                            ?: stringResource(R.string.no_apps_found),
-                        modifier = Modifier.padding(16.dp),
-                    )
+                    Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        val error = appListModel.loadError
+                        val disconnected = appListModel.selectedUserId != io.github.samolego.canta.util.apps.UserProfile.currentUserId &&
+                            !io.github.samolego.canta.util.shizuku.ShizukuPermission.isCantaAuthorized()
+                        Text(stringResource(when {
+                            disconnected -> R.string.inventory_disconnected
+                            error != null -> R.string.inventory_unavailable
+                            appListModel.allApps.any { it.isUninstalled == (appType == AppsType.UNINSTALLED) } -> R.string.inventory_no_matches
+                            appType == AppsType.UNINSTALLED -> R.string.inventory_empty_removed
+                            else -> R.string.inventory_empty
+                        }))
+                        if (error != null || disconnected) {
+                            val scope = androidx.compose.runtime.rememberCoroutineScope()
+                            androidx.compose.material3.TextButton(onClick = { scope.launch { appListModel.loadInstalled(context.packageManager, context) } }) {
+                                Text(stringResource(R.string.inventory_retry))
+                            }
+                        } else if (appListModel.activeFilterIds.isNotEmpty() || appListModel.searchQuery.isNotBlank() || appListModel.onlySystem || appListModel.collectionPackages.isNotEmpty()) {
+                            androidx.compose.material3.TextButton(onClick = appListModel::clearFilters) { Text(stringResource(R.string.clear_filters)) }
+                        }
+                    }
                 }
             }
         }
@@ -265,31 +188,21 @@ fun LoadingBadgesIndicator() {
                 modifier = Modifier.size(32.dp),
         )
         Spacer(modifier = Modifier.size(8.dp))
-        Text(stringResource(R.string.loading_badges))
+        Text(stringResource(R.string.inventory_refreshing))
     }
 }
 
 @Composable
-fun SelectAllOption(
-        onCheckedChange: (Boolean) -> Unit,
-) {
-    var checked by remember { mutableStateOf(false) }
-    Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(stringResource(R.string.select_all))
-        Spacer(modifier = Modifier.size(8.dp))
-        Checkbox(
-                checked = checked,
-                onCheckedChange = {
-                    checked = !checked
-                    onCheckedChange(checked)
-                },
+fun SelectAllOption(summary: io.github.samolego.canta.ops.SelectionSummary, enabled: Boolean = true, onToggle: () -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        androidx.compose.material3.TriStateCheckbox(
+            state = when (summary.visibleCheck) {
+                io.github.samolego.canta.ops.SelectionCheck.NONE -> androidx.compose.ui.state.ToggleableState.Off
+                io.github.samolego.canta.ops.SelectionCheck.PARTIAL -> androidx.compose.ui.state.ToggleableState.Indeterminate
+                io.github.samolego.canta.ops.SelectionCheck.ALL -> androidx.compose.ui.state.ToggleableState.On
+            }, enabled = enabled, onClick = onToggle,
         )
+        Text(stringResource(R.string.selection_visible))
     }
 }
 

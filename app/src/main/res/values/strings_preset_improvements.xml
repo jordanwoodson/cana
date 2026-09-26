@@ -1,0 +1,37 @@
+<resources>
+    <string name="preset_review_import">Review preset import</string>
+    <string name="preset_review_from_clipboard">Review clipboard preset</string>
+    <string name="preset_review_button">Review</string>
+    <string name="preset_import_update">Update preset</string>
+    <string name="preset_import_new">This imports a new saved preset.</string>
+    <string name="preset_import_existing">This updates the saved preset “%1$s” with the same ID.</string>
+    <string name="preset_import_review_description">Review the saved actions below. Importing only saves the preset. Apply it separately to change apps or privacy settings.</string>
+    <string name="preset_import_added_removal">Added removal: %1$s</string>
+    <string name="preset_import_removed_removal">Removed from removal list: %1$s</string>
+    <string name="preset_import_privacy_before">Before: %1$s</string>
+    <string name="preset_import_privacy_after">After: %1$s</string>
+    <string name="preset_import_no_privacy">No saved privacy actions</string>
+    <string name="preset_action_permissions">Revoke runtime permissions and prevent prompts</string>
+    <string name="preset_action_background">Restrict background activity</string>
+    <string name="preset_action_metered">Deny metered background data</string>
+    <string name="preset_action_network">Block all network access</string>
+    <string name="preset_import_privacy_changes">Privacy changes</string>
+    <string name="preset_import_changes">Changes to saved actions</string>
+    <string name="preset_import_no_action_changes">No changes to removal or privacy actions.</string>
+    <string name="preset_import_profile_change">Profile hint: %1$s → %2$s</string>
+    <string name="preset_import_no_profile">Any profile</string>
+    <string name="preset_import_actions">Actions after import</string>
+    <string name="preset_import_empty">This preset has no saved actions.</string>
+    <string name="preset_import_missing">Unavailable target: %1$s</string>
+    <string name="preset_import_removed">Already removed: %1$s</string>
+    <string name="preset_import_inventory_unavailable">Package availability could not be checked for this profile. It will be checked again before applying.</string>
+    <string name="preset_import_inventory_checked">All targets are available in this profile.</string>
+    <string name="preset_import_profile_unknown">The selected profile kind could not be checked against the preset hint.</string>
+    <string name="preset_import_checking">Checking package availability…</string>
+    <string name="preset_import_changed">The saved preset changed during review. The differences have been refreshed. Review them again before updating.</string>
+    <string name="preset_import_saved">Preset imported</string>
+    <string name="preset_import_version">Format: %1$s</string>
+    <string name="preset_import_metadata_before">Previously: %1$s</string>
+    <string name="preset_import_removal_explanation">Removing an action from a preset does not restore apps or revert privacy settings already applied.</string>
+    <string name="preset_library_error">Saved presets could not be loaded. Reopen Cana to retry.</string>
+</resources>

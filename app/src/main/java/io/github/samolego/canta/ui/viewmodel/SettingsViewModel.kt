@@ -7,6 +7,8 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import io.github.samolego.canta.data.SettingsStore
+import io.github.samolego.canta.util.BloatListUrlEditor
+import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -25,14 +27,13 @@ class SettingsViewModel(
     private val _autoUpdateBloatList = MutableStateFlow(true)
     val autoUpdateBloatList = _autoUpdateBloatList.asStateFlow()
 
-    private val _confirmBeforeUninstall = MutableStateFlow(true)
-    val confirmBeforeUninstall = _confirmBeforeUninstall.asStateFlow()
-
     private val _disableRiskDialog = MutableStateFlow(true)
     val disableRiskDialog = _disableRiskDialog.asStateFlow()
 
     private val _bloatListUrl = MutableStateFlow("")
     val bloatListUrl = _bloatListUrl.asStateFlow()
+    private val urlEditor = BloatListUrlEditor(persist = settingsStore::setBloatListUrl)
+    val bloatListUrlEditorState = urlEditor.state
 
     private val _bloatUnmeteredOnly = MutableStateFlow(false)
     val bloatUnmeteredOnly = _bloatUnmeteredOnly.asStateFlow()
@@ -55,7 +56,6 @@ class SettingsViewModel(
         // you could also use something like this in other parts of the code for easy management.
         observeSettings()
         observeAutoUpdateBloatList()
-        observeConfirmBeforeUninstall()
         observeBloatListUrl()
         settingsStore.bloatUnmeteredOnlyFlow.onEach { _bloatUnmeteredOnly.value = it }.launchIn(viewModelScope)
         observeAllowUnsafeUninstalls()
@@ -84,13 +84,6 @@ class SettingsViewModel(
                 .launchIn(viewModelScope)
     }
 
-    private fun observeConfirmBeforeUninstall() {
-        settingsStore
-                .confirmBeforeUninstallFlow
-                .onEach { _confirmBeforeUninstall.value = it }
-                .launchIn(viewModelScope)
-    }
-
     private fun observeAllowUnsafeUninstalls() {
         settingsStore
             .allowUnsafeUninstallsFlow
@@ -113,20 +106,21 @@ class SettingsViewModel(
     }
 
     private fun observeBloatListUrl() {
-        settingsStore.bloatListUrlFlow.onEach { _bloatListUrl.value = it }.launchIn(viewModelScope)
+        settingsStore.bloatListUrlFlow.onEach {
+            _bloatListUrl.value = it
+            urlEditor.observeSaved(it)
+        }.launchIn(viewModelScope)
     }
 
     fun saveAutoUpdateBloatList(autoupdate: Boolean) {
         viewModelScope.launch { settingsStore.setAutoUpdateBloatList(autoupdate) }
     }
 
-    fun saveConfirmBeforeUninstall(confirmBeforeUninstall: Boolean) {
-        viewModelScope.launch { settingsStore.setConfirmBeforeUninstall(confirmBeforeUninstall) }
-    }
-
-    fun saveBloatListUrl(url: String) {
-        viewModelScope.launch { settingsStore.setBloatListUrl(url) }
-    }
+    fun beginBloatListUrlEdit() = urlEditor.begin()
+    fun editBloatListUrl(draft: String) = urlEditor.edit(draft)
+    fun cancelBloatListUrlEdit() = urlEditor.cancel()
+    fun resetBloatListUrlDraft() = urlEditor.edit(DEFAULT_BLOAT_URL)
+    fun saveBloatListUrlDraft() { viewModelScope.launch { urlEditor.save() } }
 
     fun saveBloatUnmeteredOnly(value: Boolean) {
         viewModelScope.launch { settingsStore.setBloatUnmeteredOnly(value) }

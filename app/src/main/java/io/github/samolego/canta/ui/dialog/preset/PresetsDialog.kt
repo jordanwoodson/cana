@@ -103,7 +103,7 @@ fun ImportPresetDialog(
                             ) {
                                 Icon(Icons.Default.ContentPaste, contentDescription = stringResource(R.string.import_preset_clipboard))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.import_preset_clipboard))
+                                Text(stringResource(R.string.preset_review_from_clipboard))
                             }
                         }
                     }
@@ -156,7 +156,7 @@ fun ImportPresetDialog(
                         },
                         enabled = jsonText.isNotBlank()
                     ) {
-                        Text(stringResource(R.string.import_button))
+                        Text(stringResource(R.string.preset_review_button))
                     }
                 }
             }

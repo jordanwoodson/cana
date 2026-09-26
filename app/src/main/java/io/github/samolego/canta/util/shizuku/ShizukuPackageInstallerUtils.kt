@@ -9,6 +9,7 @@ import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.os.Build
 import org.lsposed.hiddenapibypass.HiddenApiBypass
+import io.github.samolego.canta.util.HiddenApiAccess
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 import java.lang.reflect.InvocationTargetException
@@ -18,12 +19,7 @@ import java.lang.reflect.InvocationTargetException
  */
 object ShizukuPackageInstallerUtils {
     private val PACKAGE_MANAGER: IPackageManager by lazy {
-        // This is needed to access hidden methods in IPackageManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            HiddenApiBypass.addHiddenApiExemptions(
-                "Landroid/content/pm"
-            )
-        }
+        HiddenApiAccess.ensureReady()
 
         IPackageManager.Stub.asInterface(
             ShizukuBinderWrapper(
