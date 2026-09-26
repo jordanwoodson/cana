@@ -6,6 +6,7 @@ data class OperationResult(
     val changed: Boolean = false,
     val freedBytes: Long = 0,
     val skipped: Boolean = false,
+    val recoveryComplete: Boolean = false,
 )
 
 data class BatchResult(val results: List<OperationResult>, val batchId: String? = null) {

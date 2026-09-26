@@ -15,6 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
+import androidx.compose.ui.platform.LocalContext
+import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.data.proto.ManagementState
 import io.github.samolego.canta.data.proto.OtaPackageChange
 import io.github.samolego.canta.ops.*
@@ -47,6 +49,7 @@ fun OtaBanner() {
 
 @Composable
 private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Unit) {
+    val context = LocalContext.current
     val services = CanaServices.getInstance()
     val scope = rememberCoroutineScope()
     var selected by remember { mutableStateOf(changes.filter { it.returned }.toSet()) }
@@ -100,14 +103,14 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
                 val captured = selected.toList()
                 val approved = reports!!.mapValues { (_, values) -> values.values.flatMap { it.warnings }.map { it.key }.toSet() }
                 scope.launch {
-                    try {
+                    try { withPackageAuthentication(context) {
                         val batch = UUID.randomUUID().toString()
                         result = BatchResult(captured.map { change ->
                             val operation = services.packageOps.uninstall(change.packageName, change.userId, batchId = batch, approvedWarnings = approved[change.userId].orEmpty())
                             operation.copy(message = "${change.packageName} · user ${change.userId}: ${operation.message}")
                         }, batch)
                         services.ota.check()
-                    } finally { busy = false }
+                    } } finally { busy = false }
                 }
             }) { Text(stringResource(R.string.ota_reapply)) }
         }, dismissButton = { if (result == null) TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })

@@ -14,8 +14,9 @@ private const val TAG = "UninstallLock"
 
 fun showBiometricPrompt(
     context: Context,
+    onError: () -> Unit = {},
     onSuccess: () -> Unit
-) {
+): BiometricPrompt {
     val executor = ContextCompat.getMainExecutor(context)
 
     val promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -41,6 +42,7 @@ fun showBiometricPrompt(
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                onError()
                 LogUtils.e(TAG, "An error occurred while trying to authenticate. Code: $errorCode, message: $errString")
             }
 
@@ -50,4 +52,5 @@ fun showBiometricPrompt(
         })
 
     biometricPrompt.authenticate(promptInfo)
+    return biometricPrompt
 }

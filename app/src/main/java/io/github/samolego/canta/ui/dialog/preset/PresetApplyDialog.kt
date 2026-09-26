@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.util.CantaPresetData
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
@@ -102,7 +103,7 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
                 val capturedUsers = targets.toList()
                 val approved = warnings!!.mapValues { (_, reports) -> reports.values.flatMap { it.warnings }.map { it.key }.toSet() + if (accepted) setOf("shared-uid") else emptySet() }
                 scope.launch {
-                    try { result = services.presets.apply(preset, capturedUsers, approved) }
+                    try { withPackageAuthentication(context) { result = services.presets.apply(preset, capturedUsers, approved) } }
                     finally { busy = false }
                 }
             }) { Text(stringResource(R.string.apply_preset)) }

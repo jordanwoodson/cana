@@ -6,7 +6,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 
 - 2026-09-25: inspected clean repository; no roadmap features implemented at start. Created `roadmap` branch from master.
 - Emulator launched as unified exec session `42132`, serial `emulator-5554`; cold boot in progress. ADB initially reports offline. No phone commands executed.
-- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phases 2–3 implementation and emulator verification pass. Phase 4 implementation and emulator checks also pass. Phases 5–7 and release remain pending.
+- Phase 0 implemented in six independent commits. Phase 1 implementation and emulator checks pass. Phases 2–3 implementation and emulator verification pass. Phase 4 implementation and emulator checks also pass. Phases 5–7 are also complete; final release gates are tracked at the end of this ledger.
 
 ## Interface preflight
 
@@ -42,7 +42,7 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 ### Remaining verification
 
 - Phase 0: offline first launch, category/menu interaction, persisted update settings, actual reset and both-profile isolation verified.
-- Phases 0–4 implementation and listed acceptance checks pass; Phases 5–7 and full release audit in plan remain open. No push/tag/release or version bump performed yet.
+- Earlier checkpoint: Phases 0–4 passed. Subsequent phase and release evidence appears chronologically below.
 
 ### Phase 1
 
@@ -188,3 +188,23 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 - A real Persian `select_all_tip` contains `d%` and throws UnknownFormatConversionException. Regression reproduced RED; single-argument legacy text now substitutes only recognized placeholders, leaving literal/omitted placeholders readable. English and numbered placeholders still work. No translations modified.
 - Ruling: missing Crowdin translations are lint warnings, using Android's English fallback. Narrow exceptions retain the unused legacy confirmation format and Hebrew missing-two plural (both have safe runtime alternatives) — these inherited translation defects cannot be edited under the spec — cost: those existing texts remain imperfect until Crowdin updates them.
 - Full JVM suite **76/76 PASS**, `lintDebug`, debug and instrumentation builds PASS (`/tmp/cana-final-lint-build.log`). Migrated UI acceptance running in `/tmp/cana-final-compose-device.log`.
+
+- Fresh whole-branch review of `8e9e5b5..34439f7` completed by one independent gpt-6-astra reviewer using requesting-code-review. Regraded all findings by user impact: data loss during reinstall undo is Critical; lost recovery after unknown post-state, authentication bypass, and permanently trapped undo selection are Important. All four entered the single fix pass. Reproducing JVM regressions **4/4 RED** (`/tmp/cana-review-{red,manual-red}.log`), then **4/4 GREEN** within the full **80/80 PASS** suite (`/tmp/cana-review-green-build2.log`). Debug/lint/test APK builds also pass.
+- Final: fixed retained-data loss — reinstall/partial-cleanup recovery now uses `pm uninstall -k`; `undoReinstallAndPartialCleanupKeepRetainedData` RED→GREEN. Both-profile marker integration pending.
+- Final: fixed lost unknown package outcomes — required post-snapshot failure produces a failed/unverified result with recovery eligibility and captured previous values; `unknownPostMutationStateFailsButRemainsInBothRecoveryPaths` RED→GREEN. A durable-store reopening regression is added to the next complete suite.
+- Final: fixed authentication bypass — all package action, preset, OTA reapply, History undo and result-dialog undo UI paths use one durable-setting authentication gate; cancellation/failure runs no action and captured approvals/users are retained. `cancelledAuthenticationNeverRunsAnyCapturedAction` RED→GREEN. Device integration pending.
+- Final: fixed trapped batch recovery — a backward-compatible `recovery_complete` history flag distinguishes completed automatic restoration from unresolved manual APK/data recovery. Manual notes remain visible and are not counted as full success; completed automatic work is not offered endlessly. `completedReversibleRecoveryDoesNotTrapEarlierBatchesBehindManualWork` RED→GREEN. Device integration pending.
+- Final: minor (deferred): History undo and OTA reapply do not automatically refresh the main package inventory; use pull-to-refresh after returning to Main. Operation results/history are accurate, and mutation-time checks still verify actual state. No destructive action relies on the stale UI state.
+- Final: Ruling: signed build, upgrade and publication were outside the reviewed implementation head — complete them as Task 10 gates before publishing — cost if wrong: an unusable updater artifact; signature/install/download checks are mandatory.
+- Final: Ruling: root-backed ordinary-app component changes remain unexercised — retain documented shell restrictions and root capability checks — cost if wrong: a root-device action may fail; no successful root coverage is claimed.
+- Final: Ruling: OTA testing uses a simulated stored fingerprint with real package inventories, not a flashed image — this tests detector/reapply logic within the emulator scope — cost if wrong: OEM boot timing may differ.
+- Final: Ruling: broader physical-device/Android/OEM certification is outside the emulator-only authorization — publish the exact tested environment and surface unsupported operations — cost if wrong: untested devices may reject a feature.
+- Final: Ruling: deleted data and removed update APK payloads remain manual recovery obligations — automatic restoration cannot reconstruct absent bytes; the newly discovered undo deletion was fixed — cost if wrong: users must reinstall APKs or restore backups themselves.
+- Final: Ruling: cross-profile usage remains hidden where no supported query exists — explicitly permitted by the spec and avoids presenting another profile's usage — cost: size/name sorting only there.
+- Final: Ruling: inherited Crowdin translations remain untouched — retain narrow lint exceptions and safe literal placeholder handling — cost: inherited wording/plural defects remain pending translation updates.
+- Final: Ruling: undo restores an app's network rule without disabling the shared chain — preserves other apps' restrictions — cost: the shared chain remains enabled.
+- Final: Ruling: metered persistence on this Android image requires saved intent and Shizuku reconciliation — real reboot evidence disproved unconditional platform persistence — cost: restrictions may be absent until Shizuku and the job run.
+
+- Final full JVM suite **81/81 PASS**, debug/release lint **zero errors** (405 warnings, largely Crowdin/deprecations), debug/signed release builds PASS (`/tmp/cana-final-all-checks.log`). Version code 227 / versionName 3.2.2-cana.3. Public release certificate matches 3.2.2-cana.2, SHA-256 `748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345`. R8 mapping retains PrivacyRecovery and ShellUserService.
+- Device review suite: retained-data markers survive reinstall → undo → reinstall in both profiles; durable authentication cancellation prevents captured preset/OTA/undo operations, success permits the captured action, disabled preference bypasses prompting; all three existing management UI tests pass. One new test failed in setup because leftover-update cleanup was called on an installed app, before reaching the recovery assertions. Fixed test setup to uninstall the system fixture first; focused rerun `/tmp/cana-review-manual-device2.log` is pending. No production change was needed for that setup error.
+- Corrected manual-recovery device regression **1/1 PASS**, 63.609s (`/tmp/cana-review-manual-device2.log`). Removing updates no longer traps the earlier disable batch, ordinary uninstall restoration retains its manual-data warning while completing automatic recovery, and repeated undo skips completed work. Combined final regression/management UI acceptance: **6/6 PASS** across the initial five passing cases and corrected setup rerun. Single review fix pass complete; no re-review dispatched.

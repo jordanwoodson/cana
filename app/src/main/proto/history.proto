@@ -18,6 +18,8 @@ message OperationRecord {
   bool changed = 12;
   string undo_of = 13;
   int64 freed_bytes = 14;
+  // Reversible recovery finished; manual data/APK obligations may still remain.
+  bool recovery_complete = 15;
 }
 
 message OperationHistory {
