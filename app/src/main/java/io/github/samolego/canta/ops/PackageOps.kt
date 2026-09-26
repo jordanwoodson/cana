@@ -147,7 +147,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         }
         val known = history.records.first()
         if (known.none { it == record }) return OperationResult(false, context.getString(R.string.operation_history_failed))
-        if (known.any { it.undoOf == record.id && it.completed && it.success }) {
+        if (known.any { it.undoOf == record.id && it.completed && (it.success || it.recoveryComplete) }) {
             return OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
         }
         val prior = runCatching { JSONObject(record.previousState) }.getOrDefault(JSONObject())
@@ -155,6 +155,11 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         return recorded(record.packageName, record.userId, record.action, batchId, undoOf = record.id,
             snapshotter = { info, user -> if (component != null) componentSnapshot(info, user, component) else snapshot(info, user) }) {
             val plan = RestoreScript.plan(record)
+            // A removed update payload needs a manual APK reinstall, not another shell mutation.
+            if (record.action == "remove_updates" && plan.commands.isEmpty() &&
+                prior.has("installed") && prior.optBoolean("updatedSystemApp") && plan.notes.isNotEmpty()) {
+                return@recorded OperationResult(false, plan.notes.joinToString("\n"), recoveryComplete = true)
+            }
             check(plan.commands.isNotEmpty()) { plan.notes.joinToString("\n").ifBlank { context.getString(R.string.operation_not_applied) } }
             if (plan.commands.any { it.getOrNull(1) in setOf("disable", "disable-user", "disable-until-used", "uninstall", "suspend") }) {
                 safety.requireAllowed(record.packageName, record.userId, approvedWarnings,
@@ -166,15 +171,16 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             val keys = when (record.action) {
                 "disable", "enable", "component" -> listOf("enabledSetting")
                 "suspend", "unsuspend" -> listOf("suspended")
-                "uninstall", "uninstall_keep_data", "reinstall" -> listOf("installed", "enabledSetting")
+                "uninstall", "uninstall_keep_data", "reinstall", "remove_updates" -> listOf("installed", "enabledSetting")
                 else -> emptyList()
             }
             val matches = keys.isNotEmpty() && keys.filter { prior.has(it) }.all { prior.get(it) == after.opt(it) }
-            val success = results.all { it.success } && matches && plan.notes.isEmpty()
+            val recovered = results.all { it.success } && matches
+            val success = recovered && plan.notes.isEmpty()
             val messages = results.filter { !it.success }.map { it.message } + plan.notes
             OperationResult(success, messages.joinToString("\n").ifBlank {
                 context.getString(if (success) R.string.operation_success else R.string.operation_not_applied)
-            })
+            }, recoveryComplete = recovered)
         }
     }
 
@@ -313,11 +319,11 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
                 LogUtils.e("PackageOps", "$action failed for $packageName user=$userId", e.cause ?: e)
                 OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
             }
-            val after = try { snapshotter(getPackageInfo(packageName, userId), userId) } catch (_: Exception) { "{}" }
-            val changed = previousState != "{}" && after != "{}" && previousState != after
-            val result = outcome.copy(changed = changed)
+            val after = runCatching { snapshotter(getPackageInfo(packageName, userId), userId) }.getOrNull()
+            val result = packageOutcome(previousState, after, outcome, context.getString(R.string.operation_state_unavailable))
+            val changed = result.changed
             try {
-                history.complete(id, result.success, result.message, after, changed, result.freedBytes)
+                history.complete(id, result.success, result.message, after ?: "{}", changed, result.freedBytes, result.recoveryComplete)
             } catch (e: Exception) {
                 LogUtils.e("PackageOps", "Cannot persist result; operation remains pending", e)
                 return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)

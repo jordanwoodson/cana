@@ -22,7 +22,7 @@ import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
-import io.github.samolego.canta.util.showBiometricPrompt
+import io.github.samolego.canta.util.withPackageAuthentication
 import kotlinx.coroutines.launch
 
 /** Requests contain immutable package/profile snapshots, including while authorization is pending. */
@@ -46,15 +46,15 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
                 onAgree = { included, reset, approvals, warnings ->
                     model.pendingAction = null
                     val run = {
-                        scope.launch {
+                        scope.launch { withPackageAuthentication(context) {
                             val batch = model.processRequest(context, request, included, reset, approvals, warnings)
                             if (batch.failureCount > 0 || request.action == PackageAction.REMOVE_UPDATES || !settings.hideSuccessDialog.value) {
                                 outcome = request.action to batch
                             }
-                        }
+                        } }
                         Unit
                     }
-                    if (settings.authEnabled.value) showBiometricPrompt(context) { run() } else run()
+                    run()
                 },
             )
         }
@@ -73,7 +73,7 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
             dismissButton = {
                 batch.batchId?.let { id ->
                     TextButton(enabled = !model.isOperating, onClick = {
-                        scope.launch { outcome = action to model.undoBatch(context, id) }
+                        scope.launch { withPackageAuthentication(context) { outcome = action to model.undoBatch(context, id) } }
                     }) { Text(stringResource(R.string.undo_action)) }
                 }
             })

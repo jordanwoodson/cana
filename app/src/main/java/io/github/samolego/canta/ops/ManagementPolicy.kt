@@ -10,7 +10,7 @@ object ManagementPolicy {
     private val undoable = setOf("uninstall", "uninstall_keep_data", "reinstall", "remove_updates", "disable", "enable",
         "suspend", "unsuspend", "component", "permissions", "background", "metered", "network", "system")
     fun lastBatch(records: List<OperationRecord>): List<OperationRecord> {
-        val undone = records.filter { it.undoOf.isNotEmpty() && it.completed && it.success }.map { it.undoOf }.toSet()
+        val undone = records.filter { it.undoOf.isNotEmpty() && it.completed && (it.success || it.recoveryComplete) }.map { it.undoOf }.toSet()
         val candidates = records.filter { it.undoOf.isEmpty() && it.id !in undone && it.action in undoable &&
             (it.changed || !it.completed && it.previousState.isNotBlank() && it.previousState != "{}") }
         val batch = candidates.lastOrNull()?.batchId ?: return emptyList()

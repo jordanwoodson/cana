@@ -35,9 +35,9 @@ object RestoreScript {
                         notes += "Uninstall may have deleted data for $pkg. Installation can be restored; deleted app data cannot be recovered."
                 }
             }
-            "reinstall" -> if (!before.getBoolean("installed")) command("pm", "uninstall", "--user", user, pkg)
+            "reinstall" -> if (!before.getBoolean("installed")) command("pm", "uninstall", "-k", "--user", user, pkg)
             "remove_updates" -> if (!before.getBoolean("installed") && after.optBoolean("installed")) {
-                command("pm", "uninstall", "--user", user, pkg)
+                command("pm", "uninstall", "-k", "--user", user, pkg)
             }
             "disable", "enable" -> enabled(pkg)
             "component" -> enabled(before.getString("component"))

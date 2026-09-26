@@ -16,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
+import androidx.compose.ui.platform.LocalContext
+import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.IconClickButton
@@ -52,6 +54,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                         Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(record.timestampMs)), style = MaterialTheme.typography.bodySmall)
                         Text(if (!record.completed) stringResource(R.string.history_pending) else record.resultMessage,
                             color = if (record.completed && !record.success) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
+                        if (record.recoveryComplete) Text(stringResource(R.string.history_recovery_complete), style = MaterialTheme.typography.labelSmall)
                         if (record.undoOf.isNotBlank()) Text(stringResource(R.string.history_undo_record), style = MaterialTheme.typography.labelSmall)
                         if (expanded) {
                             Text(stringResource(R.string.history_before, record.previousState), style = MaterialTheme.typography.bodySmall)
@@ -67,6 +70,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
 
 @Composable
 private fun UndoBatchDialog(records: List<OperationRecord>, onDismiss: () -> Unit, onResult: (BatchResult) -> Unit) {
+    val context = LocalContext.current
     val services = CanaServices.getInstance()
     val scope = rememberCoroutineScope()
     var assessments by remember { mutableStateOf<Map<Int, Map<String, SafetyAssessment>>?>(null) }
@@ -101,7 +105,7 @@ private fun UndoBatchDialog(records: List<OperationRecord>, onDismiss: () -> Uni
             TextButton(enabled = !busy && assessments != null && (warnings.isEmpty() || accepted), onClick = {
                 busy = true
                 val approved = assessments!!.mapValues { (_, reports) -> reports.values.flatMap { it.warnings }.map { it.key }.toSet() }
-                scope.launch { try { onResult(services.undo.undo(records, approved)) } finally { busy = false } }
+                scope.launch { try { withPackageAuthentication(context) { onResult(services.undo.undo(records, approved)) } } finally { busy = false } }
             }) { Text(stringResource(R.string.undo_action)) }
         }, dismissButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.cancel)) } })
 }
