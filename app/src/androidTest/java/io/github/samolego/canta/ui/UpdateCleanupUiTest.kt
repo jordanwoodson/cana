@@ -2,7 +2,7 @@ package io.github.samolego.canta.ui
 
 import android.os.Build
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.samolego.canta.ops.CanaServices
@@ -37,8 +37,9 @@ class UpdateCleanupUiTest {
                 InstrumentationRegistry.getInstrumentation().targetContext.packageManager, true, otherUser = true)
             val request = PackageActionRequest(PackageAction.REMOVE_UPDATES, 10, listOf(app))
             var consent: Set<Int>? = null
+            val model = AppListViewModel()
             compose.setContent {
-                CantaTheme { PackageActionConfirmation(request, AppListViewModel(), true, {}, { included, _, approvals, _ ->
+                CantaTheme { PackageActionConfirmation(request, model, true, {}, { included, _, approvals, _ ->
                     assertEquals(setOf(name), included)
                     consent = approvals[name]
                 }) }

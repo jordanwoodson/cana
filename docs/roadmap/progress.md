@@ -181,3 +181,10 @@ Spec: [spec.md](spec.md). Plan: [plan.md](plan.md). Base: `8e9e5b5`.
 - Final stopped-Shizuku checks are running in `/tmp/cana-phase7-unavailable.log`; Shizuku was stopped only on emulator-5554 (pid 2591). Restart it before any further privileged test.
 
 - Stopped-Shizuku native System actions and foundation access **2/2 PASS**, 11.319s (`/tmp/cana-phase7-unavailable.log`). Wi-Fi scanning changed and reverted through the retained settings permission; Data Saver failed without changes as required. Shizuku restarted afterward (`/tmp/cana-phase7-shizuku-restart.log`). Task 9 complete. All phases 0–7 have passing implementation/acceptance evidence; Task 10 review/lint/release remain.
+
+### Task 10: audit and release
+
+- Fixed Compose resource reads and lifecycle collection of the confirmation preference; moved the test view model outside composition. Migrated the four older Compose UI tests to the v2 dispatcher after Phase 5 established the v1 threading failure.
+- A real Persian `select_all_tip` contains `d%` and throws UnknownFormatConversionException. Regression reproduced RED; single-argument legacy text now substitutes only recognized placeholders, leaving literal/omitted placeholders readable. English and numbered placeholders still work. No translations modified.
+- Ruling: missing Crowdin translations are lint warnings, using Android's English fallback. Narrow exceptions retain the unused legacy confirmation format and Hebrew missing-two plural (both have safe runtime alternatives) — these inherited translation defects cannot be edited under the spec — cost: those existing texts remain imperfect until Crowdin updates them.
+- Full JVM suite **76/76 PASS**, `lintDebug`, debug and instrumentation builds PASS (`/tmp/cana-final-lint-build.log`). Migrated UI acceptance running in `/tmp/cana-final-compose-device.log`.
