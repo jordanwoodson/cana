@@ -45,9 +45,26 @@ that profile's apps, and uninstall / reinstall then act on that profile only
 * Uninstall / reinstall wait for the real result from Android. Failures (e.g. blocked by the
   work profile's admin) are reported in a toast with the reason in *Logs*, instead of the app
   being marked as uninstalled.
-* On Cana's own profile, uninstalling a *non-system* app still removes it for all users, like
-  Canta does. On any other profile it only removes it from that profile.
+* Every uninstall targets only the selected profile, including Cana's own profile.
+  Removing a system app update is device-wide and requires review when other profiles use it.
 * Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
+
+### Roadmap features
+
+* Disable, suspend, keep-data removal, leftover update cleanup, and safety checks for essential apps.
+* Durable history, Undo last batch, and a PC restore script exported from History or Logs.
+* Per-profile runtime permissions, background restrictions, metered data restrictions and
+  Android 14+ network blocks, with current state and revert controls.
+* Offline UAD recommendations, all list categories, tracker component inspection, privacy presets,
+  OTA change review, APK-size sorting, and last-used sorting in Cana's own profile.
+* A separate System screen for Private DNS, captive checks, scanning, mobile data and Data Saver.
+
+Android 15 shell-backed Shizuku cannot modify ordinary apps' components; those controls explain
+why they are unavailable. Metered and network blocks are saved and reapplied when Shizuku returns
+after reboot; they are not guaranteed to remain active during startup. Usage statistics for other
+profiles are hidden when Android provides no supported query. Undo cannot recover deleted app data
+or an APK Android has completely removed. See the [roadmap report](docs/roadmap/release-report.md)
+for verification and device-specific limitations.
 
 ## Install
 

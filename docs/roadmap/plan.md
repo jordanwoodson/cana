@@ -113,7 +113,7 @@ Files: new System screen/view model/repository and navigation, system-action his
 
 ### Task 10: audit and release
 
-- [ ] Fresh review of the whole branch, resolve significant findings with regressions; verify every spec item using current evidence in `progress.md`.
-- [ ] Run complete JVM tests, lint, debug and signed release builds. Verify release package id/version/signature and install upgrade on emulator.
-- [ ] Commit final version/release notes and phase report listing upstream commits, confirmed assumptions, adaptations and any gaps. Completion requires no unexplained gaps.
+- [x] Fresh review of the whole branch, resolve significant findings with regressions; verify every spec item using current evidence in `progress.md`.
+- [x] Run complete JVM tests, lint, debug and signed release builds. Verify release package id/version/signature and install upgrade on emulator.
+- [x] Commit final version/release notes and phase report listing upstream commits, confirmed assumptions, adaptations and any gaps. Completion requires no unexplained gaps.
 - [ ] Push final commit/branch, publish non-prerelease GitHub tag matching versionName with signed APK and checksums. Verify downloadable release metadata is compatible with existing Obtainium config.
