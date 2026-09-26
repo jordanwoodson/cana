@@ -84,7 +84,7 @@ object RestoreScript {
                 before.optJSONObject("settings")?.let { settings ->
                     for (key in settings.keys()) {
                         require(key in setOf("private_dns_mode", "private_dns_specifier", "captive_portal_mode", "captive_portal_http_url",
-                            "captive_portal_https_url", "captive_portal_fallback_url", "captive_portal_other_fallback_urls",
+                            "captive_portal_https_url", "captive_portal_fallback_url", "captive_portal_other_fallback_urls", "captive_portal_use_https",
                             "wifi_scan_always_enabled", "ble_scan_always_enabled", "mobile_data_always_on"))
                         if (settings.isNull(key)) command("settings", "delete", "global", key)
                         else command("settings", "put", "global", key, settings.getString(key))

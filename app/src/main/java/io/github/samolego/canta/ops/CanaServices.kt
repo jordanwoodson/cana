@@ -26,7 +26,8 @@ class CanaServices private constructor(context: Context) {
     val journal = OperationJournal(context.applicationContext, history)
     val privacy = PrivacyOps(context.applicationContext, shell, history, desiredPrivacy, safety, journal)
     val presets = PresetOps(packageOps, privacy, history)
-    val undo = UndoCoordinator(history, packageOps, privacy)
+    val system = SystemOps(appContext, shell, history, journal)
+    val undo = UndoCoordinator(history, packageOps, privacy, system)
     val management = ManagementStore(appContext.managementDataStore)
     val ota = OtaRepository(appContext, management, history)
 

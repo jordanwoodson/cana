@@ -312,4 +312,31 @@
     <string name="last_used_no_record">No use recorded in Android’s retained usage history</string>
     <string name="last_used_date">Last recorded use: %1$s</string>
     <string name="app_suggestions">UAD suggestions: %1$s</string>
+    <string name="system_controls">System</string>
+    <string name="system_quad9" translatable="false">Quad9</string>
+    <string name="system_cloudflare" translatable="false">Cloudflare</string>
+    <string name="system_graphene" translatable="false">GrapheneOS</string>
+    <string name="system_scope">These settings affect the whole device and every profile.</string>
+    <string name="system_permission_description">The settings permission keeps most controls available when Shizuku stops. Data Saver needs Shizuku. Revert restores the values captured before your last change.</string>
+    <string name="system_refresh">Refresh values</string>
+    <string name="system_private_dns">Private DNS</string>
+    <string name="system_captive_portal">Captive portal check</string>
+    <string name="system_wifi_scan">Wi-Fi scanning</string>
+    <string name="system_ble_scan">Bluetooth scanning</string>
+    <string name="system_mobile_data">Keep mobile data active</string>
+    <string name="system_data_saver">Data Saver</string>
+    <string name="system_default">System default</string>
+    <string name="system_automatic">Automatic</string>
+    <string name="system_on">On</string>
+    <string name="system_off">Off</string>
+    <string name="system_turn_off">Turn off</string>
+    <string name="system_dns_hostname">DNS provider hostname</string>
+    <string name="system_dns_apply">Apply hostname</string>
+    <string name="system_dns_invalid">Enter a DNS hostname such as dns.quad9.net, without a URL, IP address, port or spaces.</string>
+    <string name="system_dns_configured">Configured resolver: %1$s</string>
+    <string name="system_current_value">Current value: %1$s</string>
+    <string name="system_configured">Custom configuration</string>
+    <string name="system_portal_description">Choose the endpoint Android uses to detect Internet access and sign-in networks. System default removes overrides and uses this device’s defaults.</string>
+    <string name="system_portal_off_title">Turn off connectivity checks?</string>
+    <string name="system_portal_off_warning">Android may stop detecting networks that require sign-in and may report Internet access incorrectly. This affects every profile.</string>
 </resources>
