@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import io.github.samolego.canta.R
+import io.github.samolego.canta.util.optionalTextArgument
 import io.github.samolego.canta.extension.getAllPackagesInfo
 import io.github.samolego.canta.extension.mutableStateSetOf
 import io.github.samolego.canta.packageName
@@ -281,8 +282,8 @@ private fun cantaBloatData(context: Context): BloatData {
     return BloatData(
             installData = null,
             description =
-                    context.getString(
-                            R.string.canta_description,
+                    optionalTextArgument(
+                            context.getString(R.string.canta_description),
                             "Universal Debloater Alliance (https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation)"
                     ),
             removal = null,

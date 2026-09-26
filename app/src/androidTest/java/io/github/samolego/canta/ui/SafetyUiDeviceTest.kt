@@ -2,7 +2,7 @@ package io.github.samolego.canta.ui
 
 import android.os.Build
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.dialog.PackageActionConfirmation

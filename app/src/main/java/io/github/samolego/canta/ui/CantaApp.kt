@@ -42,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import io.github.samolego.canta.R
+import io.github.samolego.canta.util.optionalTextArgument
 import io.github.samolego.canta.extension.addAll
 import io.github.samolego.canta.extension.showFor
 import io.github.samolego.canta.ui.component.AppList
@@ -83,6 +85,7 @@ fun CantaApp(
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     val appListViewModel = viewModel<AppListViewModel>()
     val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory())
@@ -145,7 +148,7 @@ fun CantaApp(
                             // Show quick toast
                             val remainingTaps = secretTaps - versionTapCounter
                             val message =
-                                context.getString(R.string.select_all_tip, remainingTaps)
+                                optionalTextArgument(resources.getString(R.string.select_all_tip), remainingTaps)
                             val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
                             toast.showFor(500)
                         } else if (versionTapCounter >= secretTaps) {
@@ -153,7 +156,7 @@ fun CantaApp(
                             val toast =
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.select_all_enabled),
+                                    resources.getString(R.string.select_all_enabled),
                                     Toast.LENGTH_SHORT
                                 )
                             toast.showFor(500)

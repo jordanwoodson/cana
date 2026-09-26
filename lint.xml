@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Crowdin supplies translations after release; Android falls back to English. -->
+    <issue id="MissingTranslation" severity="warning" />
+    <!-- Unused legacy confirmation key; current dialogs use the new resource keys. -->
+    <issue id="StringFormatMatches">
+        <ignore regexp="Inconsistent formatting types.*are_you_sure_to_uninstall_apps.*" />
+    </issue>
+    <!-- Existing Hebrew plurals contain 'other', so quantity two has a safe fallback.
+         Keep all other locales/quantities checked; translation files belong to Crowdin. -->
+    <issue id="MissingQuantity">
+        <ignore regexp="For locale &quot;he&quot;.*quantity should also be defined: `two`" />
+    </issue>
+</lint>

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.BatchResult
 import io.github.samolego.canta.ops.UpdateImpact
@@ -30,6 +31,7 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var outcome by remember { mutableStateOf<Pair<PackageAction, BatchResult>?>(null) }
+    val confirmBeforeUninstall by settings.confirmBeforeUninstall.collectAsStateWithLifecycle()
     val request = model.pendingAction
     if (request != null) key(request) {
         var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
@@ -39,7 +41,7 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
                 onClose = { if (it) authorized = true else model.pendingAction = null },
             )
         } else {
-            PackageActionConfirmation(request, model, settings.confirmBeforeUninstall.value,
+            PackageActionConfirmation(request, model, confirmBeforeUninstall,
                 onDismiss = { model.pendingAction = null },
                 onAgree = { included, reset, approvals, warnings ->
                     model.pendingAction = null
