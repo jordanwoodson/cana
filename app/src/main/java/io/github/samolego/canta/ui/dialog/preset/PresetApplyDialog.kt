@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.dialog.preset
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,9 +18,6 @@ import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.util.CantaPresetData
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.apps.UserProfile
-import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -44,7 +43,10 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
     var busy by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<BatchResult?>(null) }
     LaunchedEffect(Unit) {
-        try { profiles = withContext(Dispatchers.IO) { ShizukuUserUtils.getUsers() } }
+        try {
+            if (!services.profiles.refresh()) throw IllegalStateException("Profile list unavailable")
+            profiles = services.profiles.profiles.value
+        }
         catch (e: CancellationException) { throw e }
         catch (e: Exception) { error = e.message ?: e.toString() }
     }
@@ -99,7 +101,7 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (busy || warnings == null && error == null) LinearProgressIndicator()
             warnings?.forEach { (user, reports) -> reports.forEach { (name, assessment) ->
-                Text(stringResource(R.string.action_user, user))
+                Text(profileName(user))
                 if (assessment.protected) Text(stringResource(R.string.safety_protected, name))
                 assessment.error?.let { Text(it) }
                 assessment.warnings.forEach { Text("$name: ${it.kind} · ${it.detail}") }

@@ -24,12 +24,9 @@ import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.apps.AppInfo
 import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.apps.UserProfile
-import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import io.github.samolego.canta.ops.BatchItem
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
 import io.github.samolego.canta.util.RemovalRecommendation
 import java.util.Locale
@@ -123,16 +120,17 @@ class AppListViewModel(
     private val apps: List<AppInfo> get() = allApps
     private var selectedUser by mutableStateOf<UserProfile?>(null)
 
-    /** Users / profiles on the device, filled by [loadUsers]. */
-    var users by mutableStateOf<List<UserProfile>>(emptyList())
-        private set
+    private val profileDirectory get() = CanaServices.getInstance().profiles
+
+    /** The shared directory is authoritative for every screen. */
+    val users: List<UserProfile> get() = profileDirectory.profiles.value
 
     val selectedUserId: Int
         get() = selectedUser?.id ?: UserProfile.currentUserId
 
-    /** The profile explicitly picked by the user, if any. */
+    /** The selected profile, including the initial current-user directory entry. */
     val selectedProfile: UserProfile?
-        get() = selectedUser
+        get() = selectedUser ?: profileDirectory.find(selectedUserId)
 
     val loadError: String? get() = inventoryState.error
 
@@ -200,18 +198,7 @@ class AppListViewModel(
     val needsReload: Boolean get() = inventoryState.stale
 
     /** Lists the users / profiles on the device through Shizuku. */
-    suspend fun loadUsers(): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                users = ShizukuUserUtils.getUsers()
-                LogUtils.i(TAG, "Found users: ${users.joinToString { "${it.id} (${it.kind})" }}")
-                true
-            } catch (e: Exception) {
-                LogUtils.e(TAG, "Failed to list users", e.cause ?: e)
-                false
-            }
-        }
-    }
+    suspend fun loadUsers(): Boolean = profileDirectory.refresh()
 
     /** Switches to managing apps of [user]. */
     suspend fun selectUser(user: UserProfile, packageManager: PackageManager, context: Context) {

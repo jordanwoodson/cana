@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.screen
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
@@ -49,7 +51,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
     Scaffold(topBar = { TopAppBar(
         title = { Column {
             Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(R.string.action_user, target.userId), style = MaterialTheme.typography.labelMedium)
+            Text(profileName(target.userId), style = MaterialTheme.typography.labelMedium)
         } },
         navigationIcon = { IconClickButton(onClick = onNavigateBack, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back)) },
     ) }) { padding ->

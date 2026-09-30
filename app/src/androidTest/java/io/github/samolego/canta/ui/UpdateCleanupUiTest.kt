@@ -45,7 +45,7 @@ class UpdateCleanupUiTest {
                 }) }
             }
             compose.waitUntil(30_000) { compose.onAllNodesWithText("Checking updates and other profiles…").fetchSemanticsNodes().isEmpty() }
-            compose.onNodeWithText("Profile: user 10").assertIsDisplayed()
+            compose.onNodeWithText("Work profile").assertIsDisplayed()
             compose.onNode(hasText("Removing updates also downgrades", substring = true)).performScrollTo().assertIsDisplayed()
             compose.onNode(hasText("Apply reviewed changes") and hasClickAction()).assertIsNotEnabled()
             compose.onNodeWithText(app.name).performScrollTo().performClick()

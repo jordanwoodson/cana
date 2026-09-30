@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.dialog.preset
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
@@ -97,9 +99,7 @@ fun PresetActionsContent(preset: io.github.samolego.canta.util.CantaPresetData) 
 fun PresetProfilePreviewContent(profiles: List<PresetProfilePreview>) {
     profiles.forEach { profile ->
         HorizontalDivider()
-        Text(stringResource(R.string.profile_subtitle, profile.name ?: profile.kind?.let { profileKindLabel(it) }
-            ?: stringResource(R.string.profile_other), profile.userId),
-            style = MaterialTheme.typography.titleSmall)
+        Text(profileName(profile.userId), style = MaterialTheme.typography.titleSmall)
         if (profile.profileMismatch) Text(stringResource(R.string.preset_profile_mismatch), color = MaterialTheme.colorScheme.error)
         if (profile.profileKindUnknown) Text(stringResource(R.string.preset_import_profile_unknown))
         if (!profile.inventoryAvailable) Text(stringResource(R.string.preset_import_inventory_unavailable))

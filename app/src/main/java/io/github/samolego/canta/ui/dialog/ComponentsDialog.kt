@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.dialog
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -56,7 +58,7 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     val content: @Composable () -> Unit = {
             Column(Modifier.heightIn(max = 560.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(packageName, style = MaterialTheme.typography.labelMedium)
-                Text(stringResource(R.string.action_user, userId))
+                Text(profileName(userId))
                 if (busy || catalog == null) LinearProgressIndicator(Modifier.fillMaxWidth())
                 message?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 val state = catalog
@@ -114,7 +116,7 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
             text = {
                 Column {
                     Text(packageName)
-                    Text(stringResource(R.string.action_user, userId))
+                    Text(profileName(userId))
                     Text(component.name.className)
                     if (report == null) LinearProgressIndicator()
                     else {

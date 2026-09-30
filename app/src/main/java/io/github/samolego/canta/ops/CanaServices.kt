@@ -12,6 +12,7 @@ import io.github.samolego.canta.data.managementDataStore
 import io.github.samolego.canta.data.batchDataStore
 import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.TrackerRepository
+import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -27,6 +28,7 @@ class CanaServices private constructor(context: Context) {
     private val appContext = context.applicationContext
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val batchStore = io.github.samolego.canta.data.BatchStore(appContext.batchDataStore)
+    val profiles = ProfileDirectory()
     val inventory = InventoryRepository(appContext, scope)
     val shell = ShellRunner(context.applicationContext)
     val safety = SafetyInspector(context.applicationContext, shell)
@@ -58,6 +60,7 @@ class CanaServices private constructor(context: Context) {
     val ota = OtaRepository(appContext, management, history)
 
     init {
+        scope.launch { if (ShizukuPermission.isCantaAuthorized()) profiles.refresh() }
         io.github.samolego.canta.util.PackageInstallerResult.onLateCompletion = { ensureGrants() }
         scope.launch {
             try { history.bindInstallation(installationId) }
@@ -86,9 +89,15 @@ class CanaServices private constructor(context: Context) {
                     observed = completed
                 }
         }
-        Shizuku.addBinderReceivedListenerSticky { ensureGrants() }
+        Shizuku.addBinderReceivedListenerSticky {
+            ensureGrants()
+            scope.launch { if (ShizukuPermission.isCantaAuthorized()) profiles.refresh() }
+        }
         Shizuku.addRequestPermissionResultListener { _, result ->
-            if (result == PackageManager.PERMISSION_GRANTED) ensureGrants()
+            if (result == PackageManager.PERMISSION_GRANTED) {
+                ensureGrants()
+                scope.launch { profiles.refresh() }
+            }
         }
     }
 

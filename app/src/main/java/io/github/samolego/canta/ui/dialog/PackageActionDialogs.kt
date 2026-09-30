@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.dialog
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import android.text.format.Formatter.formatFileSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
@@ -128,7 +130,7 @@ internal fun PackageActionConfirmation(
         text = {
             Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
-                Text(stringResource(R.string.action_user, request.userId))
+                Text(profileName(request.userId))
                 Text(stringResource(R.string.plan_summary, request.requestedPackages.size, included.size,
                     request.requestedPackages.size - included.size))
                 Text(stringResource(when (request.action) {

@@ -33,7 +33,7 @@ class PrivacyUiDeviceTest {
         ready()
         compose.setContent { CantaTheme { PrivacyDialog(pkg, 10, {}) } }
         compose.waitUntil(90_000) { compose.onAllNodesWithTag("privacy-permission-android.permission.CAMERA").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Profile: user 10").assertIsDisplayed()
+        compose.onNodeWithText("Work profile").assertIsDisplayed()
         compose.onNodeWithTag("privacy-permission-android.permission.CAMERA").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Background activity").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("All network access").performScrollTo().assertIsDisplayed()
@@ -55,7 +55,7 @@ class PrivacyUiDeviceTest {
         compose.setContent { CantaTheme { PresetApplyDialog(preset, 10, {}) } }
         compose.waitUntil(60_000) { compose.onAllNodesWithText("Apply Preset").fetchSemanticsNodes().size == 2 &&
             compose.onAllNodesWithText("Apply Preset")[1].fetchSemanticsNode().config.contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled).not() }
-        compose.onNodeWithText("Profile: user 10").assertIsDisplayed()
+        compose.onNodeWithText("Work profile").assertIsDisplayed()
         compose.onAllNodesWithText("Apply Preset")[1].performClick()
         val expected = InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.batch_outcome_counts, 1, 0, 0, 0)
         compose.waitUntil(60_000) { compose.onAllNodesWithText(expected).fetchSemanticsNodes().isNotEmpty() }

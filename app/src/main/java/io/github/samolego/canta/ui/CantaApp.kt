@@ -75,6 +75,7 @@ import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModelFactory
 import io.github.samolego.canta.util.apps.Filter
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
+import io.github.samolego.canta.util.shizuku.AuthorizationState
 import kotlinx.coroutines.launch
 
 
@@ -222,6 +223,13 @@ private fun MainContent(
 
     var showExplainBadgeDialog by rememberSaveable { mutableStateOf(false) }
     var showProfilesMenu by remember { mutableStateOf(false) }
+
+    LaunchedEffect(appListViewModel) {
+        ShizukuPermission.refresh()
+        ShizukuPermission.state.collect { authorization ->
+            if (authorization == AuthorizationState.GRANTED) appListViewModel.loadUsers()
+        }
+    }
 
     val openProfilesMenu = {
         coroutineScope.launch {

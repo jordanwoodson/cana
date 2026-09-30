@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.dialog
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -73,7 +75,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
         Column((if (embedded) Modifier.fillMaxWidth() else Modifier.heightIn(max = 560.dp))
             .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(packageName, style = MaterialTheme.typography.labelMedium)
-            Text(stringResource(R.string.action_user, userId))
+            Text(profileName(userId))
             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             message?.let { Text(it) }
             val connected = state?.connected ?: ShizukuPermission.isCantaAuthorized()
@@ -191,7 +193,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
         }, text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(packageName)
-                Text(stringResource(R.string.action_user, userId))
+                Text(profileName(userId))
                 Text(stringResource(action.title))
                 if (action == PrivacyAction.PERMISSIONS && pendingUndo == null) Text(stringResource(R.string.privacy_selected_permission_count, selected.size))
                 error?.let { Text(it) }

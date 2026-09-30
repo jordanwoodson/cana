@@ -18,10 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ops.CanaServices
+import io.github.samolego.canta.ops.ProfileNaming
 import io.github.samolego.canta.util.apps.UserProfile
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 
 @Composable
 fun ProfilesMenu(
@@ -78,14 +83,28 @@ fun ProfilesMenu(
 
 @Composable
 fun UserProfile.displayName(): String {
-    return when (kind) {
-        UserProfile.Kind.PERSONAL -> stringResource(R.string.profile_personal)
-        UserProfile.Kind.WORK -> stringResource(R.string.profile_work)
-        UserProfile.Kind.CLONE -> stringResource(R.string.profile_clone)
-        UserProfile.Kind.PRIVATE -> stringResource(R.string.profile_private)
-        UserProfile.Kind.USER -> name ?: stringResource(R.string.profile_user)
-        UserProfile.Kind.OTHER -> name ?: stringResource(R.string.profile_other)
-    }
+    return ProfileNaming.label(kind, name, id, UserProfile.currentUserId, profileLabels())
+}
+
+@Composable
+fun profileName(userId: Int): String {
+    val profiles by CanaServices.getInstance().profiles.profiles.collectAsStateWithLifecycle()
+    val entry = profiles.firstOrNull { it.id == userId }
+    return ProfileNaming.label(entry?.kind, entry?.name, userId, UserProfile.currentUserId, profileLabels())
+}
+
+@Composable
+private fun profileLabels(): ProfileNaming.Labels {
+    val context = LocalContext.current
+    return ProfileNaming.Labels(
+        personal = stringResource(R.string.profile_personal),
+        work = stringResource(R.string.profile_work),
+        clone = stringResource(R.string.profile_clone),
+        privateProfile = stringResource(R.string.profile_private),
+        user = stringResource(R.string.profile_user),
+        other = stringResource(R.string.profile_other),
+        fallbackUser = { context.getString(R.string.profile_fallback_user, it) },
+    )
 }
 
 fun UserProfile.icon(): ImageVector {

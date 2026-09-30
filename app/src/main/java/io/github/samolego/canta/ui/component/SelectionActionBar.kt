@@ -16,12 +16,10 @@ import io.github.samolego.canta.ops.SelectionSummary
 import io.github.samolego.canta.ui.AppsType
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PackageAction
-import io.github.samolego.canta.ui.menu.displayName
+import io.github.samolego.canta.ui.menu.profileName
 
 @Composable
-fun profileLabel(model: AppListViewModel): String = model.selectedProfile?.let {
-    stringResource(R.string.profile_context, it.displayName(), it.id)
-} ?: stringResource(R.string.profile_current, model.selectedUserId)
+fun profileLabel(model: AppListViewModel): String = profileName(model.selectedUserId)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

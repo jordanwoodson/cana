@@ -20,6 +20,7 @@
     <string name="profile_user">User</string>
     <string name="profile_other">Profile</string>
     <string name="user_id">User ID %1$d</string>
+    <string name="profile_fallback_user">User %1$d</string>
     <string name="profile_blocks_shell">Admin disallows debugging here, Shizuku over adb can\'t modify this profile</string>
     <string name="profile_blocks_uninstall">Admin blocks uninstalling apps here</string>
     <string name="profiles_load_failed">Couldn\'t list profiles, check Shizuku and the logs</string>
@@ -247,6 +248,8 @@
     <string name="ota_review_description">Returned apps were previously removed by Cana. New system apps start unchecked. Review each profile before removing apps again.</string>
     <string name="ota_returned">Returned · user %1$d</string>
     <string name="ota_new">New system app · user %1$d</string>
+    <string name="ota_returned_profile">Returned · %1$s</string>
+    <string name="ota_new_profile">New system app · %1$s</string>
     <string name="ota_dismiss">Dismiss these changes</string>
     <string name="ota_reapply">Remove selected apps</string>
     <string name="preset_remember_profile">Remember profile kind: %1$s</string>

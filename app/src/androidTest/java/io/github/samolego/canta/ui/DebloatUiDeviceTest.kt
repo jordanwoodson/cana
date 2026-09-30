@@ -54,7 +54,7 @@ class DebloatUiDeviceTest {
         compose.setContent { CantaTheme { ComponentsDialog("com.android.printspooler", 10, {}) } }
         compose.waitUntil(30_000) { compose.onAllNodesWithText("Root-backed Shizuku is required", substring = true).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithText("Root-backed Shizuku is required", substring = true).assertIsDisplayed()
-        compose.onNodeWithText("Profile: user 10").assertIsDisplayed()
+        compose.onNodeWithText("Work profile").assertIsDisplayed()
         compose.onAllNodes(isToggleable()).fetchSemanticsNodes().also { assertTrue(it.isNotEmpty()) }
         compose.onAllNodes(isToggleable())[0].assertIsNotEnabled()
         Unit

@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.screen
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -87,7 +89,7 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
                 ElevatedCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(block.packageName, style = MaterialTheme.typography.titleMedium)
-                        Text(stringResource(R.string.action_user, block.userId))
+                        Text(profileName(block.userId))
                         Text(stringResource(action.title))
                         Text(stringResource(R.string.privacy_saved_restriction))
                         Text(stringResource(privacyStatusLabel(if (!connected && block.status != "needs_review") "disconnected" else block.status)))
@@ -115,7 +117,7 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
     reviewPackage?.let { pkg -> PrivacyDialog(pkg, reviewUser) { reviewPackage = null; revision++ } }
     forget?.let { (block, action) ->
         AlertDialog(onDismissRequest = { forget = null }, title = { Text(stringResource(R.string.privacy_forget)) },
-            text = { Column { Text(block.packageName); Text(stringResource(R.string.action_user, block.userId)); Text(stringResource(R.string.privacy_forget_explanation)) } },
+            text = { Column { Text(block.packageName); Text(profileName(block.userId)); Text(stringResource(R.string.privacy_forget_explanation)) } },
             confirmButton = { TextButton(onClick = {
                 forget = null
                 scope.launch { withPackageAuthentication(context) {

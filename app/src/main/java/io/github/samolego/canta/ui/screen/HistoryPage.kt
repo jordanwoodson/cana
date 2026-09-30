@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.screen
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,11 +24,6 @@ import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.RestoreExportButton
-import io.github.samolego.canta.ui.menu.displayName
-import io.github.samolego.canta.util.apps.UserProfile
-import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -39,13 +36,8 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
     val historyState by services.history.state.collectAsStateWithLifecycle(io.github.samolego.canta.data.HistoryReadState())
     val records = historyState.records
     val quarantined = historyState.quarantinedRecords
-    var profiles by remember { mutableStateOf<List<UserProfile>>(emptyList()) }
     var showQuarantined by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        try { profiles = withContext(Dispatchers.IO) { ShizukuUserUtils.getUsers() } }
-        catch (e: CancellationException) { throw e }
-        catch (_: Exception) { /* User IDs remain available when the service is disconnected. */ }
-    }
+    LaunchedEffect(Unit) { services.profiles.refresh() }
     val stored by services.batchStore.state.collectAsStateWithLifecycle(io.github.samolego.canta.data.BatchReadState())
     val batches = stored.batches
     val active by services.batches.active.collectAsStateWithLifecycle()
@@ -70,7 +62,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                 Text(stringResource(R.string.history_quarantined, quarantined.size))
                 TextButton(onClick = { showQuarantined = !showQuarantined }) { Text(stringResource(if (showQuarantined) R.string.close else R.string.review_actions)) }
             }
-            if (showQuarantined) items(quarantined, key = { "quarantined:${it.id}" }) { HistoryRecordContent(it, profiles) }
+            if (showQuarantined) items(quarantined, key = { "quarantined:${it.id}" }) { HistoryRecordContent(it) }
             if (groups.isEmpty() && !historyState.unavailable) item { Text(stringResource(R.string.history_empty)) }
             items(groups, key = { it.id }) { group ->
                 var expanded by remember(group.id) { mutableStateOf(false) }
@@ -99,13 +91,13 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                         }
                         TextButton(onClick = { expanded = !expanded }) { Text(stringResource(if (expanded) R.string.close else R.string.review_actions)) }
                         if (expanded) {
-                            group.records.forEach { record -> HistoryRecordContent(record, profiles, record.id in historyState.activeOperationIds) }
+                            group.records.forEach { record -> HistoryRecordContent(record, record.id in historyState.activeOperationIds) }
                             plan?.itemsList?.filter { item -> group.records.none {
                                 it.packageName == item.packageName && it.userId == item.userId && (it.action == item.action || item.action.startsWith("undo_"))
                             } }?.forEach { item ->
                                 HorizontalDivider()
                                 Text(item.packageName.ifBlank { stringResource(R.string.device_wide) })
-                                Text(actionLabel(item.action) + " · " + historyProfile(item.userId, profiles), style = MaterialTheme.typography.bodySmall)
+                                Text(actionLabel(item.action) + " · " + profileName(item.userId), style = MaterialTheme.typography.bodySmall)
                                 Text(when (item.status) {
                                     "queued" -> stringResource(R.string.batch_queued)
                                     "running" -> stringResource(R.string.batch_running)
@@ -124,11 +116,11 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun HistoryRecordContent(record: OperationRecord, profiles: List<UserProfile>, running: Boolean = false) {
+private fun HistoryRecordContent(record: OperationRecord, running: Boolean = false) {
     var diagnostics by remember(record.id) { mutableStateOf(false) }
     HorizontalDivider()
     Text(record.packageName.ifBlank { stringResource(R.string.device_wide) }, style = MaterialTheme.typography.titleSmall)
-    Text(actionLabel(record.action) + " · " + if (record.action == "system") stringResource(R.string.device_wide) else historyProfile(record.userId, profiles))
+    Text(actionLabel(record.action) + " · " + if (record.action == "system") stringResource(R.string.device_wide) else profileName(record.userId))
     Text(if (!record.completed) stringResource(if (running) R.string.batch_running else R.string.history_pending) else record.resultMessage,
         color = if (record.completed && !record.success) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
     if (record.recoveryComplete) Text(stringResource(R.string.history_recovery_complete), style = MaterialTheme.typography.labelMedium)
@@ -138,12 +130,6 @@ private fun HistoryRecordContent(record: OperationRecord, profiles: List<UserPro
         Text(stringResource(R.string.history_before, record.previousState), style = MaterialTheme.typography.bodySmall)
         Text(stringResource(R.string.history_after, record.afterState), style = MaterialTheme.typography.bodySmall)
     }
-}
-
-@Composable
-private fun historyProfile(userId: Int, profiles: List<UserProfile>): String {
-    val profile = profiles.find { it.id == userId }
-    return (profile?.let { it.displayName() + " · " } ?: "") + stringResource(R.string.action_user, userId)
 }
 
 @Composable
@@ -221,7 +207,7 @@ internal fun UndoBatchDialog(records: List<OperationRecord>, onDismiss: () -> Un
         text = { Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.undo_batch_description))
             records.forEach { record ->
-                Text("${record.packageName} · " + actionLabel(record.action) + " · " + stringResource(R.string.action_user, record.userId))
+                Text("${record.packageName} · " + actionLabel(record.action) + " · " + profileName(record.userId))
                 if (record.action == "component") runCatching { SnapshotState.read(record.previousState).optString("component") }.getOrNull()
                     ?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 RestoreScript.plan(record).notes.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }

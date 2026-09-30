@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.component
 
+import io.github.samolego.canta.ui.menu.profileName
+
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -53,6 +55,7 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
     val services = CanaServices.getInstance()
     val scope = rememberCoroutineScope()
     val batchTitle = stringResource(R.string.ota_reapply)
+    val profileNames = changes.map { it.userId }.distinct().associateWith { profileName(it) }
     var selected by remember { mutableStateOf(changes.filter { it.returned }.toSet()) }
     var reports by remember { mutableStateOf<Map<Int, Map<String, SafetyAssessment>>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -77,7 +80,8 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
                 })
                 Column {
                     Text(change.packageName)
-                    Text(stringResource(if (change.returned) R.string.ota_returned else R.string.ota_new, change.userId), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(if (change.returned) R.string.ota_returned_profile else R.string.ota_new_profile,
+                        profileNames.getValue(change.userId)), style = MaterialTheme.typography.bodySmall)
                     reports?.get(change.userId)?.get(change.packageName)?.let { report ->
                         if (report.protected) Text(stringResource(R.string.safety_protected, change.packageName))
                         report.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -112,7 +116,7 @@ private fun OtaReviewDialog(changes: List<OtaPackageChange>, onDismiss: () -> Un
                             try { services.ota.check() }
                             catch (e: CancellationException) { throw e }
                             catch (e: Exception) { io.github.samolego.canta.util.LogUtils.e("OTA", "Post-operation check failed", e) }
-                            operation.copy(message = "${change.packageName} · user ${change.userId}: ${operation.message}")
+                            operation.copy(message = "${change.packageName} · ${profileNames.getValue(change.userId)}: ${operation.message}")
                         }
                     } } finally { busy = false }
                 }

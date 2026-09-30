@@ -29,6 +29,6 @@ data class UserProfile(
 
     companion object {
         /** Id of the user Canta itself runs in (UserHandle.PER_USER_RANGE = 100000). */
-        val currentUserId: Int = Process.myUid() / 100_000
+        val currentUserId: Int by lazy { Process.myUid() / 100_000 }
     }
 }

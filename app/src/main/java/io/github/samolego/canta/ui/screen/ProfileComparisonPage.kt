@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ui.screen
 
+import io.github.samolego.canta.ui.menu.displayName
+
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,14 +23,11 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.util.apps.UserProfile
-import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,10 +50,12 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit) {
         profileLoading = true
         profileError = null
         try {
-            profiles = withContext(Dispatchers.IO) { ShizukuUserUtils.getUsers() }
+            if (!services.profiles.refresh()) error("Profile list unavailable")
+            profiles = services.profiles.profiles.value
         } catch (e: CancellationException) { throw e }
         catch (e: Exception) {
             profileError = (e.cause ?: e).message ?: e.toString()
+            profiles = services.profiles.profiles.value
             if (profiles.isEmpty()) profiles = listOf(UserProfile(UserProfile.currentUserId, null,
                 if (UserProfile.currentUserId == 0) UserProfile.Kind.PERSONAL else UserProfile.Kind.OTHER))
         } finally {
@@ -142,7 +143,7 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit) {
                         profiles.forEach { profile -> FilterChip(
                             selected = profile.id in selectedIds,
                             onClick = { selectedIds = if (profile.id in selectedIds) selectedIds - profile.id else selectedIds + profile.id },
-                            label = { Text(comparisonProfileLabel(profile)) },
+                            label = { Text(profile.displayName()) },
                         ) }
                     }
                     OutlinedTextField(query, { query = it }, label = { Text(stringResource(R.string.comparison_search)) }, singleLine = true,
@@ -188,7 +189,7 @@ private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: 
     val appWidth = 200.dp
     val cellWidth = 190.dp
     val matrixWidth = appWidth + cellWidth * profiles.size
-    val labels = profiles.associate { it.id to comparisonProfileLabel(it) }
+    val labels = profiles.associate { it.id to it.displayName() }
     Column(modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
         Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
             Row(Modifier.width(matrixWidth)) {
@@ -233,14 +234,3 @@ private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: 
         }
     }
 }
-
-@Composable
-private fun comparisonProfileLabel(profile: UserProfile): String = stringResource(R.string.comparison_profile,
-    profile.name ?: stringResource(when (profile.kind) {
-        UserProfile.Kind.PERSONAL -> R.string.profile_personal
-        UserProfile.Kind.WORK -> R.string.profile_work
-        UserProfile.Kind.CLONE -> R.string.profile_clone
-        UserProfile.Kind.PRIVATE -> R.string.profile_private
-        UserProfile.Kind.USER -> R.string.profile_user
-        UserProfile.Kind.OTHER -> R.string.profile_other
-    }), profile.id)
