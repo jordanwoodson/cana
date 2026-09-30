@@ -1,6 +1,7 @@
 package io.github.samolego.canta.ui.screen
 
 import android.content.Intent
+import android.os.Build
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -80,6 +82,7 @@ fun SettingsScreen(
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
     val hideSuccessDialog by settingsViewModel.hideSuccessDialog.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
+    val useDynamicColor by settingsViewModel.useDynamicColor.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -150,6 +153,15 @@ fun SettingsScreen(
                         onSuccess = { settingsViewModel.saveAuthEnabled(it) },
                     )
                 }
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SettingsItem(
+                title = stringResource(R.string.use_wallpaper_colors),
+                description = stringResource(R.string.use_wallpaper_colors_description),
+                icon = Icons.Default.Palette,
+                isSwitch = true,
+                checked = useDynamicColor,
+                onCheckedChange = settingsViewModel::saveUseDynamicColor,
             )
 
             HorizontalDivider(modifier = Modifier.padding(16.dp))

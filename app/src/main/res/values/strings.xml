@@ -21,6 +21,8 @@
     <string name="profile_other">Profile</string>
     <string name="user_id">User ID %1$d</string>
     <string name="profile_fallback_user">User %1$d</string>
+    <string name="use_wallpaper_colors">Use wallpaper colours</string>
+    <string name="use_wallpaper_colors_description">Match Cana’s colours to your wallpaper.</string>
     <string name="profile_blocks_shell">Admin disallows debugging here, Shizuku over adb can\'t modify this profile</string>
     <string name="profile_blocks_uninstall">Admin blocks uninstalling apps here</string>
     <string name="profiles_load_failed">Couldn\'t list profiles, check Shizuku and the logs</string>

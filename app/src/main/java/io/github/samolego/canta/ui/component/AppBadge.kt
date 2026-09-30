@@ -31,17 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.samolego.canta.util.RemovalRecommendation
 import io.github.samolego.canta.ui.riskIcon
+import io.github.samolego.canta.ui.riskColors
 
 @Composable
 fun RemovalBadge(type: RemovalRecommendation) {
-    val scheme = MaterialTheme.colorScheme
-    val colors = when (type) {
-        RemovalRecommendation.RECOMMENDED -> scheme.tertiaryContainer to scheme.onTertiaryContainer
-        RemovalRecommendation.ADVANCED -> scheme.secondaryContainer to scheme.onSecondaryContainer
-        RemovalRecommendation.EXPERT -> scheme.errorContainer to scheme.onErrorContainer
-        RemovalRecommendation.UNSAFE -> scheme.error to scheme.onError
-        RemovalRecommendation.SYSTEM -> scheme.surfaceVariant to scheme.onSurfaceVariant
-    }
+    val colors = type.riskColors()
     AppBadge(
         label = stringResource(when (type) {
             RemovalRecommendation.RECOMMENDED -> R.string.risk_recommended
@@ -51,8 +45,8 @@ fun RemovalBadge(type: RemovalRecommendation) {
             RemovalRecommendation.SYSTEM -> R.string.risk_system
         }),
         icon = type.riskIcon(),
-        color = colors.first,
-        contentColor = colors.second,
+        color = colors.container,
+        contentColor = colors.onContainer,
     )
 }
 

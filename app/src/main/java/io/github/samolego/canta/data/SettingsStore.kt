@@ -25,6 +25,7 @@ class SettingsStore private constructor(context: Context) {
     val bloatUnmeteredOnlyFlow = dataStore.data.map { it.bloatUnmeteredOnly }
     val allowUnsafeUninstallsFlow = dataStore.data.map { it.allowUnsafeUninstalls }
     val hideSuccessDialogFlow = dataStore.data.map { it.hideSuccessDialog }
+    val useDynamicColorFlow = dataStore.data.map { it.useDynamicColor }
 
     val authEnabledFlow = dataStore.data.map { it.authEnabled }
     val trackerListUrlFlow = dataStore.data.map { it.trackerListUrl }
@@ -73,6 +74,10 @@ class SettingsStore private constructor(context: Context) {
 
     suspend fun setHideSuccessDialog(hide: Boolean) {
         dataStore.updateData { it.toBuilder().setHideSuccessDialog(hide).build() }
+    }
+
+    suspend fun setUseDynamicColor(enabled: Boolean) {
+        dataStore.updateData { it.toBuilder().setUseDynamicColor(enabled).build() }
     }
 
     suspend fun setAuthEnabled(enabled: Boolean) {
