@@ -18,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
@@ -95,7 +95,7 @@ fun profileName(userId: Int): String {
 
 @Composable
 private fun profileLabels(): ProfileNaming.Labels {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     return ProfileNaming.Labels(
         personal = stringResource(R.string.profile_personal),
         work = stringResource(R.string.profile_work),
@@ -103,7 +103,7 @@ private fun profileLabels(): ProfileNaming.Labels {
         privateProfile = stringResource(R.string.profile_private),
         user = stringResource(R.string.profile_user),
         other = stringResource(R.string.profile_other),
-        fallbackUser = { context.getString(R.string.profile_fallback_user, it) },
+        fallbackUser = { resources.getString(R.string.profile_fallback_user, it) },
     )
 }
 
