@@ -22,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -31,9 +30,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.samolego.canta.util.RemovalRecommendation
+import io.github.samolego.canta.ui.riskIcon
 
 @Composable
 fun RemovalBadge(type: RemovalRecommendation) {
+    val scheme = MaterialTheme.colorScheme
+    val colors = when (type) {
+        RemovalRecommendation.RECOMMENDED -> scheme.tertiaryContainer to scheme.onTertiaryContainer
+        RemovalRecommendation.ADVANCED -> scheme.secondaryContainer to scheme.onSecondaryContainer
+        RemovalRecommendation.EXPERT -> scheme.errorContainer to scheme.onErrorContainer
+        RemovalRecommendation.UNSAFE -> scheme.error to scheme.onError
+        RemovalRecommendation.SYSTEM -> scheme.surfaceVariant to scheme.onSurfaceVariant
+    }
     AppBadge(
         label = stringResource(when (type) {
             RemovalRecommendation.RECOMMENDED -> R.string.risk_recommended
@@ -42,8 +50,9 @@ fun RemovalBadge(type: RemovalRecommendation) {
             RemovalRecommendation.UNSAFE -> R.string.risk_unsafe
             RemovalRecommendation.SYSTEM -> R.string.risk_system
         }),
-        icon = type.icon,
-        color = type.badgeColor
+        icon = type.riskIcon(),
+        color = colors.first,
+        contentColor = colors.second,
     )
 }
 
@@ -58,18 +67,21 @@ fun DisabledBadge() {
         label = stringResource(R.string.filter_disabled),
         icon = Icons.Default.DisabledByDefault,
         color = MaterialTheme.colorScheme.tertiary,
+        contentColor = MaterialTheme.colorScheme.onTertiary,
     )
 }
 
 @Composable
-fun SuspendedBadge() = AppBadge(stringResource(R.string.suspended_badge), Icons.Default.PauseCircle, MaterialTheme.colorScheme.secondary)
+fun SuspendedBadge() = AppBadge(stringResource(R.string.suspended_badge), Icons.Default.PauseCircle,
+    MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.onSecondary)
 
 @Composable
 fun CantaBadge() {
     AppBadge(
         label = stringResource(R.string.app_name),
         icon = Icons.Default.RestoreFromTrash,
-        color = Color.Red.copy(alpha = 0.7f),
+        color = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
     )
 }
 
@@ -79,6 +91,7 @@ fun TrackerBadge(count: Int) = AppBadge(
     label = pluralStringResource(R.plurals.tracker_badge, count, count),
     icon = Icons.Default.TrackChanges,
     color = MaterialTheme.colorScheme.tertiaryContainer,
+    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
 )
 
 @Composable
@@ -86,8 +99,8 @@ private fun AppBadge(
     label: String,
     icon: ImageVector,
     color: Color,
+    contentColor: Color,
 ) {
-    val contrastColor = color.getContrastColor()
     Row(
         modifier = Modifier
             .semantics(mergeDescendants = true) {}
@@ -99,7 +112,7 @@ private fun AppBadge(
     ) {
         Icon(
             icon,
-            tint = contrastColor,
+            tint = contentColor,
             modifier = Modifier
                 .padding(start = 4.dp)
                 .padding(vertical = 2.dp)
@@ -114,13 +127,9 @@ private fun AppBadge(
                 .padding(end = 8.dp)
                 .align(alignment = Alignment.CenterVertically),
             style = MaterialTheme.typography.labelMedium,
-            color = contrastColor,
+            color = contentColor,
         )
     }
-}
-
-private fun Color.getContrastColor(): Color {
-    return if (luminance() > 0.179) Color.Black else Color.White
 }
 
 @Preview
