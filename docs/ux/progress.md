@@ -18,3 +18,12 @@ Source: `/home/jordan/projects/cana/cana-ux-plan-prompt.md`. Base: `roadmap` at 
 ## Task and phase record
 
 Each later entry records the change, commit, test counts, device checks and screenshot paths. Safety checks follow §3 of the source prompt.
+
+### Task 1.2 — Shared profile directory and names
+
+- `baa978c` adds a last-good Shizuku profile directory, refreshes it on startup and authorization, and routes main, comparison, history, dialogs, OTA and preset preview labels through translated profile names. Fallback for an unknown entry is Personal only for current user 0, otherwise “User N”. Raw IDs remain in the switcher subtitle and saved technical data. No package action targeting or authentication code changed.
+- `ProfileDirectoryTest` and `ProfileNamingTest`: five new JVM cases. The red run failed on missing types; after implementation the focused run passed. A JVM-specific Android logger initialization failure was isolated by injecting the error reporter, then the focused run passed.
+- Final `testDebugUnitTest assembleDebug assembleDebugAndroidTest`: **202/202 JVM tests pass**, both APKs build (`/tmp/cana-ux-phase1-profile-final.log`).
+- Device classes on `emulator-5554`: `DebloatUiDeviceTest` **2/2 pass** (`/tmp/cana-ux-profile-debloat-device.log`), `PrivacyUiDeviceTest` **2/2 pass** on rerun (`/tmp/cana-ux-profile-privacy-device-rerun.log`), `UpdateCleanupUiTest` **2/2 pass** (`/tmp/cana-ux-profile-update-device.log`). The first Privacy run failed **2/2** because the preceding connected test had removed the target app, changing its UID and losing Shizuku authorization. Reinstalled and granted permission through Cana’s dialog before rerunning; no test assertions were weakened.
+- Screenshot: `ux-review/after/phase1/01-main-list-light.png` at 610×1356, showing “Personal” in the main header. The profile switcher showed “Personal” and “Work profile”.
+- `PresetImportUiDeviceTest` remains to run in the Phase 1 device gate after the shared components and copy changes. The Android test runner removes Cana after each class, so reinstall, AOT compile and authorize through the app before another Shizuku-dependent class.
