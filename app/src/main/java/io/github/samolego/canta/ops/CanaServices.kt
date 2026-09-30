@@ -28,17 +28,19 @@ class CanaServices private constructor(context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     val batchStore = io.github.samolego.canta.data.BatchStore(appContext.batchDataStore)
     val inventory = InventoryRepository(appContext, scope)
+    val shell = ShellRunner(context.applicationContext)
+    val safety = SafetyInspector(context.applicationContext, shell)
+    // A full package scan per item would compete with the batch itself; scan once at the end.
     val batches = BatchCoordinator(batchStore, scope, BatchMessages(
         appContext.getString(io.github.samolego.canta.R.string.batch_stopped_item),
         appContext.getString(io.github.samolego.canta.R.string.batch_operation_failed),
         appContext.getString(io.github.samolego.canta.R.string.batch_storage_failed),
-    ), onAttemptFinished = { inventory.invalidate() })
+    ), onAttemptFinished = { inventory.invalidate(refresh = false) },
+        onBatchFinished = { safety.invalidate(); inventory.invalidate() })
     val savedViews = io.github.samolego.canta.data.SavedViewStore(appContext)
     private val installationId = OperationalIdentity.current(appContext)
     val history = HistoryStore(appContext.historyDataStore,
         HistoryArchive(File(appContext.noBackupFilesDir, "history-archive")), installationId = installationId)
-    val shell = ShellRunner(context.applicationContext)
-    val safety = SafetyInspector(context.applicationContext, shell)
     val packageOps = PackageOps(context.applicationContext, history, safety, shell)
     val selfGrants = SelfGrants(context.applicationContext, shell, history)
     val trackers = TrackerRepository(context.applicationContext)
@@ -74,7 +76,7 @@ class CanaServices private constructor(context: Context) {
                     if (state.unavailable) return@collect
                     val records = state.records
                     val completed = records.filter { it.completed }.map { it.id }.toSet()
-                    if (observed != null && (completed - observed!!).isNotEmpty()) inventory.invalidate()
+                    if (observed != null && (completed - observed!!).isNotEmpty()) inventory.invalidate(refresh = this@CanaServices.batches.active.value == null)
                     try { if (batches.batches.any { batch -> batch.itemsList.any { it.status == "pending" } }) batchStore.reconcilePending(records) }
                     catch (e: CancellationException) { throw e }
                     catch (e: Exception) { LogUtils.e("CanaServices", "Could not update pending batch outcomes", e) }

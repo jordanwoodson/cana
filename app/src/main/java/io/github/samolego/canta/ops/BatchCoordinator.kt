@@ -20,6 +20,7 @@ data class BatchMessages(
 class BatchCoordinator(private val store: BatchStore, private val scope: CoroutineScope,
     private val messages: BatchMessages = BatchMessages(),
     private val onAttemptFinished: (BatchItem) -> Unit = {},
+    private val onBatchFinished: () -> Unit = {},
 ) {
     private val execution = Mutex()
     private val mutableActive = MutableStateFlow<BatchProgress?>(null)
@@ -63,7 +64,7 @@ class BatchCoordinator(private val store: BatchStore, private val scope: Corouti
                     }
                     store.complete(id)
                     BatchResult(results, id)
-                } finally { mutableActive.value = null }
+                } finally { mutableActive.value = null; onBatchFinished() }
             }
             } catch (e: CancellationException) { throw e }
             catch (_: Exception) {

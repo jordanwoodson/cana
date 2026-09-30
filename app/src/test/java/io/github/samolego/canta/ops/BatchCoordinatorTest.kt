@@ -29,6 +29,21 @@ class BatchCoordinatorTest {
         } finally { owner.cancel() }
     }
 
+    @Test fun batchFinishedRunsOnceAfterEveryAttempt() = runBlocking {
+        val owner = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        try {
+            val events = mutableListOf<String>()
+            val coordinator = BatchCoordinator(store(owner), owner,
+                onAttemptFinished = { synchronized(events) { events += "attempt:${it.key}" } },
+                onBatchFinished = { synchronized(events) { events += "finished" } })
+            coordinator.run("Uninstall", listOf(BatchItem("one", "a", 10, "uninstall"), BatchItem("two", "b", 10, "uninstall"))) { item, _ ->
+                synchronized(events) { events += "run:${item.key}" }
+                if (item.key == "one") throw IllegalStateException("boom") else OperationResult(true, "Applied", changed = true)
+            }
+            assertEquals(listOf("run:one", "attempt:one", "run:two", "attempt:two", "finished"), events)
+        } finally { owner.cancel() }
+    }
+
     @Test fun leavingCallerDoesNotTruncateBatch() = runBlocking {
         val owner = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         try {

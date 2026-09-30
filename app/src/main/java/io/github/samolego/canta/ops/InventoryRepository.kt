@@ -37,13 +37,14 @@ class InventoryRepository(
         return withContext(Dispatchers.Main.immediate) { state(userId) }
     }
 
-    fun invalidate(userId: Int? = null) {
+    /** Marks inventories stale; with [refresh] a reload follows shortly (a full package scan). */
+    fun invalidate(userId: Int? = null, refresh: Boolean = true) {
         scope.launch {
             val users = userId?.let(::listOf) ?: states.keys.toList()
             users.forEach { user ->
                 val old = state(user)
                 states[user] = old.copy(stale = true)
-                if (old.loaded) {
+                if (old.loaded && refresh) {
                     invalidations[user]?.cancel()
                     invalidations[user] = launch { delay(150); refresh(user, refreshMetadata = false) }
                 }
