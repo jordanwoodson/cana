@@ -12,7 +12,7 @@ Installed and Removed tabs identify the current view. The active profile stays v
 
 Selected apps stay selected when you change the view. The selection bar reports both the total and how many are hidden, and lets you review or clear the whole selection.
 
-Each app has an Overview, Privacy, and Components screen. Android Settings opens for the selected profile when supported. The profile comparison screen shows installed, removed, absent, disabled, suspended, and unavailable states. Saved privacy intent is labeled separately from verified enforcement.
+Each app has an Overview, Privacy, and Components screen. The Overview names the list that supplied a recommendation when the list declares a `source`, and scans the app's APK files for Exodus Privacy tracker signatures the way εxodus does, from the classes the DEX files define. Filters offer a whole-profile tracker scan, a "With trackers" filter, and tracker sorting; tiles show a tracker badge once an app has been scanned. Android Settings opens for the selected profile when supported. The profile comparison screen shows installed, removed, absent, disabled, suspended, and unavailable states. Saved privacy intent is labeled separately from verified enforcement.
 
 ## Review and apply changes
 
@@ -36,6 +36,6 @@ Presets can include package removals and privacy settings. Import review shows n
 
 Removal recommendations are guidance, not guarantees. Readable badges identify Recommended, Advanced, Expert, Unsafe, and System apps. The UI uses Material 3, localized resources, visible labels, and Android font scaling.
 
-Recommendation and tracker data can be cached for offline use. Downloads contact the configured sources and expose normal network request metadata. Cana has no analytics SDK. See the [privacy policy](https://github.com/jordanwoodson/cana/blob/master/privacy_policy.md) for local storage, backup, download, and export details.
+Recommendation and tracker data can be cached for offline use. Downloads contact the configured sources and expose normal network request metadata. Tracker scans read APK files locally and keep their results on the device. Cana has no analytics SDK. See the [privacy policy](https://github.com/jordanwoodson/cana/blob/master/privacy_policy.md) for local storage, backup, download, and export details.
 
 Cana is an LGPL-3.0 fork of [Canta](https://github.com/samolego/Canta).

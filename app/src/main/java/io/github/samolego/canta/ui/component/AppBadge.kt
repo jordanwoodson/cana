@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DisabledByDefault
 import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.TrackChanges
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import io.github.samolego.canta.R
 import androidx.compose.material3.Icon
@@ -70,6 +72,14 @@ fun CantaBadge() {
         color = Color.Red.copy(alpha = 0.7f),
     )
 }
+
+/** Tracker signatures a Cana scan found in the app's APK code; hidden until an app has been scanned. */
+@Composable
+fun TrackerBadge(count: Int) = AppBadge(
+    label = pluralStringResource(R.plurals.tracker_badge, count, count),
+    icon = Icons.Default.TrackChanges,
+    color = MaterialTheme.colorScheme.tertiaryContainer,
+)
 
 @Composable
 private fun AppBadge(

@@ -93,6 +93,8 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     } else Text(stringResource(R.string.no_description_available))
                     app.bloatData?.suggestions?.takeIf { it.isNotEmpty() }?.let { Text(stringResource(R.string.app_suggestions, it.toString())) }
                     HorizontalDivider()
+                    TrackerSummary(app)
+                    HorizontalDivider()
                     val actions = if (app.isUninstalled) buildList {
                         add(PackageAction.REINSTALL)
                         if (app.isUpdatedSystemApp) add(PackageAction.REMOVE_UPDATES)

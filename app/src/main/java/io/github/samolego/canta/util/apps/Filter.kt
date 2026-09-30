@@ -19,6 +19,7 @@ class Filter(
 ) {
     val group: FilterGroup get() = when {
         removalRecommendation != null -> FilterGroup.RISK
+        id.startsWith("privacy_") -> FilterGroup.PRIVACY
         id.startsWith("category_") -> FilterGroup.CATEGORY
         else -> FilterGroup.STATE
     }
@@ -31,6 +32,9 @@ class Filter(
         val user = Filter(name = "User", shouldShow = { app -> !app.isSystemApp }, nameRes = R.string.filter_user)
         val leftoverUpdates = Filter("Leftover updates", { it.isUninstalled && it.isUpdatedSystemApp },
             nameRes = R.string.leftover_updates)
+        /** Apps whose APK code matched at least one tracker signature in a Cana scan. */
+        val trackers = Filter("With trackers", { app -> (io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans.count(app.packageName) ?: 0) > 0 },
+            nameRes = R.string.filter_trackers, id = "privacy_trackers")
         val unused = Filter("Unused for 90 days", { !it.isUninstalled && io.github.samolego.canta.ops.ManagementPolicy.unused90Days(it.lastUsed, it.firstInstallTime, System.currentTimeMillis()) }, nameRes = R.string.unused_90_days)
 
         /**
@@ -71,6 +75,7 @@ class Filter(
             removalFilters.add(3, disabled)
             removalFilters.add(4, leftoverUpdates)
             removalFilters.add(5, unused)
+            removalFilters.add(6, trackers)
 
             val categoryNames = mapOf(
                 InstallData.GOOGLE to R.string.category_google,
@@ -94,4 +99,4 @@ class Filter(
     }
 }
 
-enum class FilterGroup { STATE, RISK, CATEGORY }
+enum class FilterGroup { STATE, RISK, CATEGORY, PRIVACY }

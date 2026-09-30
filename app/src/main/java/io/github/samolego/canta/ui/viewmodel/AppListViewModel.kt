@@ -182,6 +182,7 @@ class AppListViewModel(
             AppSort.NAME -> nameComparator
             AppSort.SIZE -> compareByDescending<AppInfo> { it.apkSizeBytes }.then(nameComparator)
             AppSort.LAST_USED -> compareByDescending<AppInfo> { it.lastUsed ?: Long.MIN_VALUE }.then(nameComparator)
+            AppSort.TRACKERS -> compareByDescending<AppInfo> { CanaServices.getInstance().trackerScans.count(it.packageName) ?: -1 }.then(nameComparator)
         }
         apps.filter { app -> activeFilterIds.mapNotNull(Filter::fromId).all { it.shouldShow(app) } &&
             (collectionPackages.isEmpty() || app.packageName in collectionPackages) }.sortedWith(comparator)
@@ -247,7 +248,7 @@ class AppListViewModel(
 
 }
 
-enum class AppSort(val title: Int) { NAME(R.string.sort_name), SIZE(R.string.sort_size), LAST_USED(R.string.sort_last_used) }
+enum class AppSort(val title: Int) { NAME(R.string.sort_name), SIZE(R.string.sort_size), LAST_USED(R.string.sort_last_used), TRACKERS(R.string.sort_trackers) }
 
 enum class PackageAction(val label: Int) {
     UNINSTALL(R.string.uninstall), REINSTALL(R.string.reinstall), REMOVE_UPDATES(R.string.remove_updates),

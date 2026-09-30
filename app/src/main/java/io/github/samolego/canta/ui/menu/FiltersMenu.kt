@@ -57,6 +57,7 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
                     FilterGroup.STATE -> R.string.filter_state
                     FilterGroup.RISK -> R.string.filter_risk
                     FilterGroup.CATEGORY -> R.string.filter_category
+                    FilterGroup.PRIVACY -> R.string.filter_privacy
                 }), style = MaterialTheme.typography.titleSmall)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Filter.availableFilters.filter { it != Filter.any && it.group == group && (it != Filter.unused || model.usageAvailable) }.forEach { filter ->
@@ -64,6 +65,7 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
                             label = { Text(filter.nameRes?.let { stringResource(it) } ?: filter.name) })
                     }
                 }
+                if (group == FilterGroup.PRIVACY) io.github.samolego.canta.ui.component.TrackerScanControls(model)
             }
             Row {
                 TextButton(onClick = model::clearFilters) { Text(stringResource(R.string.clear_filters)) }

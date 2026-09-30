@@ -50,6 +50,7 @@ fun AppTile(
     enabled: Boolean = true,
     onCheckChanged: (Boolean) -> Unit,
     onShowDialog: () -> Unit,
+    trackerCount: Int? = null,
     showBorder: Boolean = isSelected,
     checkedColor: Color = MaterialTheme.colorScheme.primary,
     checkedBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer.copy(
@@ -100,6 +101,7 @@ fun AppTile(
                                 DisabledBadge()
                             }
                             if (appInfo.isSuspended) SuspendedBadge()
+                            if (trackerCount != null && trackerCount > 0) TrackerBadge(trackerCount)
                             if (appInfo.packageName == packageName) {
                                 CantaBadge()
                             }

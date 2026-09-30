@@ -16,6 +16,7 @@ fun MoreOptionsMenu(
         showMenu: Boolean,
         showBadgeInfoDialog: () -> Unit,
         navigateToPage: (route: String) -> Unit,
+        onScanTrackers: () -> Unit,
         onDismiss: () -> Unit,
 ) {
 
@@ -35,6 +36,9 @@ fun MoreOptionsMenu(
         })
         DropdownMenuItem(text = { Text(stringResource(R.string.history)) }, onClick = {
             navigateToPage(Screen.History.route); onDismiss()
+        })
+        DropdownMenuItem(text = { Text(stringResource(R.string.tracker_scan_all)) }, onClick = {
+            onScanTrackers(); onDismiss()
         })
         // Badge info dialog
         DropdownMenuItem(

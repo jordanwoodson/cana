@@ -45,6 +45,7 @@ class CanaServices private constructor(context: Context) {
     val selfGrants = SelfGrants(context.applicationContext, shell, history)
     val trackers = TrackerRepository(context.applicationContext)
     val components = ComponentRepository(trackers)
+    val trackerScans = TrackerScanRepository(appContext, scope, trackers)
     val desiredPrivacy = PrivacyStore(context.applicationContext.privacyDataStore)
     val journal = OperationJournal(context.applicationContext, history)
     val privacy = PrivacyOps(context.applicationContext, shell, history, desiredPrivacy, safety, journal)

@@ -18,6 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -43,6 +44,7 @@ fun CantaTopBar(
     var searchActive by rememberSaveable { mutableStateOf(false) }
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
+    val context = LocalContext.current
     val closeSearch = { searchActive = false; appListViewModel.searchQuery = ""; keyboard?.hide(); Unit }
     BackHandler(searchActive, closeSearch)
     Column(Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
@@ -54,7 +56,7 @@ fun CantaTopBar(
                 IconClickButton(onClick = { filters = true }, icon = Icons.Default.FilterAlt, contentDescription = stringResource(R.string.filters_action))
                 Box {
                     IconClickButton(onClick = { more = true }, icon = Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options_action))
-                    MoreOptionsMenu(more, openBadgesInfoDialog, navigateToPage) { more = false }
+                    MoreOptionsMenu(more, openBadgesInfoDialog, navigateToPage, { startTrackerScan(context, appListViewModel) }) { more = false }
                 }
             })
         Text(profileLabel(appListViewModel), Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 8.dp),

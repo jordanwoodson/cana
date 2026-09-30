@@ -1,12 +1,12 @@
 # Privacy Policy for Cana
 
-Updated September 26, 2026.
+Updated September 30, 2026.
 
 Cana manages Android apps and profiles locally using Shizuku. Cana has no analytics SDK, advertising SDK, developer account system, or developer-operated collection endpoint.
 
 ## Information on your device
 
-Cana reads package names, app versions, installation state, profile identifiers, and the permission or system settings needed for the controls you use. If you enable usage access, it can read app usage timestamps for sorting and filtering. It stores preferences, presets, saved views, desired privacy rules, and operation/recovery history in its private app storage. Diagnostic logs can contain package names, profile IDs, command results, and errors; the in-app log is bounded and kept in memory.
+Cana reads package names, app versions, installation state, profile identifiers, and the permission or system settings needed for the controls you use. If you enable usage access, it can read app usage timestamps for sorting and filtering. Tracker scans read the APK files of installed apps on this device and store the matched signature names per package; the APK contents are not stored or sent anywhere. It stores preferences, presets, saved views, desired privacy rules, and operation/recovery history in its private app storage. Diagnostic logs can contain package names, profile IDs, command results, and errors; the in-app log is bounded and kept in memory.
 
 Android protects this storage using its app sandbox. Operational history, pending batches, privacy rules, and management snapshots are excluded from Android backup and device transfer. Portable preferences, presets, and saved views may be included if Android backup is enabled. Installation identity checks keep older restored operational records from being silently reapplied.
 

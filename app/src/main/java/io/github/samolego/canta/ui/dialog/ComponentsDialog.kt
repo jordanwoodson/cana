@@ -153,7 +153,7 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                 }) { Text(stringResource(R.string.ok)) }
             }, dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.cancel)) } })
     }
-    if (sourceDialog) TrackerSourceDialog(onDismiss = { sourceDialog = false }, onSaved = { sourceDialog = false; revision++ })
+    if (sourceDialog) TrackerSourceDialog(onDismiss = { sourceDialog = false }, onSaved = { sourceDialog = false; revision++; services.trackerScans.invalidate() })
 }
 
 @Composable

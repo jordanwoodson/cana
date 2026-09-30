@@ -81,6 +81,7 @@ fun AppList(
         if (appListModel.isLoading) {
             LoadingAppsInfo()
         } else {
+            val trackerScans = io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans
             if (appType == AppsType.UNINSTALLED && appListModel.leftoverUpdates.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
@@ -104,6 +105,9 @@ fun AppList(
             }
             if (appListModel.isLoadingBadges) {
                 LoadingBadgesIndicator()
+            }
+            trackerScans.progress?.let { progress ->
+                if (progress.userId == appListModel.selectedUserId) TrackerScanProgressRow(progress, Modifier.padding(horizontal = 16.dp), trackerScans::cancelScanAll)
             }
             if (appList.isNotEmpty()) {
                 SelectAllOption(
@@ -136,7 +140,9 @@ fun AppList(
                                         appListModel.selectedApps.remove(appInfo.packageName)
                                     }
                                 },
-                                onShowDialog = { onOpenDetails(appInfo.packageName, appListModel.selectedUserId) }
+                                onShowDialog = { onOpenDetails(appInfo.packageName, appListModel.selectedUserId) },
+                                trackerCount = trackerScans.results[appInfo.packageName]
+                                        ?.takeIf { it.error == null && it.isFor(appInfo.versionCode) }?.trackers?.size,
                         )
                     }
                     item { Spacer(modifier = Modifier.height(64.dp)) }

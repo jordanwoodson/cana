@@ -289,4 +289,28 @@
     <string name="operation_state_unavailable">The action may have applied, but its final state could not be read. Recovery remains available.</string>
     <string name="history_recovery_complete">Automatic recovery is finished. Any manual recovery notes still apply.</string>
     <string name="app_list_source">List source: %1$s</string>
+    <string name="trackers_title">Trackers</string>
+    <plurals name="tracker_count">
+        <item quantity="one">%1$d tracker signature found</item>
+        <item quantity="other">%1$d tracker signatures found</item>
+    </plurals>
+    <plurals name="tracker_badge">
+        <item quantity="one">%1$d tracker</item>
+        <item quantity="other">%1$d trackers</item>
+    </plurals>
+    <string name="tracker_scan_running">Reading the APK files for tracker signatures…</string>
+    <string name="tracker_scan_classes">%1$d classes checked in %2$d APK files</string>
+    <string name="tracker_scan_failed">Scan failed: %1$s</string>
+    <string name="tracker_not_scanned">Not scanned yet.</string>
+    <string name="tracker_no_apk">The APK files of this app are not readable from this profile.</string>
+    <string name="tracker_scan_description">Cana reads the app’s APK files on this device and compares the classes they define with Exodus Privacy signatures. Nothing is uploaded.</string>
+    <string name="tracker_rescan_action">Rescan</string>
+    <string name="tracker_exodus_report">Exodus report</string>
+    <string name="tracker_scan_all">Scan for trackers</string>
+    <string name="tracker_scan_progress">Scanning trackers: %1$d of %2$d apps</string>
+    <string name="tracker_scanned_count">%1$d of %2$d installed apps scanned</string>
+    <string name="tracker_scan_summary">Tracker scan finished: %1$d of %2$d apps contain tracker signatures</string>
+    <string name="filter_trackers">With trackers</string>
+    <string name="filter_privacy">Privacy</string>
+    <string name="sort_trackers">Sort by trackers</string>
 </resources>
