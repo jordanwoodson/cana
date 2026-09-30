@@ -12,7 +12,8 @@ labels are guidance; they do not guarantee that removal is safe on every device.
 
 To change a custom list URL, edit it and press **Save**. The address must use HTTPS
 or HTTP and contain a host. Cancel leaves the stored source and cache settings
-unchanged. Downloads contact the selected source; see the [privacy policy](https://github.com/jordanwoodson/cana/blob/roadmap/privacy_policy.md).
+unchanged. A custom list may add a `source` string to each package, for example when
+it merges several upstream lists; Cana shows it on the app's Overview. Downloads contact the selected source; see the [privacy policy](https://github.com/jordanwoodson/cana/blob/roadmap/privacy_policy.md).
 
 ## Reviewed actions
 

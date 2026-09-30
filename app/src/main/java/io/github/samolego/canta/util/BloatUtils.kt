@@ -27,6 +27,8 @@ data class BloatData(
     val neededBy: List<String> = emptyList(),
     val labels: List<String> = emptyList(),
     val suggestions: String? = null,
+    /** Which list produced this entry, when the list says so (Cana's debloat server does). */
+    val source: String? = null,
 ) : Parcelable {
     companion object {
         fun fromJson(json: JSONObject): BloatData {
@@ -38,6 +40,7 @@ data class BloatData(
                 neededBy = json.stringList("neededBy"),
                 labels = json.stringList("labels"),
                 suggestions = (json.opt("suggestions") as? String)?.takeIf { it.isNotBlank() },
+                source = (json.opt("source") as? String)?.takeIf { it.isNotBlank() },
             )
         }
 

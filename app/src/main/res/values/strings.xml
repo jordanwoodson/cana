@@ -288,4 +288,5 @@
     <string name="system_portal_off_warning">Android may stop detecting networks that require sign-in and may report Internet access incorrectly. This affects every profile.</string>
     <string name="operation_state_unavailable">The action may have applied, but its final state could not be read. Recovery remains available.</string>
     <string name="history_recovery_complete">Automatic recovery is finished. Any manual recovery notes still apply.</string>
+    <string name="app_list_source">List source: %1$s</string>
 </resources>

@@ -35,6 +35,13 @@ class BloatDataTest {
         assertEquals("cameras", parsed.suggestions)
     }
 
+    @Test fun parsesTheOptionalListSource() {
+        assertEquals("ADL", BloatData.fromJson(JSONObject("""{"list":"Misc","removal":"Recommended","source":"ADL"}""")).source)
+        assertNull(BloatData.fromJson(JSONObject("""{"list":"Misc","removal":"Recommended"}""")).source)
+        assertNull(BloatData.fromJson(JSONObject("""{"source":""}""")).source)
+        assertNull(BloatData.fromJson(JSONObject("""{"source":7}""")).source)
+    }
+
     @Test fun nullAndMalformedOptionalValuesDoNotBecomeFakePackageNames() {
         val parsed = BloatData.fromJson(JSONObject("""{
             "list":null, "description":null, "removal":null,

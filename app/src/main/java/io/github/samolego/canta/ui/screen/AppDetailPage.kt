@@ -74,6 +74,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     }
                     Text(stringResource(R.string.app_version_details, app.versionName ?: "—", app.versionCode))
                     Text(stringResource(R.string.app_apk_size, Formatter.formatFileSize(context, app.apkSizeBytes)))
+                    app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }
                     FlowRow {
                         app.removalInfo?.let { RemovalBadge(it) }
                         if (app.isSystemApp) SystemBadge()
