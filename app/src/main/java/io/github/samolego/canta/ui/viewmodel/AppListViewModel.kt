@@ -182,7 +182,7 @@ class AppListViewModel(
             AppSort.NAME -> nameComparator
             AppSort.SIZE -> compareByDescending<AppInfo> { it.apkSizeBytes }.then(nameComparator)
             AppSort.LAST_USED -> compareByDescending<AppInfo> { it.lastUsed ?: Long.MIN_VALUE }.then(nameComparator)
-            AppSort.TRACKERS -> compareByDescending<AppInfo> { CanaServices.getInstance().trackerScans.count(it.packageName) ?: -1 }.then(nameComparator)
+            AppSort.TRACKERS -> compareByDescending<AppInfo> { CanaServices.getInstance().trackerScans.count(it) ?: -1 }.then(nameComparator)
         }
         apps.filter { app -> activeFilterIds.mapNotNull(Filter::fromId).all { it.shouldShow(app) } &&
             (collectionPackages.isEmpty() || app.packageName in collectionPackages) }.sortedWith(comparator)

@@ -1,0 +1,10 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+app/build/outputs/apk/debug/app-debug.apk: 74648146 bytes; SHA-256 6a8b4b617f4d6d1116149faaf620676d5120efc1c72c1fa4844996ea1f506ea0
+app/build/outputs/apk/release/app-release.apk: 6029519 bytes; SHA-256 a50af8b9e14d00d7cccce043538f36773402e2e8bd4c1600e99c33253ddadeb2

@@ -29,8 +29,7 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
     val scope = rememberCoroutineScope()
     var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
     if (!authorized) {
-        io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog({ if (it) authorized = true else onDismiss() },
-            ShizukuPermission.checkShizukuActive(context.packageManager))
+        io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog({ if (it) authorized = true else onDismiss() })
         return
     }
     var profiles by remember { mutableStateOf<List<UserProfile>>(emptyList()) }

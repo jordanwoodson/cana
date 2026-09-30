@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +41,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
     var pending by remember { mutableStateOf<PrivacyAction?>(null) }
     var pendingUndo by remember { mutableStateOf<OperationRecord?>(null) }
     var forget by remember { mutableStateOf<PrivacyAction?>(null) }
-    var authorize by remember { mutableStateOf(false) }
+    var authorize by rememberSaveable(packageName, userId) { mutableStateOf(false) }
     var diagnostics by remember { mutableStateOf(false) }
     var selected by remember(packageName, userId) { mutableStateOf<Set<String>>(emptySet()) }
     LaunchedEffect(packageName, userId, revision) {
@@ -166,7 +167,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
     }
     if (embedded) content() else AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(stringResource(R.string.privacy)) },
         text = content, confirmButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.close)) } })
-    if (authorize) ShizukuRequirementDialog({ authorize = false; revision++ }, ShizukuPermission.checkShizukuActive(context.packageManager))
+    if (authorize) ShizukuRequirementDialog({ authorize = false; revision++ })
     forget?.let { action ->
         AlertDialog(onDismissRequest = { forget = null }, title = { Text(stringResource(R.string.privacy_forget)) },
             text = { Text(stringResource(R.string.privacy_forget_explanation)) }, confirmButton = {

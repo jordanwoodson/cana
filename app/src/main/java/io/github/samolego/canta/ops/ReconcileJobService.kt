@@ -12,15 +12,18 @@ import kotlinx.coroutines.*
 
 /** Keeps the process alive while boot/binder reconciliation finishes its journaled work. */
 class ReconcileJobService : JobService() {
-    private var work: Job? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val work = ReconcileWork(scope)
     override fun onStartJob(params: JobParameters): Boolean {
-        work = CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-            try { CanaServices.getInstance().reconcileNow() }
-            finally { withContext(Dispatchers.Main) { jobFinished(params, false) } }
-        }
+        work.start(params.jobId, execute = {
+            try { withContext(Dispatchers.IO) { CanaServices.getInstance().reconcileNow() } }
+            catch (e: CancellationException) { throw e }
+            catch (e: Exception) { LogUtils.e("ReconcileJob", "Reconciliation failed", e) }
+        }, finished = { jobFinished(params, false) })
         return true
     }
-    override fun onStopJob(params: JobParameters): Boolean { work?.cancel(); return true }
+    override fun onStopJob(params: JobParameters): Boolean { work.stop(params.jobId); return true }
+    override fun onDestroy() { scope.cancel(); super.onDestroy() }
     companion object {
         fun schedule(context: Context) {
             // Settings can clear shell-created metered rules in its own boot receiver.

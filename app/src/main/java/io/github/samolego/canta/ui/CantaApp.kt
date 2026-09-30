@@ -198,8 +198,7 @@ private fun MainContent(
 
     val disableRiskDialog by settingsViewModel.disableRiskDialog.collectAsStateWithLifecycle()
 
-    // Current active dialog
-    var currentDialog by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
+    var showShizukuDialog by rememberSaveable { mutableStateOf(false) }
 
     if (!disableRiskDialog) {
         NoWarrantyDialog(
@@ -210,7 +209,6 @@ private fun MainContent(
         )
     }
 
-    currentDialog?.let { it() }
     PackageActionDialogs(appListViewModel, settingsViewModel)
 
     val pagerState = rememberPagerState(pageCount = { AppsType.entries.size })
@@ -235,6 +233,11 @@ private fun MainContent(
         }
     }
 
+    if (showShizukuDialog) ShizukuRequirementDialog { proceed ->
+        showShizukuDialog = false
+        if (proceed) openProfilesMenu()
+    }
+
     Scaffold(
         topBar = {
             CantaTopBar(
@@ -247,18 +250,7 @@ private fun MainContent(
                     if (ShizukuPermission.isCantaAuthorized()) {
                         openProfilesMenu()
                     } else {
-                        currentDialog = {
-                            ShizukuRequirementDialog(
-                                shizukuStatus =
-                                ShizukuPermission.checkShizukuActive(context.packageManager),
-                                onClose = { proceed ->
-                                    currentDialog = null
-                                    if (proceed) {
-                                        openProfilesMenu()
-                                    }
-                                }
-                            )
-                        }
+                        showShizukuDialog = true
                     }
                 },
                 onProfileSelected = { profile ->

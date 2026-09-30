@@ -13,13 +13,15 @@ data class TrackerScan(
     val apkCount: Int,
     val scannedAt: Long,
     val error: String? = null,
+    val apkIdentity: String = "",
 ) {
-    fun isFor(versionCode: Long): Boolean = this.versionCode == versionCode
+    fun isFor(versionCode: Long, apkIdentity: String): Boolean =
+        this.versionCode == versionCode && (apkIdentity.isNotEmpty() || error != null) && this.apkIdentity == apkIdentity
 }
 
 /** JSON persistence for scan results, tied to the signature set they were computed with. */
 object TrackerScanCache {
-    private const val VERSION = 1
+    private const val VERSION = 2
 
     /** Identifies a signature set; results computed with another set are discarded on load. */
     fun signatureKey(catalog: TrackerCatalog): String {
@@ -35,11 +37,24 @@ object TrackerScanCache {
         return buildMap {
             for (key in scans.keys()) {
                 val item = scans.optJSONObject(key) ?: continue
-                val trackers = item.optJSONArray("trackers") ?: JSONArray()
-                put(key, TrackerScan(key, item.optLong("versionCode"),
-                    (0 until trackers.length()).mapNotNull { trackers.optString(it).takeIf(String::isNotBlank) },
-                    item.optInt("classes"), item.optInt("apks"), item.optLong("scannedAt"),
-                    item.optString("error").takeIf { it.isNotBlank() }))
+                val scan = runCatching {
+                    val trackers = item.getJSONArray("trackers")
+                    val names = (0 until trackers.length()).map { index ->
+                        (trackers.get(index) as? String)?.takeIf { it.isNotBlank() && it.length <= 256 }
+                            ?: error("Invalid tracker name")
+                    }
+                    val version = (item.get("versionCode") as? Number)?.toLong() ?: error("Invalid version")
+                    val classes = item.getInt("classes")
+                    val apks = item.getInt("apks")
+                    val time = item.getLong("scannedAt")
+                    val identity = item.getString("apkIdentity")
+                    val error = if (item.has("error")) item.getString("error").takeIf { it.isNotBlank() } else null
+                    require(version >= 0 && classes >= 0 && apks >= 0 && time > 0)
+                    require(names.size <= 5000 && key.isNotBlank())
+                    require(error != null || (apks > 0 && identity.matches(Regex("[0-9a-f]{64}"))))
+                    TrackerScan(key, version, names, classes, apks, time, error, identity)
+                }.getOrNull() ?: continue
+                put(key, scan)
             }
         }
     }
@@ -48,7 +63,7 @@ object TrackerScanCache {
         val all = JSONObject()
         for (scan in scans.values) {
             all.put(scan.packageName, JSONObject().put("versionCode", scan.versionCode).put("trackers", JSONArray(scan.trackers))
-                .put("classes", scan.classCount).put("apks", scan.apkCount).put("scannedAt", scan.scannedAt)
+                .put("classes", scan.classCount).put("apks", scan.apkCount).put("scannedAt", scan.scannedAt).put("apkIdentity", scan.apkIdentity)
                 .apply { scan.error?.let { put("error", it) } })
         }
         return JSONObject().put("version", VERSION).put("signatures", signatureKey).put("scans", all).toString()

@@ -11,6 +11,7 @@ import java.nio.ByteOrder
 import java.nio.file.Files
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import java.util.concurrent.CancellationException
 
 class DexClassNamesTest {
     private fun uleb(value: Int): ByteArray {
@@ -28,7 +29,7 @@ class DexClassNamesTest {
     /** A minimal DEX: [defined] classes get `class_def` entries, [referenced] ones only type ids. */
     private fun dex(defined: List<String>, referenced: List<String> = emptyList(), version: String = "035"): ByteArray {
         val descriptors = (defined + referenced).map { "L" + it.replace('.', '/') + ";" }
-        val header = 0x70
+        val header = if (version == "041") 0x78 else 0x70
         val stringIdsOff = header
         val typeIdsOff = stringIdsOff + descriptors.size * 4
         val classDefsOff = typeIdsOff + descriptors.size * 4
@@ -44,6 +45,7 @@ class DexClassNamesTest {
         buffer.position(0x20); buffer.putInt(buffer.capacity()); buffer.putInt(header); buffer.putInt(0x12345678)
         buffer.position(0x38); buffer.putInt(descriptors.size); buffer.putInt(stringIdsOff); buffer.putInt(descriptors.size); buffer.putInt(typeIdsOff)
         buffer.position(0x60); buffer.putInt(defined.size); buffer.putInt(classDefsOff); buffer.putInt(data.size()); buffer.putInt(dataOff)
+        if (version == "041") { buffer.position(0x70); buffer.putInt(buffer.capacity()); buffer.putInt(0) }
         buffer.position(stringIdsOff); stringOffsets.forEach { buffer.putInt(it) }
         buffer.position(typeIdsOff); descriptors.indices.forEach { buffer.putInt(it) }
         buffer.position(classDefsOff); defined.indices.forEach { index -> buffer.putInt(index); repeat(7) { buffer.putInt(0) } }
@@ -80,6 +82,67 @@ class DexClassNamesTest {
             }
             assertEquals(listOf("first.dex.One", "first.dex.Also", "second.dex.Two"), DexClassNames.fromApk(apk))
         } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun rejectsOversizedDexInsteadOfReturningPartialApkClasses() {
+        val dir = Files.createTempDirectory("dex-limit").toFile()
+        try {
+            val apk = dir.resolve("base.apk")
+            ZipOutputStream(apk.outputStream()).use { zip ->
+                for (name in listOf("classes.dex", "classes2.dex")) {
+                    zip.putNextEntry(ZipEntry(name)); zip.write(dex(listOf("a.b.C"))); zip.closeEntry()
+                }
+            }
+            // A corrupt/hostile central directory must not turn a missing scan into "no matches".
+            val bytes = apk.readBytes()
+            val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+            val central = bytes.indices.filter { it + 4 <= bytes.size && buffer.getInt(it) == 0x02014b50 }
+            buffer.putInt(central.last() + 24, (DexClassNames.MAX_DEX_BYTES + 1).toInt())
+            apk.writeBytes(bytes)
+            assertThrows(IllegalArgumentException::class.java) { DexClassNames.fromApk(apk) }
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun rejectsEmptyDexAndInvalidHeaderSizes() {
+        assertThrows(IllegalArgumentException::class.java) { DexClassNames.fromDex(byteArrayOf()) }
+        for (field in listOf(0x20, 0x24)) {
+            val bytes = dex(listOf("a.b.C"))
+            ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).putInt(field, 0)
+            assertThrows(IllegalArgumentException::class.java) { DexClassNames.fromDex(bytes) }
+        }
+    }
+
+    @Test fun cancellationStopsBeforeProcessingAllClasses() {
+        val dir = Files.createTempDirectory("dex-cancel").toFile()
+        try {
+            val apk = dir.resolve("base.apk")
+            ZipOutputStream(apk.outputStream()).use { zip ->
+                zip.putNextEntry(ZipEntry("classes.dex"))
+                zip.write(dex((0..1024).map { "a.b.Class$it" })); zip.closeEntry()
+            }
+            var classes = 0
+            assertThrows(CancellationException::class.java) {
+                DexClassNames.forEachClass(apk, checkActive = {
+                    if (classes > 0) throw CancellationException()
+                }) { classes++ }
+            }
+            assertTrue(classes in 1..256)
+        } finally { dir.deleteRecursively() }
+    }
+
+    @Test fun readsVersion41ContainerAndRejectsIncorrectContainerBounds() {
+        val first = dex(listOf("first.Container"), version = "041")
+        val second = dex(listOf("second.Container"), version = "041")
+        val total = first.size + second.size
+        ByteBuffer.wrap(first).order(ByteOrder.LITTLE_ENDIAN).putInt(0x70, total)
+        val buffer = ByteBuffer.wrap(second).order(ByteOrder.LITTLE_ENDIAN)
+        for (field in listOf(0x3C, 0x44, 0x64)) buffer.putInt(field, buffer.getInt(field) + first.size)
+        buffer.putInt(0x78, buffer.getInt(0x78) + first.size) // string_data offset
+        buffer.putInt(0x70, total); buffer.putInt(0x74, first.size)
+        val container = first + second
+        assertEquals(listOf("first.Container", "second.Container"), DexClassNames.fromDex(container))
+        buffer.putInt(0x74, 0)
+        assertThrows(IllegalArgumentException::class.java) { DexClassNames.fromDex(first + second) }
     }
 
     /** Real D8 output: Cana's own debug APK, when a build has produced one. It defines Cana and matches no tracker. */

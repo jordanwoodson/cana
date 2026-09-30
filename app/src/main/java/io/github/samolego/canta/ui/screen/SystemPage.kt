@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -40,7 +41,7 @@ fun SystemPage(onNavigateBack: () -> Unit) {
     var host by remember { mutableStateOf("") }
     var initializedHost by remember { mutableStateOf(false) }
     var confirmPortalOff by remember { mutableStateOf(false) }
-    var connect by remember { mutableStateOf(false) }
+    var connect by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(revision) {
         states.clear(); errors.clear()
         records = services.history.records.first()
@@ -139,7 +140,7 @@ fun SystemPage(onNavigateBack: () -> Unit) {
         text = { Text(stringResource(R.string.system_portal_off_warning)) }, confirmButton = {
             TextButton(onClick = { confirmPortalOff = false; apply(SystemControl.CAPTIVE_PORTAL, SystemPolicy.captivePortal("off")) }) { Text(stringResource(R.string.system_turn_off)) }
         }, dismissButton = { TextButton(onClick = { confirmPortalOff = false }) { Text(stringResource(R.string.cancel)) } })
-    if (connect) ShizukuRequirementDialog({ connect = false; revision++ }, ShizukuPermission.checkShizukuActive(context.packageManager))
+    if (connect) ShizukuRequirementDialog({ connect = false; revision++ })
 }
 
 private fun SystemControl.title(): Int = when (this) {

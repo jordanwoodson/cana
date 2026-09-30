@@ -1,82 +1,64 @@
 package io.github.samolego.canta.util.shizuku
 
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import io.github.samolego.canta.SHIZUKU_PACKAGE_NAME
 import io.github.samolego.canta.packageName
 import io.github.samolego.canta.util.LogUtils
 import rikka.shizuku.Shizuku
 import rikka.sui.Sui
 
-class ShizukuPermission {
-    companion object {
-        private const val SHIZUKU_CODE = 0xCA07A
+/** Process-owned listeners never capture an Activity, dialog or operation callback. */
+object ShizukuPermission {
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val authorization: ShizukuAuthorization = ShizukuAuthorization(::readAuthorization) { code ->
+        Shizuku.requestPermission(code)
+        mainHandler.postDelayed({ authorizationTimeout(code) }, 60_000)
+    }
+    val state = authorization.state
 
-        private val isSui: Boolean = Sui.init(packageName)
-        private val TAG: String = ShizukuPermission::class.java.simpleName
-        private var binderStatus = Shizuku.pingBinder()
-
-        init {
-            Shizuku.addBinderDeadListener { binderStatus = false }
-            Shizuku.addBinderReceivedListener { binderStatus = true }
+    init {
+        runCatching { Sui.init(packageName) }
+        Shizuku.addBinderReceivedListenerSticky { refresh() }
+        Shizuku.addBinderDeadListener { refresh() }
+        Shizuku.addRequestPermissionResultListener { code, result ->
+            authorization.onResult(code, result == PackageManager.PERMISSION_GRANTED)
         }
+    }
 
-        /** Checks if the shizuku permission is granted. Call from main thread only! */
-        fun requestShizukuPermission(onPermissionResult: (Int) -> Unit) {
-            if (!checkRequirements()) {
-                LogUtils.i(
-                        TAG,
-                        "Shizuku permission result: ping: ${Shizuku.pingBinder()}, preV11: ${Shizuku.isPreV11()}"
-                )
-                onPermissionResult(PackageManager.PERMISSION_DENIED)
-            } else if (isPermissionGranted()) {
-                LogUtils.i(
-                        TAG,
-                        "Shizuku permission result: ${Shizuku.checkSelfPermission()}, sui status: $isSui"
-                )
-                onPermissionResult(PackageManager.PERMISSION_GRANTED)
-            } else {
-                LogUtils.i(TAG, "Requesting shizuku permission")
-                Shizuku.addRequestPermissionResultListener { requestCode, grantResult ->
-                    if (requestCode == SHIZUKU_CODE) {
-                        onPermissionResult(grantResult)
-                    }
-                }
-                Shizuku.requestPermission(SHIZUKU_CODE)
-            }
+    private fun authorizationTimeout(code: Int) { authorization.onTimeout(code) }
+
+    /** Call from the main thread; repeated taps reuse the in-flight request. */
+    fun requestShizukuPermission() = authorization.request()
+    fun refresh() = authorization.refresh()
+
+    private fun readAuthorization(): AuthorizationState = try {
+        when {
+            !Shizuku.pingBinder() -> AuthorizationState.DISCONNECTED
+            Shizuku.isPreV11() -> AuthorizationState.UNSUPPORTED
+            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED -> AuthorizationState.GRANTED
+            Shizuku.shouldShowRequestPermissionRationale() -> AuthorizationState.BLOCKED
+            else -> AuthorizationState.READY
         }
+    } catch (e: Exception) {
+        LogUtils.w("ShizukuPermission", "Unable to read authorization: ${e.message}")
+        AuthorizationState.DISCONNECTED
+    }
 
-        private fun checkRequirements(): Boolean {
-            return binderStatus && !Shizuku.isPreV11() && !Shizuku.shouldShowRequestPermissionRationale()
-        }
+    fun isCantaAuthorized(): Boolean = readAuthorization() == AuthorizationState.GRANTED
 
-        private fun isPermissionGranted(): Boolean {
-            return isSui || Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-        }
-
-        fun isCantaAuthorized(): Boolean {
-            return checkRequirements() && isPermissionGranted()
-        }
-
-        fun checkShizukuActive(packageManager: PackageManager): ShizukuStatus {
-            if (isSui) {
-                return ShizukuStatus.ACTIVE
-            }
-            try {
-                packageManager.getPackageInfo(SHIZUKU_PACKAGE_NAME, 0)
-                if (Shizuku.pingBinder() && !Shizuku.isPreV11()) {
-                    return ShizukuStatus.ACTIVE
-                }
-                return ShizukuStatus.NOT_ACTIVE
-            } catch (e: PackageManager.NameNotFoundException) {
-                return ShizukuStatus.NOT_INSTALLED
-            }
+    fun checkShizukuActive(packageManager: PackageManager): ShizukuStatus {
+        // A live binder also covers Sui and compatible managers with another package name.
+        val live = readAuthorization()
+        if (live != AuthorizationState.DISCONNECTED) return ShizukuStatus.ACTIVE
+        return try {
+            packageManager.getPackageInfo(SHIZUKU_PACKAGE_NAME, 0)
+            ShizukuStatus.NOT_ACTIVE
+        } catch (_: PackageManager.NameNotFoundException) {
+            ShizukuStatus.NOT_INSTALLED
         }
     }
 }
 
-/** Enum class to represent Shizuku status. */
-enum class ShizukuStatus {
-    ACTIVE,
-    NOT_ACTIVE,
-    NOT_INSTALLED,
-}
+enum class ShizukuStatus { ACTIVE, NOT_ACTIVE, NOT_INSTALLED }

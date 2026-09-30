@@ -37,11 +37,11 @@ jobs:
       - name: 📝🔐 Create keystore.properties file
         env:
           KEYSTORE_PROPERTIES_PATH: ${{ github.workspace }}/key.properties
-        run: |
-          echo "storeFile=${{ github.workspace }}/android-keystore.jks" > $KEYSTORE_PROPERTIES_PATH
-          echo "keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}" >> $KEYSTORE_PROPERTIES_PATH
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> $KEYSTORE_PROPERTIES_PATH
-          echo "keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}" >> $KEYSTORE_PROPERTIES_PATH
+          KEYSTORE_FILE: ${{ github.workspace }}/android-keystore.jks
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: python3 scripts/write-signing-properties.py
 
       - name: 🤖📦 Create Android release
         run: |

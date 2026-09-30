@@ -43,9 +43,11 @@ class CanaServices private constructor(context: Context) {
         HistoryArchive(File(appContext.noBackupFilesDir, "history-archive")), installationId = installationId)
     val packageOps = PackageOps(context.applicationContext, history, safety, shell)
     val selfGrants = SelfGrants(context.applicationContext, shell, history)
-    val trackers = TrackerRepository(context.applicationContext)
+    val trackers: TrackerRepository = TrackerRepository(context.applicationContext, onSourceChanged = {
+        scope.launch { trackerScans.invalidate() }
+    })
     val components = ComponentRepository(trackers)
-    val trackerScans = TrackerScanRepository(appContext, scope, trackers)
+    val trackerScans = TrackerScanRepository(appContext, scope, trackers::load)
     val desiredPrivacy = PrivacyStore(context.applicationContext.privacyDataStore)
     val journal = OperationJournal(context.applicationContext, history)
     val privacy = PrivacyOps(context.applicationContext, shell, history, desiredPrivacy, safety, journal)

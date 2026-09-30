@@ -336,61 +336,63 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             return@withContext OperationResult(false, context.getString(R.string.recovery_pending_review), outcomeUnknown = true)
         }
         val id = UUID.randomUUID().toString()
-        var before: PackageInfo? = null
-        var previousState = "{}"
-        var preflightError: Throwable? = null
-        try {
-            require(userId >= 0 && packageName.isNotBlank())
-            if (action != "reinstall") check(packageName !in safety.alwaysProtected) {
-                context.getString(R.string.safety_protected, packageName)
-            }
-            check(Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                context.getString(R.string.operation_shizuku_unavailable)
-            }
-            before = getPackageInfo(packageName, userId)
-            previousState = snapshotter(before, userId)
-        } catch (e: Exception) { preflightError = e }
-        try {
-            val intended = intendedState.ifBlank { when (action) {
-                "uninstall", "uninstall_keep_data" -> "{\"installed\":false}"
-                "reinstall" -> "{\"installed\":true}"
-                "remove_updates" -> "{\"installed\":false,\"updatedSystemApp\":false}"
-                "enable" -> "{\"enabledSetting\":1}"
-                "disable" -> "{\"enabledSetting\":3}"
-                "suspend" -> "{\"suspended\":true}"
-                "unsuspend" -> "{\"suspended\":false}"
-                else -> ""
-            } }
-            history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
-                .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
-                .setAction(action).setPreviousState(previousState).setUndoOf(undoOf).setIntendedState(intended).build())
-        } catch (e: Exception) {
-            LogUtils.e("PackageOps", "Cannot persist operation before mutation", e)
-            return@withContext OperationResult(false, context.getString(R.string.operation_history_failed))
-        }
-        // Once a mutation starts, finish verification/journaling even if the caller leaves the screen.
-        withContext(NonCancellable) {
-            val outcome = try {
-                preflightError?.let { throw it }
-                operation(before)
-            } catch (e: Exception) {
-                LogUtils.e("PackageOps", "$action failed for $packageName user=$userId", e.cause ?: e)
-                OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
-            }
-            val after = runCatching { snapshotter(getPackageInfo(packageName, userId), userId) }.getOrNull()
-            val result = packageOutcome(previousState, after, outcome, context.getString(R.string.operation_state_unavailable))
-            val changed = result.changed
+        history.withActiveOperation(id) {
+            var before: PackageInfo? = null
+            var previousState = "{}"
+            var preflightError: Throwable? = null
             try {
-                if (result.outcomeUnknown) history.markPending(id, context.getString(R.string.recovery_pending_review),
-                    after ?: "{}", changed, result.installerRequestId)
-                else history.complete(id, result.success, result.message, after ?: "{}", changed, result.freedBytes, result.recoveryComplete)
+                require(userId >= 0 && packageName.isNotBlank())
+                if (action != "reinstall") check(packageName !in safety.alwaysProtected) {
+                    context.getString(R.string.safety_protected, packageName)
+                }
+                check(Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                    context.getString(R.string.operation_shizuku_unavailable)
+                }
+                before = getPackageInfo(packageName, userId)
+                previousState = snapshotter(before, userId)
+            } catch (e: Exception) { preflightError = e }
+            try {
+                val intended = intendedState.ifBlank { when (action) {
+                    "uninstall", "uninstall_keep_data" -> "{\"installed\":false}"
+                    "reinstall" -> "{\"installed\":true}"
+                    "remove_updates" -> "{\"installed\":false,\"updatedSystemApp\":false}"
+                    "enable" -> "{\"enabledSetting\":1}"
+                    "disable" -> "{\"enabledSetting\":3}"
+                    "suspend" -> "{\"suspended\":true}"
+                    "unsuspend" -> "{\"suspended\":false}"
+                    else -> ""
+                } }
+                history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
+                    .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
+                    .setAction(action).setPreviousState(previousState).setUndoOf(undoOf).setIntendedState(intended).build())
             } catch (e: Exception) {
-                LogUtils.e("PackageOps", "Cannot persist result; operation remains pending", e)
-                return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
+                LogUtils.e("PackageOps", "Cannot persist operation before mutation", e)
+                return@withActiveOperation OperationResult(false, context.getString(R.string.operation_history_failed))
             }
-            if (result.success) LogUtils.i("PackageOps", "$action verified: $packageName user=$userId")
-            else LogUtils.e("PackageOps", "$action failed: ${result.message}")
-            result
+            // Once a mutation starts, finish verification/journaling even if the caller leaves the screen.
+            withContext(NonCancellable) {
+                val outcome = try {
+                    preflightError?.let { throw it }
+                    operation(before)
+                } catch (e: Exception) {
+                    LogUtils.e("PackageOps", "$action failed for $packageName user=$userId", e.cause ?: e)
+                    OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed))
+                }
+                val after = runCatching { snapshotter(getPackageInfo(packageName, userId), userId) }.getOrNull()
+                val result = packageOutcome(previousState, after, outcome, context.getString(R.string.operation_state_unavailable))
+                val changed = result.changed
+                try {
+                    if (result.outcomeUnknown) history.markPending(id, context.getString(R.string.recovery_pending_review),
+                        after ?: "{}", changed, result.installerRequestId)
+                    else history.complete(id, result.success, result.message, after ?: "{}", changed, result.freedBytes, result.recoveryComplete)
+                } catch (e: Exception) {
+                    LogUtils.e("PackageOps", "Cannot persist result; operation remains pending", e)
+                    return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
+                }
+                if (result.success) LogUtils.i("PackageOps", "$action verified: $packageName user=$userId")
+                else LogUtils.e("PackageOps", "$action failed: ${result.message}")
+                result
+            }
         }
     } }
 

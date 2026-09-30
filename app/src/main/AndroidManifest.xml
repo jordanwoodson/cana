@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <queries>
-        <package android:name="rikka.shizuku" />
+        <package android:name="moe.shizuku.privileged.api" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.BROWSABLE" />

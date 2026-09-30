@@ -21,34 +21,36 @@ class OperationJournal(private val context: Context, private val history: Histor
         mutate: suspend (JSONObject) -> OperationResult,
     ): OperationResult = withContext(Dispatchers.IO) { mutex.withLock {
         val id = UUID.randomUUID().toString()
-        var previous = JSONObject()
-        var error: Exception? = null
-        try { previous = SnapshotState.version(snapshot()) } catch (e: Exception) { error = e }
-        try {
-            history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
-                .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
-                .setAction(action).setPreviousState(previous.toString()).setUndoOf(undoOf).build())
-        } catch (e: Exception) {
-            LogUtils.e("OperationJournal", "Cannot persist intent", e)
-            return@withContext OperationResult(false, context.getString(R.string.operation_history_failed))
-        }
-        withContext(NonCancellable) {
-            LogUtils.i("OperationJournal", "$action $packageName user=$userId batch=$batchId")
-            val result = try { error?.let { throw it }; mutate(previous) }
-            catch (e: Exception) { OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed)) }
-            val after = runCatching { SnapshotState.version(snapshot()) }.getOrNull()
-            // Unknown post-state is a failure with an outstanding recovery obligation.
-            val changed = previous.length() > 0 && (after == null || !SnapshotState.equal(previous, after))
-            val verified = if (after == null && result.success) result.copy(success = false,
-                message = context.getString(R.string.operation_not_applied)) else result
-            try { history.complete(id, verified.success, verified.message, after?.toString() ?: "{}", changed) }
-            catch (e: Exception) {
-                LogUtils.e("OperationJournal", "Result remains pending", e)
-                return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
+        history.withActiveOperation(id) {
+            var previous = JSONObject()
+            var error: Exception? = null
+            try { previous = SnapshotState.version(snapshot()) } catch (e: Exception) { error = e }
+            try {
+                history.append(OperationRecord.newBuilder().setId(id).setBatchId(batchId)
+                    .setTimestampMs(System.currentTimeMillis()).setUserId(userId).setPackageName(packageName)
+                    .setAction(action).setPreviousState(previous.toString()).setUndoOf(undoOf).build())
+            } catch (e: Exception) {
+                LogUtils.e("OperationJournal", "Cannot persist intent", e)
+                return@withActiveOperation OperationResult(false, context.getString(R.string.operation_history_failed))
             }
-            if (verified.success) LogUtils.i("OperationJournal", "$action verified")
-            else LogUtils.e("OperationJournal", "$action failed: ${verified.message}")
-            verified.copy(changed = changed)
+            withContext(NonCancellable) {
+                LogUtils.i("OperationJournal", "$action $packageName user=$userId batch=$batchId")
+                val result = try { error?.let { throw it }; mutate(previous) }
+                catch (e: Exception) { OperationResult(false, (e.cause ?: e).message ?: context.getString(R.string.operation_failed)) }
+                val after = runCatching { SnapshotState.version(snapshot()) }.getOrNull()
+                // Unknown post-state is a failure with an outstanding recovery obligation.
+                val changed = previous.length() > 0 && (after == null || !SnapshotState.equal(previous, after))
+                val verified = if (after == null && result.success) result.copy(success = false,
+                    message = context.getString(R.string.operation_not_applied)) else result
+                try { history.complete(id, verified.success, verified.message, after?.toString() ?: "{}", changed) }
+                catch (e: Exception) {
+                    LogUtils.e("OperationJournal", "Result remains pending", e)
+                    return@withContext OperationResult(false, context.getString(R.string.operation_history_failed), changed)
+                }
+                if (verified.success) LogUtils.i("OperationJournal", "$action verified")
+                else LogUtils.e("OperationJournal", "$action failed: ${verified.message}")
+                verified.copy(changed = changed)
+            }
         }
     } }
 }

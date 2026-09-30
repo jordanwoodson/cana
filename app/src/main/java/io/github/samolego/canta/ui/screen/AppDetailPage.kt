@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.text.Html
-import android.text.format.Formatter
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.compose.foundation.layout.*
@@ -73,7 +72,8 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         Text(stringResource(R.string.copy_package_name_to_clipboard))
                     }
                     Text(stringResource(R.string.app_version_details, app.versionName ?: "—", app.versionCode))
-                    Text(stringResource(R.string.app_apk_size, Formatter.formatFileSize(context, app.apkSizeBytes)))
+                    AppSizeSummary(app)
+                    Text(stringResource(R.string.app_apk_size_explanation), style = MaterialTheme.typography.bodySmall)
                     app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }
                     FlowRow {
                         app.removalInfo?.let { RemovalBadge(it) }

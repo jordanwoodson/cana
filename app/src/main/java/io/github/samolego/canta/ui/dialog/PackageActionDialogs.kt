@@ -25,6 +25,7 @@ import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
+import io.github.samolego.canta.util.apps.knownApkTotal
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
@@ -41,7 +42,6 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
         var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
         if (!authorized) {
             ShizukuRequirementDialog(
-                shizukuStatus = ShizukuPermission.checkShizukuActive(context.packageManager),
                 onClose = { if (it) authorized = true else model.pendingAction = null },
             )
         } else {
@@ -183,8 +183,11 @@ internal fun PackageActionConfirmation(
                     }
                     if (checked.orEmpty().any { it.updated }) {
                         Text(stringResource(R.string.update_global_warning))
-                        Text(stringResource(R.string.update_space_estimate,
-                            formatFileSize(context, checked.orEmpty().filter { !cleanup || it.packageName in included }.sumOf { it.reclaimableBytes })))
+                        val selectedUpdateBytes = knownApkTotal(checked.orEmpty()
+                            .filter { it.updated && it.packageName in included }.map { it.sizeBytes })
+                        Text(stringResource(R.string.selected_update_apks, selectedUpdateBytes?.let {
+                            formatFileSize(context, it)
+                        } ?: stringResource(R.string.app_size_unavailable)))
                         if (!cleanup) {
                             Row(Modifier.fillMaxWidth().clickable { reset = !reset }, verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(checked = reset, onCheckedChange = { reset = it })

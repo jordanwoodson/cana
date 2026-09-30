@@ -90,6 +90,8 @@ fun AppTile(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                         ) { Text(appInfo.packageName, modifier = Modifier.weight(9f)) }
 
+                        AppSizeSummary(appInfo)
+
                         FlowRow {
                             if (appInfo.removalInfo != null) {
                                 RemovalBadge(type = appInfo.removalInfo!!)

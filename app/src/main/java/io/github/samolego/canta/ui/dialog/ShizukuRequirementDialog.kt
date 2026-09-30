@@ -1,221 +1,142 @@
 package io.github.samolego.canta.ui.dialog
 
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.provider.Settings
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
 import io.github.samolego.canta.SHIZUKU_PACKAGE_NAME
-import io.github.samolego.canta.ui.theme.GreenOk
-import io.github.samolego.canta.ui.theme.Orange
+import io.github.samolego.canta.util.shizuku.AuthorizationState
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.shizuku.ShizukuStatus
 
-const val SHIZUKU_PLAY_STORE_URL =
-    "https://play.google.com/store/apps/details?id=$SHIZUKU_PACKAGE_NAME"
-const val SHIZUKU_ANDROID_16_URL = "https://github.com/thedjchi/Shizuku/releases"
+private const val SHIZUKU_DOWNLOAD_URL = "https://shizuku.rikka.app/download/"
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShizukuRequirementDialog(
-    onClose: (shouldProceed: Boolean) -> Unit,
-    shizukuStatus: ShizukuStatus,
-) {
+fun ShizukuRequirementDialog(onClose: (shouldProceed: Boolean) -> Unit) {
     val context = LocalContext.current
-    val launchShizuku = {
-        // Try to open Shizuku app
-        val intent =
-            context.packageManager.getLaunchIntentForPackage(SHIZUKU_PACKAGE_NAME)
-        if (intent != null) {
-            context.startActivity(intent)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val authorization by ShizukuPermission.state.collectAsStateWithLifecycle()
+    val latestClose by rememberUpdatedState(onClose)
+    var status by remember { mutableStateOf(ShizukuPermission.checkShizukuActive(context.packageManager)) }
+    var usbDebugging by remember { mutableStateOf(false) }
+    var launchFailed by remember { mutableStateOf(false) }
+
+    DisposableEffect(lifecycleOwner) {
+        fun refresh() {
+            ShizukuPermission.refresh()
+            status = ShizukuPermission.checkShizukuActive(context.packageManager)
+            usbDebugging = runCatching {
+                Settings.Global.getInt(context.contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
+            }.getOrDefault(false)
         }
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) refresh() }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        refresh()
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    LaunchedEffect(authorization) {
+        status = ShizukuPermission.checkShizukuActive(context.packageManager)
+        if (authorization == AuthorizationState.GRANTED) latestClose(true)
     }
 
-    val isUsbDebuggingEnabled = try {
-        Settings.Global.getInt(
-            context.contentResolver,
-            Settings.Global.ADB_ENABLED,
-            0
-        ) == 1
-    } catch (e: Exception) {
-        false
+    fun launch(intent: Intent?) {
+        launchFailed = intent == null || runCatching { context.startActivity(intent) }.isFailure
     }
-
-
-    BasicAlertDialog(
-        modifier =
-        Modifier
-            .fillMaxWidth(0.9f)
-            .background(
-                MaterialTheme.colorScheme.surfaceContainer,
-                MaterialTheme.shapes.large
-            ),
-        properties =
-        DialogProperties(
-            decorFitsSystemWindows = true,
-            usePlatformDefaultWidth = false,
-        ),
-        onDismissRequest = { onClose(false) },
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Title
-            Text(
-                text = stringResource(R.string.shizuku_required),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Description
-            Text(
-                text = stringResource(R.string.shizuku_requirement_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            // Requirements list
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // We want to also prompt
-                // the user to enable USB debugging just
-                // in case, if they'll need to rescue their device with
-                // PC if sth goes wrong (#284)
-                RequirementItem(
-                    text = stringResource(R.string.enable_usb_debugging),
-                    isCompleted = isUsbDebuggingEnabled,
-                    enabled = false,
-                    onActionClick = {
-                        val intent = Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
-                        context.startActivity(intent)
-                    }
-                )
-                // Install Shizuku
-                RequirementItem(
-                    text = stringResource(R.string.install_shizuku),
-                    isCompleted = shizukuStatus != ShizukuStatus.NOT_INSTALLED,
-                    onActionClick =
-                    {
-                        val intent =
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                                    SHIZUKU_ANDROID_16_URL.toUri()
-                                else
-                                    SHIZUKU_PLAY_STORE_URL.toUri()
-                            )
-                        context.startActivity(intent)
-                    }
-                )
-
-                // Start Shizuku service
-                RequirementItem(
-                    text = stringResource(R.string.start_shizuku_service),
-                    isCompleted = shizukuStatus != ShizukuStatus.NOT_INSTALLED && shizukuStatus != ShizukuStatus.NOT_ACTIVE,
-                    onActionClick = launchShizuku,
-                )
-
-                // Authorize Canta
-                RequirementItem(
-                    text = stringResource(R.string.grant_shizuku_permission_to_canta),
-                    isCompleted = shizukuStatus == ShizukuStatus.ACTIVE && ShizukuPermission.isCantaAuthorized(),
-                    onActionClick = {
-                        ShizukuPermission.requestShizukuPermission { permission ->
-                            onClose(permission == PackageManager.PERMISSION_GRANTED)
-                        }
-                    },
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Close button
-            TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onClose(false) },
-            ) { Text(stringResource(R.string.close)) }
-        }
-    }
+    ShizukuRequirementContent(
+        authorization = authorization,
+        status = status,
+        usbDebugging = usbDebugging,
+        launchFailed = launchFailed,
+        onAuthorize = { launchFailed = false; ShizukuPermission.requestShizukuPermission() },
+        onOpenManager = { launch(context.packageManager.getLaunchIntentForPackage(SHIZUKU_PACKAGE_NAME)) },
+        onInstall = { launch(Intent(Intent.ACTION_VIEW, SHIZUKU_DOWNLOAD_URL.toUri())) },
+        onOpenDeveloperSettings = { launch(Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)) },
+        onClose = { latestClose(false) },
+    )
 }
 
 @Composable
-private fun RequirementItem(
-    text: String,
-    isCompleted: Boolean,
-    enabled: Boolean = true,
-    onActionClick: (() -> Unit)? = null
+internal fun ShizukuRequirementContent(
+    authorization: AuthorizationState,
+    status: ShizukuStatus,
+    usbDebugging: Boolean,
+    launchFailed: Boolean = false,
+    onAuthorize: () -> Unit,
+    onOpenManager: () -> Unit,
+    onInstall: () -> Unit,
+    onOpenDeveloperSettings: () -> Unit,
+    onClose: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().alpha(if (enabled) 1.0f else 0.4f),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        // Status indicator dot
-        Icon(
-            imageVector = if (isCompleted) Icons.Default.Check else Icons.Default.Circle,
-            contentDescription = null,
-            tint = if (isCompleted) GreenOk else Orange,
-            modifier = Modifier.size(16.dp)
-        )
-
-        // Requirement text
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color =
-            if (isCompleted) MaterialTheme.colorScheme.onSurfaceVariant
-            else MaterialTheme.colorScheme.onSurface,
-            textDecoration = if (isCompleted) TextDecoration.LineThrough else null,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Action button (only shown if not completed and action is available)
-        if (!isCompleted && onActionClick != null) {
-            IconButton(onClick = onActionClick, modifier = Modifier.size(32.dp)) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.ArrowForward,
-                    contentDescription = "Take action",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
+    val active = authorization !in setOf(AuthorizationState.DISCONNECTED, AuthorizationState.UNSUPPORTED)
+    val waiting = authorization == AuthorizationState.REQUESTING
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.shizuku_required)) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.shizuku_requirement_description))
+                RequirementItem(stringResource(R.string.install_shizuku), status != ShizukuStatus.NOT_INSTALLED,
+                    onActionClick = onInstall)
+                RequirementItem(stringResource(R.string.start_shizuku_service), active,
+                    enabled = status != ShizukuStatus.NOT_INSTALLED, onActionClick = onOpenManager)
+                RequirementItem(stringResource(R.string.grant_shizuku_permission_to_canta), authorization == AuthorizationState.GRANTED,
+                    enabled = active && !waiting && authorization != AuthorizationState.BLOCKED,
+                    onActionClick = onAuthorize)
+                val message = when (authorization) {
+                    AuthorizationState.DISCONNECTED -> R.string.shizuku_connect_service
+                    AuthorizationState.UNSUPPORTED -> R.string.shizuku_update_required
+                    AuthorizationState.REQUESTING -> R.string.shizuku_waiting
+                    AuthorizationState.DENIED -> R.string.shizuku_denied
+                    AuthorizationState.BLOCKED -> R.string.shizuku_blocked
+                    AuthorizationState.ERROR -> R.string.shizuku_request_failed
+                    AuthorizationState.TIMED_OUT -> R.string.shizuku_request_timeout
+                    else -> null
+                }
+                if (waiting) LinearProgressIndicator(Modifier.fillMaxWidth())
+                message?.let { Text(stringResource(it), style = MaterialTheme.typography.bodyMedium) }
+                if (authorization in setOf(AuthorizationState.BLOCKED, AuthorizationState.DENIED,
+                        AuthorizationState.TIMED_OUT, AuthorizationState.ERROR, AuthorizationState.UNSUPPORTED)) {
+                    TextButton(onClick = onOpenManager) { Text(stringResource(R.string.shizuku_open_manager)) }
+                }
+                HorizontalDivider()
+                Text(stringResource(R.string.shizuku_usb_optional), style = MaterialTheme.typography.bodySmall)
+                RequirementItem(stringResource(R.string.enable_usb_debugging), usbDebugging,
+                    onActionClick = onOpenDeveloperSettings)
+                if (launchFailed) Text(stringResource(R.string.shizuku_launch_failed), color = MaterialTheme.colorScheme.error)
             }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.close)) } },
+    )
+}
+
+@Composable
+private fun RequirementItem(text: String, isCompleted: Boolean, enabled: Boolean = true, onActionClick: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Icon(if (isCompleted) Icons.Default.Check else Icons.Default.Circle, contentDescription = null,
+            tint = if (isCompleted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp))
+        Text(text, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+        if (!isCompleted) IconButton(onClick = onActionClick, enabled = enabled, modifier = Modifier.size(48.dp)) {
+            Icon(Icons.AutoMirrored.Default.ArrowForward, contentDescription = text)
         }
     }
 }

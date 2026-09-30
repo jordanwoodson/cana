@@ -3,6 +3,7 @@ package io.github.samolego.canta.util
 import android.content.Context
 import io.github.samolego.canta.data.SettingsStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -13,7 +14,7 @@ import java.security.MessageDigest
 
 data class TrackerCatalog(val signatures: List<TrackerSignature>, val source: String, val error: String? = null)
 
-class TrackerRepository(context: Context, private val fetch: (String) -> JSONObject = { url ->
+class TrackerRepository(context: Context, private val onSourceChanged: () -> Unit = {}, private val fetch: (String) -> JSONObject = { url ->
     checkNotNull(BloatListClient().fetch(url, "").data) { "Server returned no tracker data" }
 }) {
     private val context = context.applicationContext
@@ -33,16 +34,23 @@ class TrackerRepository(context: Context, private val fetch: (String) -> JSONObj
     /** A custom source is opt-in and fetched only when saved/refreshed, never from Exodus by default. */
     suspend fun setSource(input: String) = withContext(Dispatchers.IO) { mutex.withLock {
         val url = input.trim()
-        if (url.isNotEmpty()) {
+        val json = if (url.isNotEmpty()) {
             val json = fetch(url)
             TrackerSignatures.parse(json)
-            val target = cache(url)
-            val temporary = File(target.path + ".tmp")
-            try {
-                temporary.writeText(json.toString())
-                check(temporary.renameTo(target)) { "Cannot save tracker cache" }
-            } finally { temporary.delete() }
+            json
+        } else null
+        // Once the saved source changes, invalidate its scans even if the initiating UI closes.
+        withContext(NonCancellable) {
+            if (json != null) {
+                val target = cache(url)
+                val temporary = File(target.path + ".tmp")
+                try {
+                    temporary.writeText(json.toString())
+                    check(temporary.renameTo(target)) { "Cannot save tracker cache" }
+                } finally { temporary.delete() }
+            }
+            try { settings.setTrackerListUrl(url) }
+            finally { onSourceChanged() }
         }
-        settings.setTrackerListUrl(url)
     } }
 }

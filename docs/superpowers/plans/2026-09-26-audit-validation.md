@@ -59,7 +59,7 @@ The Gradle wrapper changed concurrently from 9.3.1 to 9.8.0 outside this audit w
 
 Emulator acceptance: the isolated UI/lifecycle suite passed **13/13** in 174.959 seconds (`/tmp/cana-final-ui-acceptance.log`). The first privileged fixture run passed 11 of 13; it exposed the app-op parser issue and stale UI result assertion described below. After correction, the focused privacy, preset UI, authentication and component/package recovery run passed **5/5** in 528.919 seconds (`/tmp/cana-final-fixture-normal-runtime.log`). Across those runs, **28 distinct device tests passed**. The final startup regression and screenshot evidence are recorded below.
 
-The build and acceptance logs, plus selected screenshots, are retained in [the evidence folder](../evidence/2026-09-26/).
+The build and acceptance logs, plus selected screenshots, are retained in [the evidence folder](https://github.com/jordanwoodson/cana/tree/a594782/docs/superpowers/evidence/2026-09-26).
 
 ## Limits
 

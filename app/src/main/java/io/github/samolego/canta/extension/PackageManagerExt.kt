@@ -16,7 +16,7 @@ private fun PackageManager.getUninstalledPackages(installedPackages: List<Packag
     // Get uninstalled packages + installed packages
     val uninstalledPackages = getPackages(flags).toSet()
 
-    val installed = installedPackages.map { it.packageName }
+    val installed = installedPackages.mapTo(HashSet()) { it.packageName }
     val minus = uninstalledPackages.filter { !installed.contains(it.packageName) }
 
     // Return only apps that have been uninstalled

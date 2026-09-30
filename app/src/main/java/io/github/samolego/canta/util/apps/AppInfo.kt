@@ -30,6 +30,7 @@ data class AppInfo(
     val firstInstallTime: Long = 0,
     /** Null means unavailable for this profile; zero means no use in Android's retained history. */
     val lastUsed: Long? = null,
+    val apkIdentity: String = "",
 ) : Parcelable {
 
     val name: String
@@ -49,6 +50,8 @@ data class AppInfo(
             otherUser: Boolean = false,
         ): AppInfo {
             val bloatData = bloatList[packageInfo.packageName]
+            val apk = ApkSnapshot.read(packageInfo.applicationInfo?.sourceDir,
+                packageInfo.applicationInfo?.splitSourceDirs?.toList().orEmpty())
 
             val isSystemApp =
                 (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SYSTEM) != 0
@@ -75,14 +78,11 @@ data class AppInfo(
                 bloatData = bloatData,
                 applicationInfo = if (otherUser) packageInfo.applicationInfo else null,
                 isUpdatedSystemApp = packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0,
-                updateSizeBytes = updateApkSize(
-                    packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0,
-                    packageInfo.applicationInfo!!.sourceDir,
-                    packageInfo.applicationInfo!!.splitSourceDirs?.toList().orEmpty(),
-                ),
+                updateSizeBytes = if (packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP != 0 &&
+                    apk?.files?.all { it.path.startsWith("/data/app/") } == true) apk.sizeBytes else 0,
                 isSuspended = packageInfo.applicationInfo!!.flags and ApplicationInfo.FLAG_SUSPENDED != 0,
-                apkSizeBytes = (listOfNotNull(packageInfo.applicationInfo!!.sourceDir) + packageInfo.applicationInfo!!.splitSourceDirs.orEmpty())
-                    .distinct().sumOf { java.io.File(it).length().coerceAtLeast(0) },
+                apkSizeBytes = apk?.sizeBytes ?: 0,
+                apkIdentity = apk?.identity.orEmpty(),
                 firstInstallTime = packageInfo.firstInstallTime,
             )
         }

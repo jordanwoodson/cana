@@ -1,0 +1,38 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuLifecycleUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ShizukuLifecycleUiTest:
+INSTRUMENTATION_STATUS: test=profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuLifecycleUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Shizuku Required' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ShizukuLifecycleUiTest.profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened(ShizukuLifecycleUiTest.kt:26)
+
+INSTRUMENTATION_STATUS: stream=
+Error in profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened(io.github.samolego.canta.ui.ShizukuLifecycleUiTest):
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Shizuku Required' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ShizukuLifecycleUiTest.profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened(ShizukuLifecycleUiTest.kt:26)
+
+INSTRUMENTATION_STATUS: test=profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 44.967
+There was 1 failure:
+1) profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened(io.github.samolego.canta.ui.ShizukuLifecycleUiTest)
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Shizuku Required' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ShizukuLifecycleUiTest.profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened(ShizukuLifecycleUiTest.kt:26)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

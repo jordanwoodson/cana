@@ -83,9 +83,11 @@ fun AppList(
         } else {
             val trackerScans = io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans
             if (appType == AppsType.UNINSTALLED && appListModel.leftoverUpdates.isNotEmpty()) {
+                val updateBytes = io.github.samolego.canta.util.apps.knownApkTotal(appListModel.leftoverUpdates.map { it.updateSizeBytes })
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
-                        android.text.format.Formatter.formatFileSize(context, appListModel.leftoverUpdates.sumOf { it.updateSizeBytes })),
+                    Text(if (updateBytes == null) stringResource(R.string.leftover_updates_size_unavailable, appListModel.leftoverUpdates.size)
+                        else stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
+                            android.text.format.Formatter.formatFileSize(context, updateBytes)),
                         modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                     androidx.compose.material3.TextButton(
                         enabled = !appListModel.isOperating,
@@ -141,8 +143,7 @@ fun AppList(
                                     }
                                 },
                                 onShowDialog = { onOpenDetails(appInfo.packageName, appListModel.selectedUserId) },
-                                trackerCount = trackerScans.results[appInfo.packageName]
-                                        ?.takeIf { it.error == null && it.isFor(appInfo.versionCode) }?.trackers?.size,
+                                trackerCount = trackerScans.count(appInfo),
                         )
                     }
                     item { Spacer(modifier = Modifier.height(64.dp)) }

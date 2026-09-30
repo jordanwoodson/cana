@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.BuildConfig
 import io.github.samolego.canta.R
+import io.github.samolego.canta.util.openWebLink
 import io.github.samolego.canta.ui.component.CanaWordmark
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
@@ -255,8 +256,7 @@ fun SettingsScreen(
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.clickable {
-                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jordanwoodson/cana"))
-                        context.startActivity(browserIntent)
+                        context.openWebLink("https://github.com/jordanwoodson/cana")
                     }
                 )
             }

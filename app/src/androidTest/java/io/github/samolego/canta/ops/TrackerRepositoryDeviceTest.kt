@@ -20,17 +20,25 @@ class TrackerRepositoryDeviceTest {
         val url = "https://example.invalid/cana-test-trackers.json"
         val hash = MessageDigest.getInstance("SHA-256").digest(url.toByteArray()).joinToString("") { "%02x".format(it) }
         val cache = File(context.filesDir, "trackers-$hash.json")
+        var changes = 0
         try {
-            val repository = TrackerRepository(context) { JSONObject("""{"trackers":{"1":{"name":"Test tracker","code_signature":"test.tracker."}}}""") }
+            val repository = TrackerRepository(context, onSourceChanged = {
+                assertTrue(cache.isFile)
+                assertEquals(url, runBlocking { settings.trackerListUrlFlow.first() })
+                changes++
+            }) { JSONObject("""{"trackers":{"1":{"name":"Test tracker","code_signature":"test.tracker."}}}""") }
             repository.setSource(url)
+            assertEquals(1, changes)
             assertEquals(url, settings.trackerListUrlFlow.first())
             val offline = TrackerRepository(context) { error("Network must not be used while loading") }.load()
             assertEquals(url, offline.source)
             assertEquals(listOf("Test tracker"), TrackerSignatures.matches("test.tracker.Service", offline.signatures))
             try {
-                TrackerRepository(context) { JSONObject("{}") }.setSource("https://example.invalid/broken.json")
+                TrackerRepository(context, onSourceChanged = { changes++ }) { JSONObject("{}") }
+                    .setSource("https://example.invalid/broken.json")
                 fail("Invalid source must be rejected")
             } catch (_: IllegalArgumentException) { }
+            assertEquals(1, changes)
             assertEquals(url, settings.trackerListUrlFlow.first())
             cache.writeText("corrupt")
             val fallback = repository.load()

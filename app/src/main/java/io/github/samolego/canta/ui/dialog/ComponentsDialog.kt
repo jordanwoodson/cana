@@ -7,14 +7,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.util.openWebLink
 import io.github.samolego.canta.data.SettingsStore
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
@@ -36,8 +37,7 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     val scope = rememberCoroutineScope()
     var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
     if (!authorized) {
-        ShizukuRequirementDialog({ if (it) authorized = true else onDismiss() },
-            ShizukuPermission.checkShizukuActive(context.packageManager))
+        ShizukuRequirementDialog({ if (it) authorized = true else onDismiss() })
         return
     }
     var catalog by remember { mutableStateOf<ComponentCatalog?>(null) }
@@ -48,7 +48,6 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     var undoReview by remember { mutableStateOf<OperationRecord?>(null) }
     var pending by remember { mutableStateOf<AppComponent?>(null) }
     var sourceDialog by remember { mutableStateOf(false) }
-    val uriHandler = LocalUriHandler.current
     LaunchedEffect(packageName, userId, revision) {
         try { catalog = services.components.load(packageName, userId) }
         catch (e: CancellationException) { throw e }
@@ -86,8 +85,8 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                     Text(stringResource(R.string.tracker_active_source, state.trackers.source), style = MaterialTheme.typography.labelSmall)
                     Text(stringResource(R.string.tracker_attribution), style = MaterialTheme.typography.labelSmall)
                     Row {
-                        TextButton(onClick = { uriHandler.openUri("https://reports.exodus-privacy.eu.org/trackers/") }) { Text("Exodus Privacy") }
-                        TextButton(onClick = { uriHandler.openUri("https://opendatacommons.org/licenses/odbl/1-0/") }) { Text("ODbL 1.0") }
+                        TextButton(onClick = { context.openWebLink("https://reports.exodus-privacy.eu.org/trackers/") }) { Text("Exodus Privacy") }
+                        TextButton(onClick = { context.openWebLink("https://opendatacommons.org/licenses/odbl/1-0/") }) { Text("ODbL 1.0") }
                     }
                     TextButton(onClick = { sourceDialog = true }) { Text(stringResource(R.string.tracker_source)) }
                 }
@@ -153,29 +152,38 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                 }) { Text(stringResource(R.string.ok)) }
             }, dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.cancel)) } })
     }
-    if (sourceDialog) TrackerSourceDialog(onDismiss = { sourceDialog = false }, onSaved = { sourceDialog = false; revision++; services.trackerScans.invalidate() })
+    if (sourceDialog) TrackerSourceDialog(onDismiss = { sourceDialog = false }, onSaved = { sourceDialog = false; revision++ })
 }
 
 @Composable
-private fun TrackerSourceDialog(onDismiss: () -> Unit, onSaved: () -> Unit) {
-    var url by remember { mutableStateOf("") }
+internal fun TrackerSourceDialog(onDismiss: () -> Unit, onSaved: () -> Unit,
+    loadSource: suspend () -> String = { SettingsStore.getInstance().trackerListUrlFlow.first() },
+    saveSource: suspend (String) -> Unit = { CanaServices.getInstance().trackers.setSource(it) },
+) {
+    var url by rememberSaveable { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) { url = SettingsStore.getInstance().trackerListUrlFlow.first() }
+    var loadAttempt by remember { mutableIntStateOf(0) }
+    LaunchedEffect(loadAttempt) {
+        if (url == null) try { url = loadSource(); error = null }
+        catch (e: CancellationException) { throw e }
+        catch (e: Exception) { error = e.message ?: e.toString() }
+    }
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(stringResource(R.string.tracker_source)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(R.string.tracker_source_description))
-                OutlinedTextField(url, { url = it }, enabled = !busy, label = { Text(stringResource(R.string.tracker_url)) })
+                OutlinedTextField(url.orEmpty(), { url = it }, enabled = !busy && url != null, label = { Text(stringResource(R.string.tracker_url)) })
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                if (busy) LinearProgressIndicator()
+                if (busy || url == null && error == null) LinearProgressIndicator()
+                if (url == null && error != null) TextButton(onClick = { loadAttempt++ }) { Text(stringResource(R.string.retry)) }
             }
         },
         confirmButton = {
-            TextButton(enabled = !busy, onClick = { scope.launch {
+            TextButton(enabled = !busy && url != null, onClick = { scope.launch {
                 busy = true
-                try { CanaServices.getInstance().trackers.setSource(url); onSaved() }
+                try { saveSource(requireNotNull(url)); onSaved() }
                 catch (e: CancellationException) { throw e }
                 catch (e: Exception) { error = e.message }
                 finally { busy = false }

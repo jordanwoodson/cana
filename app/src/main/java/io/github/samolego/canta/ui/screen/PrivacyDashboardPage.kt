@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
@@ -38,8 +39,9 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
         .collectAsState(initial = PrivacyDesiredState.getDefaultInstance())
     var connected by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
     var loading by remember { mutableStateOf(true) }
-    var connect by remember { mutableStateOf(false) }
-    var review by remember { mutableStateOf<Pair<String, Int>?>(null) }
+    var connect by rememberSaveable { mutableStateOf(false) }
+    var reviewPackage by rememberSaveable { mutableStateOf<String?>(null) }
+    var reviewUser by rememberSaveable { mutableIntStateOf(0) }
     var forget by remember { mutableStateOf<Pair<NetworkBlock, PrivacyAction>?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
     var diagnostics by remember { mutableStateOf(false) }
@@ -98,7 +100,7 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
                         if (block.status == "needs_review") Text(stringResource(R.string.privacy_review_required), style = MaterialTheme.typography.bodySmall)
                         if (diagnostics && block.statusMessage.isNotBlank()) Text(block.statusMessage, style = MaterialTheme.typography.bodySmall)
                         FlowRow {
-                            TextButton(onClick = { review = block.packageName to block.userId }) { Text(stringResource(R.string.privacy_review)) }
+                            TextButton(onClick = { reviewUser = block.userId; reviewPackage = block.packageName }) { Text(stringResource(R.string.privacy_review)) }
                             TextButton(onClick = { forget = block to action }) { Text(stringResource(R.string.privacy_forget)) }
                         }
                     }
@@ -109,8 +111,8 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
             }
         }
     }
-    if (connect) ShizukuRequirementDialog({ connect = false; revision++ }, ShizukuPermission.checkShizukuActive(context.packageManager))
-    review?.let { (pkg, user) -> PrivacyDialog(pkg, user) { review = null; revision++ } }
+    if (connect) ShizukuRequirementDialog({ connect = false; revision++ })
+    reviewPackage?.let { pkg -> PrivacyDialog(pkg, reviewUser) { reviewPackage = null; revision++ } }
     forget?.let { (block, action) ->
         AlertDialog(onDismissRequest = { forget = null }, title = { Text(stringResource(R.string.privacy_forget)) },
             text = { Column { Text(block.packageName); Text(stringResource(R.string.action_user, block.userId)); Text(stringResource(R.string.privacy_forget_explanation)) } },

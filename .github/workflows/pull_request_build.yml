@@ -51,7 +51,7 @@ jobs:
           target: google_apis
           arch: x86_64
           disable-animations: true
-          script: ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=io.github.samolego.canta.ui.CategoryFilterDeviceTest,io.github.samolego.canta.ui.AppListLoadingDeviceTest,io.github.samolego.canta.ui.PresetImportUiDeviceTest,io.github.samolego.canta.ui.SelectionUxDeviceTest,io.github.samolego.canta.ui.PrivacyDisconnectedUiTest,io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+          script: ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=io.github.samolego.canta.ui.CategoryFilterDeviceTest,io.github.samolego.canta.ui.AppListLoadingDeviceTest,io.github.samolego.canta.ui.PresetImportUiDeviceTest,io.github.samolego.canta.ui.SelectionUxDeviceTest,io.github.samolego.canta.ui.PrivacyDisconnectedUiTest,io.github.samolego.canta.ui.ShizukuAuthorizationUiTest,io.github.samolego.canta.ui.ShizukuLifecycleUiTest,io.github.samolego.canta.ui.AppSizeUiTest,io.github.samolego.canta.ui.TrackerSourceUiTest,io.github.samolego.canta.ops.BatchLifecycleDeviceTest,io.github.samolego.canta.ops.TrackerScanDeviceTest,io.github.samolego.canta.ops.TrackerRepositoryDeviceTest
       - uses: actions/upload-artifact@v4
         if: always()
         with:

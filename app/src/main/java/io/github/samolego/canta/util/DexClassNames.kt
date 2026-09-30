@@ -15,32 +15,61 @@ object DexClassNames {
     private const val ENDIAN_CONSTANT = 0x12345678
     private const val MAX_ITEMS = 1 shl 20
     private const val MAX_DESCRIPTOR = 4096
-    /** Larger entries are skipped rather than loaded into memory on a phone. */
-    const val MAX_DEX_BYTES = 192L * 1024 * 1024
+    /** Reject scans beyond the memory/work budget; never present a partial scan as clean. */
+    const val MAX_DEX_BYTES = 64L * 1024 * 1024
+    private const val MAX_APK_DEX_BYTES = 256L * 1024 * 1024
+    private const val MAX_DEX_ENTRIES = 256
 
-    /** Class names from every `classes*.dex` in [apk]; [onSkipped] reports oversized entries. */
-    fun fromApk(apk: File, onSkipped: (String) -> Unit = {}): List<String> = ZipFile(apk).use { zip ->
-        buildList {
-            for (entry in zip.entries().asSequence().filter { DEX_ENTRY.matches(it.name) }.sortedBy { it.name }) {
-                if (entry.size > MAX_DEX_BYTES) { onSkipped(entry.name); continue }
-                addAll(fromDex(zip.getInputStream(entry).use { it.readBytes() }))
+    fun fromApk(apk: File): List<String> = buildList { forEachClass(apk, onClass = { add(it) }) }
+
+    /** Streams names to the matcher, retaining only one bounded DEX byte array at a time. */
+    fun forEachClass(apk: File, checkActive: () -> Unit = {}, onClass: (String) -> Unit) = ZipFile(apk).use { zip ->
+        var totalBytes = 0L
+        var entries = 0
+        val dexEntries = zip.entries().asSequence().filter { checkActive(); DEX_ENTRY.matches(it.name) }
+            .take(MAX_DEX_ENTRIES + 1).sortedBy { it.name }
+        for (entry in dexEntries) {
+            checkActive()
+            require(++entries <= MAX_DEX_ENTRIES) { "Too many DEX files in ${apk.name}" }
+            require(entry.size in 1..MAX_DEX_BYTES) { "${entry.name} is empty or exceeds the 64 MiB scan limit" }
+            totalBytes += entry.size
+            require(totalBytes <= MAX_APK_DEX_BYTES) { "APK exceeds the 256 MiB DEX scan limit" }
+            val bytes = ByteArray(entry.size.toInt())
+            zip.getInputStream(entry).use { input ->
+                var offset = 0
+                while (offset < bytes.size) {
+                    checkActive()
+                    val read = input.read(bytes, offset, minOf(64 * 1024, bytes.size - offset))
+                    require(read > 0) { "Truncated ${entry.name}" }
+                    offset += read
+                }
+                require(input.read() == -1) { "${entry.name} exceeds its declared size" }
             }
+            parseDex(bytes, checkActive, onClass)
         }
     }
 
     /** Parses one DEX file (versions 035 to 041); a version 041 container yields every embedded file. */
-    fun fromDex(bytes: ByteArray): List<String> {
-        val names = ArrayList<String>()
+    fun fromDex(bytes: ByteArray): List<String> = buildList { parseDex(bytes, {}, { add(it) }) }
+
+    private fun parseDex(bytes: ByteArray, checkActive: () -> Unit, onClass: (String) -> Unit) {
+        require(bytes.isNotEmpty()) { "Empty DEX file" }
         var base = 0
         while (base < bytes.size) {
+            checkActive()
             require(bytes.size - base >= HEADER_SIZE) { "Truncated DEX header" }
             require(bytes[base] == 'd'.code.toByte() && bytes[base + 1] == 'e'.code.toByte() &&
                 bytes[base + 2] == 'x'.code.toByte() && bytes[base + 3] == '\n'.code.toByte() && bytes[base + 7] == 0.toByte()) { "Not a DEX file" }
             val version = String(bytes, base + 4, 3, Charsets.US_ASCII).toIntOrNull() ?: throw IllegalArgumentException("Unknown DEX version")
-            require(version in 35..41) { "Unsupported DEX version $version" }
+            require(version in setOf(35, 37, 38, 39, 40, 41)) { "Unsupported DEX version $version" }
             require(u4(bytes, base + 0x28) == ENDIAN_CONSTANT) { "Big-endian DEX is not supported" }
             val fileSize = u4(bytes, base + 0x20)
-            // Version 041 (Android 15 containers) stores offsets relative to the container; earlier versions to the file.
+            val headerSize = if (version == 41) 0x78 else HEADER_SIZE
+            require(u4(bytes, base + 0x24) == headerSize && fileSize >= headerSize && fileSize <= bytes.size - base) { "Invalid DEX header or file size" }
+            if (version == 41) {
+                require(u4(bytes, base + 0x70) == bytes.size && u4(bytes, base + 0x74) == base) { "Invalid DEX container header" }
+            } else require(base == 0 && fileSize == bytes.size) { "Invalid DEX file size" }
+            // Version 041 offsets are relative to the physical container, not this header.
             val origin = if (version >= 41) 0 else base
             val stringIdsSize = u4(bytes, base + 0x38)
             val stringIdsOff = origin + u4(bytes, base + 0x3C)
@@ -53,20 +82,19 @@ object DexClassNames {
             checkRange(bytes, typeIdsOff, typeIdsSize * 4L)
             checkRange(bytes, classDefsOff, classDefsSize * 32L)
             for (i in 0 until classDefsSize) {
+                if (i % 256 == 0) checkActive()
                 val classIdx = u4(bytes, classDefsOff + i * 32)
                 require(classIdx < typeIdsSize) { "class_idx out of range" }
                 val descriptorIdx = u4(bytes, typeIdsOff + classIdx * 4)
                 require(descriptorIdx < stringIdsSize) { "descriptor_idx out of range" }
                 val descriptor = string(bytes, origin + u4(bytes, stringIdsOff + descriptorIdx * 4))
                 if (descriptor.length > 2 && descriptor[0] == 'L' && descriptor.last() == ';') {
-                    names.add(descriptor.substring(1, descriptor.length - 1).replace('/', '.'))
+                    onClass(descriptor.substring(1, descriptor.length - 1).replace('/', '.'))
                 }
             }
-            if (version < 41 || fileSize <= HEADER_SIZE) break
-            require(fileSize <= bytes.size - base) { "DEX file_size exceeds container" }
+            if (version < 41) break
             base += fileSize
         }
-        return names
     }
 
     private fun u4(bytes: ByteArray, offset: Int): Int {

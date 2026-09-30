@@ -99,7 +99,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                         }
                         TextButton(onClick = { expanded = !expanded }) { Text(stringResource(if (expanded) R.string.close else R.string.review_actions)) }
                         if (expanded) {
-                            group.records.forEach { record -> HistoryRecordContent(record, profiles) }
+                            group.records.forEach { record -> HistoryRecordContent(record, profiles, record.id in historyState.activeOperationIds) }
                             plan?.itemsList?.filter { item -> group.records.none {
                                 it.packageName == item.packageName && it.userId == item.userId && (it.action == item.action || item.action.startsWith("undo_"))
                             } }?.forEach { item ->
@@ -124,12 +124,12 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun HistoryRecordContent(record: OperationRecord, profiles: List<UserProfile>) {
+private fun HistoryRecordContent(record: OperationRecord, profiles: List<UserProfile>, running: Boolean = false) {
     var diagnostics by remember(record.id) { mutableStateOf(false) }
     HorizontalDivider()
     Text(record.packageName.ifBlank { stringResource(R.string.device_wide) }, style = MaterialTheme.typography.titleSmall)
     Text(actionLabel(record.action) + " · " + if (record.action == "system") stringResource(R.string.device_wide) else historyProfile(record.userId, profiles))
-    Text(if (!record.completed) stringResource(R.string.history_pending) else record.resultMessage,
+    Text(if (!record.completed) stringResource(if (running) R.string.batch_running else R.string.history_pending) else record.resultMessage,
         color = if (record.completed && !record.success) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
     if (record.recoveryComplete) Text(stringResource(R.string.history_recovery_complete), style = MaterialTheme.typography.labelMedium)
     if (record.undoOf.isNotBlank()) Text(stringResource(R.string.history_undo_record), style = MaterialTheme.typography.labelMedium)

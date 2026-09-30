@@ -1,0 +1,434 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.CategoryFilterDeviceTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.CategoryFilterDeviceTest:
+INSTRUMENTATION_STATUS: test=allCategoriesAreReachableAndSelectionUpdatesTheMenu
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.CategoryFilterDeviceTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=allCategoriesAreReachableAndSelectionUpdatesTheMenu
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppListLoadingDeviceTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.AppListLoadingDeviceTest:
+INSTRUMENTATION_STATUS: test=cancelledBadgeLoadIsRetriedOnReturn
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppListLoadingDeviceTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=cancelledBadgeLoadIsRetriedOnReturn
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PresetImportUiDeviceTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.PresetImportUiDeviceTest:
+INSTRUMENTATION_STATUS: test=checkingInventoryDisablesConfirmationButAllowsCancel
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PresetImportUiDeviceTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=checkingInventoryDisablesConfirmationButAllowsCancel
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PresetImportUiDeviceTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=cancelPreservesSavedPresetAndUpdatePersistsReviewedContent
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PresetImportUiDeviceTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=cancelPreservesSavedPresetAndUpdatePersistsReviewedContent
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.SelectionUxDeviceTest:
+INSTRUMENTATION_STATUS: test=unavailableUsageFilterDoesNotEraseOtherFilters
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=unavailableUsageFilterDoesNotEraseOtherFilters
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=selectionRemainsReviewableWhenEveryTargetIsHidden
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=selectionRemainsReviewableWhenEveryTargetIsHidden
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=profileScopedCollectionClearsOnSwitchWithoutRetargetingPendingAction
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=profileScopedCollectionClearsOnSwitchWithoutRetargetingPendingAction
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=globalCollectionRemainsAppliedAfterProfileSwitch
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=globalCollectionRemainsAppliedAfterProfileSwitch
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=actionRequestRetainsUnavailableSelectedTargetsForPreflight
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.SelectionUxDeviceTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=actionRequestRetainsUnavailableSelectedTargetsForPreflight
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PrivacyDisconnectedUiTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.PrivacyDisconnectedUiTest:
+INSTRUMENTATION_STATUS: test=disconnectedStateHasOneExplanationAndWorkingConnectAndRetryActions
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.PrivacyDisconnectedUiTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=disconnectedStateHasOneExplanationAndWorkingConnectAndRetryActions
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ShizukuAuthorizationUiTest:
+INSTRUMENTATION_STATUS: test=disconnectedActionsAreDisabledAndInstallationRemainsAvailable
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=disconnectedActionsAreDisabledAndInstallationRemainsAvailable
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=blockedPermissionOffersManagerAndClose
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=blockedPermissionOffersManagerAndClose
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=requestProgressPreventsRepeatTapsAndDenialKeepsSetupOpenForRetry
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuAuthorizationUiTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=requestProgressPreventsRepeatTapsAndDenialKeepsSetupOpenForRetry
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuLifecycleUiTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ShizukuLifecycleUiTest:
+INSTRUMENTATION_STATUS: test=profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ShizukuLifecycleUiTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppSizeUiTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.AppSizeUiTest:
+INSTRUMENTATION_STATUS: test=ordinaryAppRowShowsApkSizeWithoutAnUpdateLine
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppSizeUiTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=ordinaryAppRowShowsApkSizeWithoutAnUpdateLine
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppSizeUiTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=removedUpdatedSystemAppRowShowsUnknownTotalAndKnownUpdate
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.AppSizeUiTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=removedUpdatedSystemAppRowShowsUnknownTotalAndKnownUpdate
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.TrackerSourceUiTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.TrackerSourceUiTest:
+INSTRUMENTATION_STATUS: test=draftSurvivesRecreationWithoutBeingReplacedBySavedSource
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.TrackerSourceUiTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=draftSurvivesRecreationWithoutBeingReplacedBySavedSource
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.TrackerSourceUiTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=cannotOverwriteSourceBeforeItsSavedValueLoads
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.TrackerSourceUiTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (is not enabled)
+Reason: Expected exactly '1' node but could not find any node that satisfies: (SetText is defined)
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertIsNotEnabled(Assertions.kt:67)
+	at io.github.samolego.canta.ui.TrackerSourceUiTest.cannotOverwriteSourceBeforeItsSavedValueLoads(TrackerSourceUiTest.kt:23)
+
+INSTRUMENTATION_STATUS: stream=
+Error in cannotOverwriteSourceBeforeItsSavedValueLoads(io.github.samolego.canta.ui.TrackerSourceUiTest):
+java.lang.AssertionError: Failed to assert the following: (is not enabled)
+Reason: Expected exactly '1' node but could not find any node that satisfies: (SetText is defined)
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertIsNotEnabled(Assertions.kt:67)
+	at io.github.samolego.canta.ui.TrackerSourceUiTest.cannotOverwriteSourceBeforeItsSavedValueLoads(TrackerSourceUiTest.kt:23)
+
+INSTRUMENTATION_STATUS: test=cannotOverwriteSourceBeforeItsSavedValueLoads
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ops.BatchLifecycleDeviceTest:
+INSTRUMENTATION_STATUS: test=reopeningPersistedPlanReportsInterruptionWithoutExecutingIt
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=reopeningPersistedPlanReportsInterruptionWithoutExecutingIt
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=activityRecreationAndObserverCancellationDoNotStopAcceptedBatch
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=activityRecreationAndObserverCancellationDoNotStopAcceptedBatch
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=terminalJournalPublishedBeforePendingItemStillSettlesTheBatch
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.BatchLifecycleDeviceTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=terminalJournalPublishedBeforePendingItemStillSettlesTheBatch
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ops.TrackerScanDeviceTest:
+INSTRUMENTATION_STATUS: test=oldScanCannotPublishAfterSourceInvalidation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=oldScanCannotPublishAfterSourceInvalidation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=sourceChangedDuringLoadRetriesBeforePublishing
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=sourceChangedDuringLoadRetriesBeforePublishing
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=missingSplitFailsAndBatchSummaryDoesNotCountItAsScanned
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=missingSplitFailsAndBatchSummaryDoesNotCountItAsScanned
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=successfulCountsRejectDifferentVersionsAndApkFiles
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=successfulCountsRejectDifferentVersionsAndApkFiles
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=cancelledBatchCannotHideReplacementProgress
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerScanDeviceTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=cancelledBatchCannotHideReplacementProgress
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerRepositoryDeviceTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ops.TrackerRepositoryDeviceTest:
+INSTRUMENTATION_STATUS: test=customSourceIsValidatedBeforeSaveAndSurvivesOfflineReload
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ops.TrackerRepositoryDeviceTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=27
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=customSourceIsValidatedBeforeSaveAndSurvivesOfflineReload
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 223.532
+There was 1 failure:
+1) cannotOverwriteSourceBeforeItsSavedValueLoads(io.github.samolego.canta.ui.TrackerSourceUiTest)
+java.lang.AssertionError: Failed to assert the following: (is not enabled)
+Reason: Expected exactly '1' node but could not find any node that satisfies: (SetText is defined)
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:262)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertIsNotEnabled(Assertions.kt:67)
+	at io.github.samolego.canta.ui.TrackerSourceUiTest.cannotOverwriteSourceBeforeItsSavedValueLoads(TrackerSourceUiTest.kt:23)
+
+FAILURES!!!
+Tests run: 27,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

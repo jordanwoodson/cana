@@ -11,9 +11,13 @@ import io.github.samolego.canta.data.proto.OperationRecord
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -32,7 +36,10 @@ object HistorySerializer : Serializer<OperationHistory> {
 }
 
 data class HistoryReadState(val records: List<OperationRecord> = emptyList(),
-    val quarantinedRecords: List<OperationRecord> = emptyList(), val unavailable: Boolean = false)
+    val quarantinedRecords: List<OperationRecord> = emptyList(), val unavailable: Boolean = false,
+    val activeOperationIds: Set<String> = emptySet()) {
+    val needsRecoveryReview: Boolean get() = records.any { !it.completed && it.id !in activeOperationIds }
+}
 
 class HistoryStore(private val dataStore: DataStore<OperationHistory>, private val archive: HistoryArchive? = null,
     private val completedLimit: Int = 500,
@@ -41,14 +48,33 @@ class HistoryStore(private val dataStore: DataStore<OperationHistory>, private v
     init { require(completedLimit > 0) }
     /** One platform transaction at a time across package, privacy and system journals. */
     val mutationMutex = Mutex()
+    private val presentationMutex = Mutex()
+    private val activeOperations = MutableStateFlow<Set<String>>(emptySet())
+
+    /** Only presentation distinguishes live work; recovery still sees every durable record. */
+    suspend fun <T> withActiveOperation(id: String, block: suspend () -> T): T {
+        presentationMutex.withLock {
+            check(id !in activeOperations.value)
+            activeOperations.value += id
+        }
+        try { return block() }
+        finally { withContext(NonCancellable) {
+            presentationMutex.withLock { activeOperations.value -= id }
+        } }
+    }
     val records = dataStore.data.map {
         if (installationId != null && it.installationId != installationId) emptyList() else it.recordsList.toList()
     }
     val quarantinedRecords = dataStore.data.map { it.quarantinedRecordsList.toList() }
     /** Presentation may show unavailable; privileged callers keep using the throwing records flow. */
-    val state = dataStore.data.map {
-        HistoryReadState(if (installationId != null && it.installationId != installationId) emptyList() else it.recordsList.toList(),
-            it.quarantinedRecordsList.toList())
+    val state = combine(dataStore.data, activeOperations) { _, _ ->
+        presentationMutex.withLock {
+            // Read the latest durable snapshot while ownership is stable. Combining an old
+            // queued snapshot with newly released ownership would briefly report false recovery.
+            val current = dataStore.data.first()
+            HistoryReadState(if (installationId != null && current.installationId != installationId) emptyList() else current.recordsList.toList(),
+                current.quarantinedRecordsList.toList(), activeOperationIds = activeOperations.value)
+        }
     }.catch { emit(HistoryReadState(unavailable = true)) }
 
     suspend fun bindInstallation(id: String) {

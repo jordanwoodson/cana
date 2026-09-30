@@ -1,0 +1,19 @@
+{
+  "distinct_emulator_tests_passed": 27,
+  "jvm_tests_passed": 197,
+  "runs": [
+    {
+      "log": "cana-audit-acceptance-ui-initial.log",
+      "passed": 26,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "log": "cana-audit-tracker-source-ui-final.log",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "note": "The first run found a disabled-field selector mistake; the affected two-test class passes after correcting the selector. Application code did not change between these two runs."
+}

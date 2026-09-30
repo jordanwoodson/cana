@@ -19,16 +19,15 @@ fun BatchProgressBanner(onHistory: () -> Unit) {
     val stored by services.batchStore.state.collectAsStateWithLifecycle(io.github.samolego.canta.data.BatchReadState())
     val batches = stored.batches
     val history by services.history.state.collectAsStateWithLifecycle(io.github.samolego.canta.data.HistoryReadState())
-    val records = history.records
     var stopFailed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val unfinished = batches.any { it.interrupted && !it.reviewAcknowledged }
-    val pending = records.any { !it.completed }
+    val pending = history.needsRecoveryReview
     val current = active
     if (current != null || unfinished || pending || stored.unavailable || history.unavailable) Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
         Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 4.dp)) {
             Text(if (current != null) stringResource(R.string.batch_progress, current.title, current.completed, current.total)
-                else stringResource(if (history.unavailable) R.string.history_store_unavailable else if (stored.unavailable) R.string.batch_store_unavailable else if (pending) R.string.recovery_pending_review else R.string.batch_interrupted), style = MaterialTheme.typography.labelLarge)
+                else stringResource(if (history.unavailable) R.string.history_store_unavailable else if (stored.unavailable) R.string.batch_store_unavailable else if (pending) R.string.history_pending_review else R.string.batch_interrupted), style = MaterialTheme.typography.labelLarge)
             if (current != null) LinearProgressIndicator(progress = { current.completed.toFloat() / current.total }, modifier = Modifier.fillMaxWidth())
             if (stopFailed) Text(stringResource(R.string.batch_stop_failed), color = MaterialTheme.colorScheme.error)
             Row {
