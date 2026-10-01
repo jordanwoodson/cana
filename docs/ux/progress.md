@@ -92,3 +92,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Phase 2 verification gate
 
 - `AppSizeUiTest` **2/2**, `CategoryFilterDeviceTest` **1/1** (`/tmp/cana-ux-phase2-category-device.log`), and `SelectionUxDeviceTest` **5/5** (`/tmp/cana-ux-phase2-selection-device.log`) passed on `emulator-5554`. The latter two were run after the Phase 2 code commits; neither performs package mutations. Main-list and Work screenshots are recorded under Tasks 2.1–2.5. Task 4.1 will complete the scope-chip wording, and the full theme/profile matrix remains for Phase 9.
+
+### Task 3.1 — State-aware action policy
+
+- `450ccef` adds the pure `ActionChoices.forSelection` policy and makes `AppListViewModel.defaultAction` delegate to it. Installed choices depend on mixed enabled/suspended states, with Enable primary for an all-disabled selection and Disable primary when an Expert or Unsafe app is selected. Removed choices use Reinstall as primary and include Remove updates only for an updated system app. The primary is excluded from secondary groups.
+- Five new `SelectionPolicyTest` cases cover mixed states, all disabled, Expert/Unsafe, both removed variants, and empty selection. The new tests failed to compile before the policy existed and then passed **8/8** with the existing selection tests (`/tmp/cana-ux-action-choices-red.log`, `/tmp/cana-ux-action-choices-green.log`). Full `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed **211/211 JVM tests**, both APKs (`/tmp/cana-ux-action-choices-build.log`). No device state changes are involved in this pure policy task.
