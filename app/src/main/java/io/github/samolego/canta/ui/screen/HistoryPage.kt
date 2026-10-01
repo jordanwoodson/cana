@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
-import io.github.samolego.canta.ui.component.IconClickButton
+import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.RestoreExportButton
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -47,8 +47,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
     var result by remember { mutableStateOf<BatchResult?>(null) }
     val last = remember(records) { ManagementPolicy.lastBatch(records) }
     val recovered = remember(records) { records.filter { it.undoOf.isNotEmpty() && it.completed && (it.success || it.recoveryComplete) }.map { it.undoOf }.toSet() }
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.history)) },
-        navigationIcon = { IconClickButton(onClick = onNavigateBack, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back)) },
+    Scaffold(topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.history)) },
         actions = { RestoreExportButton() }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item { Button(enabled = active == null && last.isNotEmpty() && batches.none { !it.completed && it.id == last.firstOrNull()?.batchId }, onClick = { pending = last }) { Text(stringResource(R.string.undo_last_batch)) } }

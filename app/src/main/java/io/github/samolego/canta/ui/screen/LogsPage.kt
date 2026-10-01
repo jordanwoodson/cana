@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.RestoreExportButton
+import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.util.LogUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,20 +50,8 @@ fun LogsPage(onNavigateBack: () -> Unit) {
 
     Scaffold(
             topBar = {
-                TopAppBar(
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        title = { Text(stringResource(R.string.logs)) },
-                        actions = { RestoreExportButton() },
-                        navigationIcon = {
-                            IconClickButton(
-                                onClick = onNavigateBack,
-                                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                            )
-                        }
-                )
+                ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.logs)) },
+                    actions = { RestoreExportButton() })
             },
             floatingActionButton = {
                 FloatingActionButton(

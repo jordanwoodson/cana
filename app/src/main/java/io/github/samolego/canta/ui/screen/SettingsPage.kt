@@ -63,6 +63,8 @@ import io.github.samolego.canta.ui.component.CanaWordmark
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SelfGrantSettings
+import io.github.samolego.canta.ui.component.SectionHeader
+import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.showBiometricPrompt
 
@@ -86,19 +88,7 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                title = { Text(stringResource(R.string.settings)) },
-                navigationIcon = {
-                    IconClickButton(
-                        onClick = onNavigateBack,
-                        icon = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-            )
+            ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.settings)) })
         }
     ) { padding ->
         Column(
@@ -155,6 +145,7 @@ fun SettingsScreen(
                 }
             )
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SectionHeader(stringResource(R.string.settings_appearance))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SettingsItem(
                 title = stringResource(R.string.use_wallpaper_colors),
                 description = stringResource(R.string.use_wallpaper_colors_description),

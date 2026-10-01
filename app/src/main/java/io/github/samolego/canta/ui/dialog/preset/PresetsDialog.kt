@@ -12,14 +12,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ui.component.ChoiceOption
+import io.github.samolego.canta.ui.component.ChoiceRow
 
 @Composable
 fun ImportPresetDialog(
@@ -65,23 +64,14 @@ fun ImportPresetDialog(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                TabRow(
-                    selectedTabIndex = selectedTab.ordinal,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Tab(
-                        selected = selectedTab == Tab.CLIPBOARD,
-                        onClick = { selectedTab = Tab.CLIPBOARD },
-                        text = { Text(stringResource(R.string.clipboard)) },
-                        icon = { Icon(Icons.Default.ContentPaste, contentDescription = stringResource(R.string.clipboard)) }
-                    )
-                    Tab(
-                        selected = selectedTab == Tab.TEXT,
-                        onClick = { selectedTab = Tab.TEXT },
-                        text = { Text(stringResource(R.string.text)) },
-                        icon = { Icon(Icons.Default.Download, contentDescription = stringResource(R.string.text)) }
-                    )
-                }
+                ChoiceRow(
+                    options = listOf(
+                        ChoiceOption(Tab.CLIPBOARD, stringResource(R.string.clipboard), "preset-import-clipboard"),
+                        ChoiceOption(Tab.TEXT, stringResource(R.string.text), "preset-import-text"),
+                    ),
+                    selected = selectedTab,
+                    onSelect = { selectedTab = it },
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 

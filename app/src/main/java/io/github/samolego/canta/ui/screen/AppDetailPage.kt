@@ -48,12 +48,10 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
     val state = services.inventory.state(target.userId)
     val app = state.apps.find { it.packageName == target.packageName }
     LaunchedEffect(target) { if (!state.loaded || state.stale) services.inventory.snapshot(target.userId) }
-    Scaffold(topBar = { TopAppBar(
-        title = { Column {
-            Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium)
-            Text(profileName(target.userId), style = MaterialTheme.typography.labelMedium)
-        } },
-        navigationIcon = { IconClickButton(onClick = onNavigateBack, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back)) },
+    Scaffold(topBar = { ScreenTopBar(
+        onNavigateBack = onNavigateBack,
+        title = { Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium) },
+        subtitle = profileName(target.userId),
     ) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             PrimaryScrollableTabRow(selectedTabIndex = tab, edgePadding = 0.dp) {
@@ -75,7 +73,9 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     }
                     Text(stringResource(R.string.app_version_details, app.versionName ?: "—", app.versionCode))
                     AppSizeSummary(app)
-                    Text(stringResource(R.string.app_apk_size_explanation), style = MaterialTheme.typography.bodySmall)
+                    InfoDisclosure(stringResource(R.string.app_apk_size_details)) {
+                        Text(stringResource(R.string.app_apk_size_explanation), style = MaterialTheme.typography.bodySmall)
+                    }
                     app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }
                     FlowRow {
                         app.removalInfo?.let { RemovalBadge(it) }

@@ -38,6 +38,9 @@
     <string name="selected_unavailable">Selected app is no longer available in this profile</string>
     <string name="inventory_retry">Retry</string>
     <string name="inventory_empty">No apps in this profile.</string>
+    <string name="inventory_empty_title">Nothing here yet</string>
+    <string name="inventory_no_matches_title">No matches</string>
+    <string name="inventory_unavailable_title">Apps unavailable</string>
     <string name="inventory_empty_removed">No removed apps in this profile.</string>
     <string name="inventory_no_matches">No apps match this view.</string>
     <string name="inventory_unavailable">Apps could not be refreshed. Check the connection and profile access, then retry.</string>

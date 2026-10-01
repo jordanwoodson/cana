@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
-import io.github.samolego.canta.ui.component.IconClickButton
+import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import kotlinx.coroutines.CancellationException
@@ -66,9 +66,7 @@ fun SystemPage(onNavigateBack: () -> Unit) {
         busy = true
         scope.launch { try { showResult(services.system.apply(control, values, saver)) } finally { busy = false } }
     }
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.system_controls)) }, navigationIcon = {
-        IconClickButton(onClick = onNavigateBack, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-    }) }) { padding ->
+    Scaffold(topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.system_controls)) }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.system_scope))
             Text(stringResource(R.string.system_permission_description), style = MaterialTheme.typography.bodySmall)

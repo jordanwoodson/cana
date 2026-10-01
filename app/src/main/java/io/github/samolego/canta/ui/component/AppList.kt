@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -84,11 +88,13 @@ fun AppList(
             val trackerScans = io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans
             if (appType == AppsType.UNINSTALLED && appListModel.leftoverUpdates.isNotEmpty()) {
                 val updateBytes = io.github.samolego.canta.util.apps.knownApkTotal(appListModel.leftoverUpdates.map { it.updateSizeBytes })
-                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (updateBytes == null) stringResource(R.string.leftover_updates_size_unavailable, appListModel.leftoverUpdates.size)
-                        else stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
-                            android.text.format.Formatter.formatFileSize(context, updateBytes)),
-                        modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                CanaBanner(
+                    Icons.Default.DeleteSweep,
+                    if (updateBytes == null) stringResource(R.string.leftover_updates_size_unavailable, appListModel.leftoverUpdates.size)
+                    else stringResource(R.string.leftover_updates_banner, appListModel.leftoverUpdates.size,
+                        android.text.format.Formatter.formatFileSize(context, updateBytes)),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                ) {
                     androidx.compose.material3.TextButton(
                         enabled = !appListModel.isOperating,
                         onClick = { appListModel.requestAction(io.github.samolego.canta.ui.viewmodel.PackageAction.REMOVE_UPDATES,
@@ -98,8 +104,8 @@ fun AppList(
             }
             if (appListModel.loadError != null && appListModel.allApps.isNotEmpty()) {
                 val scope = androidx.compose.runtime.rememberCoroutineScope()
-                Column(Modifier.padding(16.dp)) {
-                    Text(stringResource(R.string.inventory_unavailable), color = MaterialTheme.colorScheme.error)
+                CanaBanner(Icons.Default.Warning, stringResource(R.string.inventory_unavailable), StatusTone.ERROR,
+                    modifier = Modifier.padding(horizontal = 16.dp)) {
                     androidx.compose.material3.TextButton(onClick = { scope.launch { appListModel.loadInstalled(context.packageManager, context) } }) {
                         Text(stringResource(R.string.inventory_retry))
                     }
@@ -155,17 +161,22 @@ fun AppList(
                             .fillMaxHeight(),
                         contentAlignment = Alignment.Center
                 ) {
-                    Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        val error = appListModel.loadError
-                        val disconnected = appListModel.selectedUserId != io.github.samolego.canta.util.apps.UserProfile.currentUserId &&
-                            !io.github.samolego.canta.util.shizuku.ShizukuPermission.isCantaAuthorized()
-                        Text(stringResource(when {
+                    val error = appListModel.loadError
+                    val disconnected = appListModel.selectedUserId != io.github.samolego.canta.util.apps.UserProfile.currentUserId &&
+                        !io.github.samolego.canta.util.shizuku.ShizukuPermission.isCantaAuthorized()
+                    val noMatches = appListModel.allApps.any { it.isUninstalled == (appType == AppsType.UNINSTALLED) }
+                    EmptyState(
+                        icon = if (error != null || disconnected) Icons.Default.Warning else Icons.Default.Info,
+                        title = stringResource(if (error != null || disconnected) R.string.inventory_unavailable_title
+                            else if (noMatches) R.string.inventory_no_matches_title else R.string.inventory_empty_title),
+                        body = stringResource(when {
                             disconnected -> R.string.inventory_disconnected
                             error != null -> R.string.inventory_unavailable
-                            appListModel.allApps.any { it.isUninstalled == (appType == AppsType.UNINSTALLED) } -> R.string.inventory_no_matches
+                            noMatches -> R.string.inventory_no_matches
                             appType == AppsType.UNINSTALLED -> R.string.inventory_empty_removed
                             else -> R.string.inventory_empty
-                        }))
+                        }),
+                    ) {
                         if (error != null || disconnected) {
                             val scope = androidx.compose.runtime.rememberCoroutineScope()
                             androidx.compose.material3.TextButton(onClick = { scope.launch { appListModel.loadInstalled(context.packageManager, context) } }) {

@@ -19,7 +19,7 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.data.proto.NetworkBlock
 import io.github.samolego.canta.data.proto.PrivacyDesiredState
 import io.github.samolego.canta.ops.*
-import io.github.samolego.canta.ui.component.IconClickButton
+import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.dialog.*
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
@@ -73,9 +73,7 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
         finally { loading = false }
     }
     val entries = stored.networkBlocksList.map { it to PrivacyAction.NETWORK } + stored.meteredBlocksList.map { it to PrivacyAction.METERED }
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.privacy_dashboard)) }, navigationIcon = {
-        IconClickButton(onClick = onNavigateBack, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-    }) }) { padding ->
+    Scaffold(topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.privacy_dashboard_description))

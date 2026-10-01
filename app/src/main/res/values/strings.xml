@@ -267,6 +267,8 @@
     <string name="app_update_apk_size">System update: %1$s (included)</string>
     <string name="app_size_unavailable">Unavailable</string>
     <string name="app_apk_size_explanation">Size includes the active base and split APK files shared across profiles. System update APKs are included in this total. App data, cache, extracted libraries and the factory image are not included; this is not a prediction of space freed.</string>
+    <string name="app_apk_size_details">About this size</string>
+    <string name="settings_appearance">Appearance</string>
     <string name="last_used_no_record">No use recorded in Android’s retained usage history</string>
     <string name="last_used_date">Last recorded use: %1$s</string>
     <string name="app_suggestions">UAD suggestions: %1$s</string>
