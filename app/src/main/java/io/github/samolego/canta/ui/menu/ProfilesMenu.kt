@@ -46,10 +46,6 @@ fun ProfilesMenu(
                 text = {
                     Column {
                         Text(profile.displayName())
-                        Text(
-                            stringResource(R.string.user_id, profile.id),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
                         if (profile.blocksShell) {
                             Text(
                                 stringResource(R.string.profile_blocks_shell),
