@@ -1,111 +1,103 @@
-name: 📦🚀 Build and publish Android release
+name: 📦🚀 Release
 
+# Every push to master that changes the app publishes a signed APK as a new
+# GitHub release, which Obtainium picks up as an update. Versions are assigned
+# here: don't bump version_name/version_code or push tags by hand.
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - "3.2.2-cana.*"
+    branches: [master]
+    paths:
+      - "app/**"
+      - "gradle/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+  workflow_dispatch:
+
+# Queue releases so two pushes can't claim the same version number
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
+  contents: write
   id-token: write
-  contents: read
   attestations: write
 
-jobs:
-  deployAndroid:
-    permissions:
-      contents: write
-      id-token: write
-      attestations: write
-    name: 🤖📦🚀 Build & prepare Android release
-    runs-on: ubuntu-latest
+env:
+  # Cana release certificate; Android refuses updates signed with any other key
+  CERT_SHA256: 748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345
 
+jobs:
+  release:
+    runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags and history for the version number and notes
 
       - name: ⚙️ Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          java-version: "21.x"
-          cache: "gradle"
-          distribution: "adopt"
+          java-version: "21"
+          distribution: temurin
+          cache: gradle
 
-      - name: 🔐 Retrieve base64 keystore
-        uses: timheuer/base64-to-file@v1.2
-        with:
-          fileName: "android-keystore.jks"
-          fileDir: "${{ github.workspace }}/"
-          encodedString: ${{ secrets.KEYSTORE_FILE_BASE64 }}
+      - name: 📌 Assign the next version
+        run: |
+          n=$(git tag --list '*-cana.*' | sed 's/.*-cana\.//' | sort -n | tail -1)
+          last_tag=$(git tag --list "*-cana.$n")
+          n=$((n + 1))
+          base=$(sed -n 's/^version_name=\(.*\)-cana\..*/\1/p' app/gradle.properties)
+          test -n "$base"
+          version="$base-cana.$n"
+          code=$((224 + n)) # cana.1 was version code 225
+          sed -i "s/^version_name=.*/version_name=$version/; s/^version_code=.*/version_code=$code/" app/gradle.properties
+          echo "LAST_TAG=$last_tag" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "Releasing $version (version code $code) after $last_tag"
 
-      - name: 📝🔐 Create keystore.properties file
+      - name: 🔐 Set up release signing
         env:
-          KEYSTORE_PROPERTIES_PATH: ${{ github.workspace }}/key.properties
-          KEYSTORE_FILE: ${{ github.workspace }}/android-keystore.jks
+          KEYSTORE_FILE_BASE64: ${{ secrets.KEYSTORE_FILE_BASE64 }}
+          KEYSTORE_FILE: ${{ runner.temp }}/cana-release.jks
           KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-        run: python3 scripts/write-signing-properties.py
-
-      - name: 📌 Extract version_name from gradle.properties
-        id: extract_version
         run: |
-          # read version_name
-          version=$(grep "^version_name=" app/gradle.properties | cut -d'=' -f2)
-          echo "VERSION_NAME=$version" >> $GITHUB_ENV
+          printf '%s' "$KEYSTORE_FILE_BASE64" | base64 -d > "$KEYSTORE_FILE"
+          python3 scripts/write-signing-properties.py
 
-      - name: Check release tag matches the APK version
-        if: github.event_name == 'push'
-        run: test "$GITHUB_REF_NAME" = "$VERSION_NAME"
+      - name: 🤖📦 Test and build
+        run: ./gradlew :app:testDebugUnitTest :app:lintRelease :app:assembleRelease
 
-      - name: 🤖📦 Build Android APKs
-        run: ./gradlew :app:testDebugUnitTest :app:lintDebug :app:lintRelease :app:assembleRelease
-
-      - name: Name the signed APK for Obtainium
-        run: mv app/build/outputs/apk/release/app-release.apk "app/build/outputs/apk/release/cana-v$VERSION_NAME.apk"
-
-      - name: 📝 Generate SHA-256 checksums
+      - name: 🔏 Check the signature and name the APK
+        working-directory: app/build/outputs/apk/release
         run: |
-          cd app/build/outputs/apk/release/
-          sha256sum *.apk > SHA256SUMS.txt
-
-      - name: "Echo SHA-256 sums"
-        run: cat app/build/outputs/apk/release/SHA256SUMS.txt
-
-      - name: 🔧 Setup GitHub CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh config set prompt disabled
+          apksigner="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner"
+          "$apksigner" verify --print-certs app-release.apk | grep -qi "SHA-256 digest: $CERT_SHA256" \
+            || { echo "::error::APK is not signed with the Cana release key"; exit 1; }
+          mv app-release.apk "cana-v$VERSION.apk"
+          sha256sum "cana-v$VERSION.apk" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
 
       - name: 🛡️ Generate artifact attestation
-        id: attest
         uses: actions/attest-build-provenance@v3
         with:
-          subject-path: 'app/build/outputs/apk/release/*.apk'
+          subject-path: app/build/outputs/apk/release/*.apk
 
-      - name: 📦 Publish tagged GitHub release with its assets
-        if: github.event_name == 'push'
+      - name: 🚀 Publish the GitHub release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$VERSION_NAME" \
-            app/build/outputs/apk/release/*.apk \
+          {
+            git log --no-merges --format='- %s' "$LAST_TAG"..HEAD
+            echo
+            echo "Built from $GITHUB_SHA."
+          } > "$RUNNER_TEMP/notes.md"
+          gh release create "$VERSION" \
+            "app/build/outputs/apk/release/cana-v$VERSION.apk" \
             app/build/outputs/apk/release/SHA256SUMS.txt \
-            "${{ steps.attest.outputs.bundle-path }}" \
-            --verify-tag --latest \
-            --title "Cana $VERSION_NAME" \
-            --notes-file "docs/releases/$VERSION_NAME.md"
-
-      - name: 📦 Prepare manual GitHub release draft with its assets
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "$VERSION_NAME" \
-            app/build/outputs/apk/release/*.apk \
-            app/build/outputs/apk/release/SHA256SUMS.txt \
-            "${{ steps.attest.outputs.bundle-path }}" \
-            --draft --target "$GITHUB_SHA" \
-            --title "Cana $VERSION_NAME" \
-            --notes-file "docs/releases/$VERSION_NAME.md"
+            --target "$GITHUB_SHA" --latest \
+            --title "Cana $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md"

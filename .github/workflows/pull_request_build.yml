@@ -2,7 +2,7 @@ name: Android checks
 
 on:
   pull_request:
-    branches: [master, roadmap]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
