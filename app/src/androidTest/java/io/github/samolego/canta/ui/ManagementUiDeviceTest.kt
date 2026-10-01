@@ -5,13 +5,18 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Scaffold
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.dialog.preset.PresetApplyDialog
 import io.github.samolego.canta.ui.menu.FiltersMenu
 import io.github.samolego.canta.ui.screen.HistoryPage
+import io.github.samolego.canta.ui.dialog.PackageActionDialogs
 import io.github.samolego.canta.ui.theme.CantaTheme
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
+import io.github.samolego.canta.ui.viewmodel.PackageAction
+import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
 import io.github.samolego.canta.util.CantaPresetData
 import io.github.samolego.canta.util.LockdownSettings
 import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
@@ -49,6 +54,47 @@ class ManagementUiDeviceTest {
         compose.waitUntil(60_000) { runBlocking { services.packageOps.getPackageInfo(pkg, 10)?.applicationInfo?.enabled == true } }
         assertTrue(services.packageOps.getPackageInfo(pkg, 10)!!.applicationInfo!!.enabled)
         assertTrue(services.packageOps.getPackageInfo(pkg, 0)!!.applicationInfo!!.enabled)
+    }
+    @Test fun successfulWorkDisableCanBeUndoneFromSnackbar() = runBlocking {
+        ready()
+        val app = services.inventory.snapshot(10).apps.first { it.packageName == pkg }
+        assertTrue(services.packageOps.getPackageInfo(pkg, 10)!!.applicationInfo!!.enabled)
+        assertTrue(services.packageOps.getPackageInfo(pkg, 0)!!.applicationInfo!!.enabled)
+        services.profiles.refresh()
+        val model = AppListViewModel { _, _ -> JSONObject() }
+        model.pendingAction = PackageActionRequest(PackageAction.DISABLE, 10, listOf(app))
+        val host = SnackbarHostState()
+        try {
+            compose.setContent { CantaTheme {
+                CanaMessageCollector(services.uiMessages, host)
+                CompositionLocalProvider(LocalCanaSnackbar provides host) {
+                    Scaffold(snackbarHost = { SnackbarHost(host) }) { PackageActionDialogs(model) }
+                }
+            } }
+            compose.waitUntil(60_000) {
+                compose.onAllNodesWithText("Disable").fetchSemanticsNodes().any {
+                    !it.config.contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled)
+                }
+            }
+            compose.onNodeWithText("Disable").performClick()
+            compose.waitUntil(60_000) {
+                compose.onAllNodesWithText("Disabled 1 app").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onNodeWithText("Undo").performClick()
+            compose.waitUntil(30_000) {
+                compose.onAllNodesWithText("Undo").fetchSemanticsNodes().isNotEmpty()
+            }
+            compose.onAllNodesWithText("Undo").onLast().performClick()
+            compose.waitUntil(60_000) {
+                runBlocking { services.packageOps.getPackageInfo(pkg, 10)?.applicationInfo?.enabled == true }
+            }
+            assertTrue(services.packageOps.getPackageInfo(pkg, 0)!!.applicationInfo!!.enabled)
+        } finally {
+            if (services.packageOps.getPackageInfo(pkg, 10)?.applicationInfo?.enabled != true) {
+                assertTrue(services.packageOps.setEnabled(pkg, 10, true).success)
+            }
+        }
+        Unit
     }
     @Test fun allProfileApplyRequiresProfileHintConfirmation() = runBlocking {
         ready()
