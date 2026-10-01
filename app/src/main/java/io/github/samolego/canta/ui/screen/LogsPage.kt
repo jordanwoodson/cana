@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.ScreenTopBar
+import io.github.samolego.canta.ui.component.EmptyState
 import io.github.samolego.canta.util.LogUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +68,11 @@ fun LogsPage(onNavigateBack: () -> Unit) {
                         Modifier.fillMaxSize()
                                 .padding(padding)
                                 .verticalScroll(rememberScrollState())
-        ) { logs.forEach { logEntry -> LogEntryChip(logEntry) } }
+        ) {
+            if (logs.isEmpty()) EmptyState(Icons.Default.Description,
+                stringResource(R.string.logs_empty_title), stringResource(R.string.logs_empty_body))
+            else logs.forEach { logEntry -> LogEntryChip(logEntry) }
+        }
     }
 }
 
@@ -91,7 +97,12 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
                     uiMessages.post(copiedText)
                 }
             ),
-        color = logEntry.level.color.copy(alpha = 0.2f),
+        color = when (logEntry.level) {
+            LogUtils.LogLevel.DEBUG -> MaterialTheme.colorScheme.surfaceVariant
+            LogUtils.LogLevel.INFO -> MaterialTheme.colorScheme.primaryContainer
+            LogUtils.LogLevel.WARNING -> MaterialTheme.colorScheme.tertiaryContainer
+            LogUtils.LogLevel.ERROR -> MaterialTheme.colorScheme.errorContainer
+        },
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {

@@ -199,3 +199,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - The empty state now uses Inventory2. Creating a preset states the exact removed-app count and selected profile, with an expandable app-name/package list; the saved app set matches that preview. Preset cards expose their stored profile kind as a chip.
 - `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed 225/225 JVM tests. Device visual review is pending the Phase 7 gate.
+
+### Task 7.6 — Logs
+
+- Logs remains under Settings → Diagnostics with Copy all in the top bar. Entry backgrounds now come from Material colour scheme containers for Debug, Info, Warning and Error. A blank log shows an empty state. Long-press copy and snackbar feedback are retained.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed 225/225 JVM tests. Device visual review is pending the Phase 7 gate.

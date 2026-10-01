@@ -33,6 +33,8 @@
     <string name="back">Back</string>
     <string name="copy_logs">Copy logs</string>
     <string name="log_copied">Log copied to clipboard</string>
+    <string name="logs_empty_title">No logs yet</string>
+    <string name="logs_empty_body">Diagnostic entries will appear here as you use Cana.</string>
     <plurals name="num_selected_apps">
     <item quantity="one">%d app selected</item>
     <item quantity="other">%d apps selected</item>
