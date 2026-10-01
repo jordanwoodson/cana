@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
@@ -15,6 +16,7 @@ import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.util.CantaPresetData
+import io.github.samolego.canta.ui.menu.profileName
 
 @Composable
 private fun PresetDialog(
@@ -22,6 +24,8 @@ private fun PresetDialog(
     initialName: String,
     initialDescription: String,
     capturePrivacy: Boolean = false,
+    captureApps: List<Pair<String, String>>? = null,
+    captureProfile: String = "",
     profileKind: String? = null,
     busy: Boolean = false,
     onDismiss: () -> Unit,
@@ -32,6 +36,7 @@ private fun PresetDialog(
     var nameError by remember { mutableStateOf(false) }
     var includePrivacy by remember { mutableStateOf(capturePrivacy) }
     var includeProfile by remember { mutableStateOf(profileKind != null) }
+    var showCapturedApps by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -49,6 +54,18 @@ private fun PresetDialog(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                captureApps?.let { apps ->
+                    Text(pluralStringResource(R.plurals.preset_capture_summary, apps.size, apps.size, captureProfile),
+                        style = MaterialTheme.typography.bodyMedium)
+                    TextButton(onClick = { showCapturedApps = !showCapturedApps }) {
+                        Text(stringResource(if (showCapturedApps) R.string.preset_hide_captured else R.string.preset_show_captured))
+                    }
+                    if (showCapturedApps) apps.forEach { (name, pkg) ->
+                        Text(name, style = MaterialTheme.typography.bodySmall)
+                        if (name != pkg) Text(pkg, style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
 
                 OutlinedTextField(
                     value = name,
@@ -114,11 +131,14 @@ fun PresetCreateDialog(
 ) {
     val uiMessages = remember { CanaServices.getInstance().uiMessages }
     val presetSaveErrorText = stringResource(R.string.preset_save_error)
+    val capturedApps = appListViewModel.allApps.filter { it.isUninstalled }
     PresetDialog(
         title = stringResource(R.string.create_preset),
         initialName = "",
         initialDescription = "",
         capturePrivacy = true,
+        captureApps = capturedApps.map { it.name to it.packageName },
+        captureProfile = profileName(appListViewModel.selectedUserId),
         profileKind = appListViewModel.selectedProfile?.kind?.name
             ?: appListViewModel.users.find { it.id == appListViewModel.selectedUserId }?.kind?.name
             ?: "PERSONAL".takeIf { appListViewModel.selectedUserId == 0 },
@@ -130,8 +150,7 @@ fun PresetCreateDialog(
                 description = description,
                 privacyUserId = if (includePrivacy) appListViewModel.selectedUserId else null,
                 profileKind = kind,
-                apps = appListViewModel.allApps.filter { it.isUninstalled }.map { it.packageName }
-                    .toSet(),
+                apps = capturedApps.map { it.packageName }.toSet(),
                 onSuccess = { closeDialog() },
                 onError = {
                     uiMessages.post(presetSaveErrorText)

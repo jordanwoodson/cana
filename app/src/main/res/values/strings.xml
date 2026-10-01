@@ -256,6 +256,12 @@
     <string name="ota_reapply">Remove selected apps</string>
     <string name="preset_remember_profile">Remember profile kind: %1$s</string>
     <string name="preset_profile_hint">Preset profile kind: %1$s</string>
+    <plurals name="preset_capture_summary">
+        <item quantity="one">This preset will include the %1$d app currently removed in %2$s.</item>
+        <item quantity="other">This preset will include the %1$d apps currently removed in %2$s.</item>
+    </plurals>
+    <string name="preset_show_captured">Show included apps</string>
+    <string name="preset_hide_captured">Hide included apps</string>
     <string name="preset_target_users">Apply to users: %1$s</string>
     <string name="preset_all_profiles">Apply to all profiles</string>
     <string name="preset_profile_mismatch">A selected profile differs from this preset’s profile kind. Confirm that these actions are appropriate there.</string>

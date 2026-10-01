@@ -194,3 +194,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - Saved restriction cards resolve app names from each profile inventory, falling back to the package, and show the profile as a subtitle. Restriction type and verification state use status chips; live enforcement has its own line. The existing Review and Forget actions remain. The empty view uses `EmptyState`, and refresh remains in the top bar.
 - `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed 225/225 JVM tests. Device visual review is pending the Phase 7 gate.
+
+### Task 7.5 — Presets
+
+- The empty state now uses Inventory2. Creating a preset states the exact removed-app count and selected profile, with an expandable app-name/package list; the saved app set matches that preview. Preset cards expose their stored profile kind as a chip.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed 225/225 JVM tests. Device visual review is pending the Phase 7 gate.

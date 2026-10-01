@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.ScreenTopBar
+import io.github.samolego.canta.ui.component.StatusChip
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
 import io.github.samolego.canta.ui.dialog.preset.ImportPresetDialog
 import io.github.samolego.canta.ui.dialog.preset.PresetCreateDialog
@@ -245,7 +246,7 @@ private fun EmptyPresetsState(onCreateClick: () -> Unit, onImportClick: () -> Un
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                        imageVector = Icons.Default.Settings,
+                        imageVector = Icons.Default.Inventory2,
                         contentDescription = stringResource(R.string.presets),
                         modifier = Modifier.size(40.dp),
                         tint = MaterialTheme.colorScheme.primary
@@ -326,6 +327,10 @@ private fun PresetCard(
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(top = 4.dp)
                         )
+                    }
+                    preset.profileKind?.let { kind ->
+                        StatusChip(kind.lowercase().replaceFirstChar { it.titlecase() }, Icons.Default.Person,
+                            modifier = Modifier.padding(top = 8.dp))
                     }
 
                     Row(
