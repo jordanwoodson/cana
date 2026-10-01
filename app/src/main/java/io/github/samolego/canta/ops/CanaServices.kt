@@ -31,7 +31,7 @@ class CanaServices private constructor(context: Context) {
     val batchStore = io.github.samolego.canta.data.BatchStore(appContext.batchDataStore)
     val profiles = ProfileDirectory()
     val inventory = InventoryRepository(appContext, scope)
-    val shell = ShellRunner(context.applicationContext)
+    val shell = ShellRunner()
     val safety = SafetyInspector(context.applicationContext, shell)
     // A full package scan per item would compete with the batch itself; scan once at the end.
     val batches = BatchCoordinator(batchStore, scope, BatchMessages(

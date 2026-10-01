@@ -1,11 +1,11 @@
 package io.github.samolego.canta.ops
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.IBinder
 import io.github.samolego.canta.BuildConfig
+import io.github.samolego.canta.packageName
 import io.github.samolego.canta.util.LogUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
@@ -19,8 +19,8 @@ import rikka.shizuku.Shizuku
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class ShellRunner(context: Context) {
-    private val args = Shizuku.UserServiceArgs(ComponentName(context, ShellUserService::class.java))
+class ShellRunner {
+    private val args = Shizuku.UserServiceArgs(ComponentName(packageName, ShellUserService::class.java.name))
         .tag("cana-shell").daemon(false).processNameSuffix("shell")
         .debuggable(BuildConfig.DEBUG).version(BuildConfig.VERSION_CODE)
     private val mutex = Mutex()
