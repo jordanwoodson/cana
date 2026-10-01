@@ -17,9 +17,19 @@ class ShizukuLifecycleUiTest {
     @Test fun profileAuthorizationSurvivesRecreationAndCanBeClosedAndReopened() {
         assumeFalse("Requires an unauthorized app", ShizukuPermission.isCantaAuthorized())
         runBlocking { SettingsStore.getInstance().setDisableRiskDialog(true) }
+        val profile = compose.activity.getString(R.string.switch_profile)
+        compose.waitUntil(30_000) {
+            compose.onAllNodesWithText("Welcome to Cana").fetchSemanticsNodes().isNotEmpty() ||
+                compose.onAllNodesWithContentDescription(profile).fetchSemanticsNodes().isNotEmpty()
+        }
+        if (compose.onAllNodesWithText("Welcome to Cana").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithText("I understand removing system apps can break my device").performClick()
+            compose.onNodeWithText("Continue").performClick()
+            compose.onNodeWithText("Skip for now").performClick()
+        }
+        compose.waitUntil(30_000) { compose.onAllNodesWithContentDescription(profile).fetchSemanticsNodes().isNotEmpty() }
         val title = compose.activity.getString(R.string.shizuku_required)
         val close = compose.activity.getString(R.string.close)
-        val profile = compose.activity.getString(R.string.switch_profile)
         compose.onNodeWithContentDescription(profile).performClick()
         compose.onNodeWithText(title).assertIsDisplayed()
         compose.activityRule.scenario.recreate()

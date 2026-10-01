@@ -1,6 +1,7 @@
 package io.github.samolego.canta.ui.navigation
 
 sealed class Screen(val route: String) {
+    data object Welcome : Screen("welcome")
     data object AppDetail : Screen("app/{userId}/{packageName}") {
         fun path(packageName: String, userId: Int) = "app/$userId/${android.net.Uri.encode(packageName)}"
     }

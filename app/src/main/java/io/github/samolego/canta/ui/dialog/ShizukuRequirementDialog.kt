@@ -84,14 +84,13 @@ internal fun ShizukuRequirementContent(
     onInstall: () -> Unit,
     onOpenDeveloperSettings: () -> Unit,
     onClose: () -> Unit,
+    inline: Boolean = false,
 ) {
     val active = authorization !in setOf(AuthorizationState.DISCONNECTED, AuthorizationState.UNSUPPORTED)
     val waiting = authorization == AuthorizationState.REQUESTING
-    AlertDialog(
-        onDismissRequest = onClose,
-        title = { Text(stringResource(R.string.shizuku_required)) },
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    val checklist: @Composable () -> Unit = {
+            Column(if (inline) Modifier else Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(R.string.shizuku_requirement_description))
                 RequirementItem(stringResource(R.string.install_shizuku), status != ShizukuStatus.NOT_INSTALLED,
                     onActionClick = onInstall)
@@ -122,7 +121,12 @@ internal fun ShizukuRequirementContent(
                     onActionClick = onOpenDeveloperSettings)
                 if (launchFailed) Text(stringResource(R.string.shizuku_launch_failed), color = MaterialTheme.colorScheme.error)
             }
-        },
+    }
+    if (inline) checklist()
+    else AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(stringResource(R.string.shizuku_required)) },
+        text = checklist,
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.close)) } },
     )
 }

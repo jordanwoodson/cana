@@ -56,7 +56,7 @@ import io.github.samolego.canta.extension.showFor
 import io.github.samolego.canta.ui.component.AppList
 import io.github.samolego.canta.ui.component.CantaTopBar
 import io.github.samolego.canta.ui.component.fab.PresetEditFAB
-import io.github.samolego.canta.ui.dialog.NoWarrantyDialog
+import io.github.samolego.canta.data.SettingsStore
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
 import io.github.samolego.canta.ui.dialog.PackageActionDialogs
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
@@ -65,6 +65,7 @@ import io.github.samolego.canta.ui.navigation.Screen
 import io.github.samolego.canta.ui.screen.LogsPage
 import io.github.samolego.canta.ui.screen.PresetsPage
 import io.github.samolego.canta.ui.screen.SettingsScreen
+import io.github.samolego.canta.ui.screen.WelcomePage
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
@@ -75,6 +76,7 @@ import io.github.samolego.canta.ui.theme.LocalCanaColors
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.shizuku.AuthorizationState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 
 
 @Composable
@@ -90,13 +92,29 @@ fun CantaApp(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiMessages = remember { io.github.samolego.canta.ops.CanaServices.getInstance().uiMessages }
+    var onboardingDone by remember { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(Unit) { onboardingDone = SettingsStore.getInstance().disableRiskDialogFlow.first() }
     CanaMessageCollector(uiMessages, snackbarHostState)
     PackageActionDialogs(appListViewModel)
+
+    if (onboardingDone == null) return
 
     CompositionLocalProvider(LocalCanaSnackbar provides snackbarHostState) {
     Column(Modifier.fillMaxSize()) {
     io.github.samolego.canta.ui.component.BatchProgressBanner { navController.navigate(Screen.History.route) { launchSingleTop = true } }
-    NavHost(navController = navController, startDestination = Screen.Main.route, modifier = Modifier.weight(1f)) {
+    NavHost(navController = navController,
+        startDestination = if (onboardingDone == true) Screen.Main.route else Screen.Welcome.route,
+        modifier = Modifier.weight(1f)) {
+        composable(Screen.Welcome.route) {
+            WelcomePage(appListViewModel, closeApp) {
+                SettingsStore.getInstance().setDisableRiskDialog(true)
+                navController.navigate(Screen.Main.route) {
+                    popUpTo(Screen.Welcome.route) { inclusive = true }
+                    launchSingleTop = true
+                }
+                onboardingDone = true
+            }
+        }
         composable(Screen.AppDetail.route) { entry ->
             val target = io.github.samolego.canta.ops.AppTarget(entry.arguments!!.getString("packageName")!!,
                 entry.arguments!!.getString("userId")!!.toInt())
@@ -118,7 +136,6 @@ fun CantaApp(
             val presetSaveError = stringResource(R.string.preset_save_error)
             MainContent(
                 navigateToPage = { navController.navigate(it) },
-                closeApp = closeApp,
                 presetEditMode = presetViewModel.editingPreset != null,
                 onPresetEditFinish = {
                     // Save all the selected apps to the preset
@@ -185,7 +202,6 @@ fun CantaApp(
 private fun MainContent(
     onPresetEditFinish: () -> Unit,
     navigateToPage: (route: String) -> Unit,
-    closeApp: () -> Unit,
     enableSelectAll: Boolean,
     presetEditMode: Boolean,
     appListViewModel: AppListViewModel,
@@ -210,18 +226,7 @@ private fun MainContent(
     // Selected tab
     var selectedAppsType by remember { mutableStateOf(AppsType.INSTALLED) }
 
-    val disableRiskDialog by settingsViewModel.disableRiskDialog.collectAsStateWithLifecycle()
-
     var showShizukuDialog by rememberSaveable { mutableStateOf(false) }
-
-    if (!disableRiskDialog) {
-        NoWarrantyDialog(
-            onProceed = { neverShowAgain ->
-                settingsViewModel.saveDisableRiskDialog(neverShowAgain)
-            },
-            onCancel = { closeApp() }
-        )
-    }
 
 
     val pagerState = rememberPagerState(pageCount = { AppsType.entries.size })
