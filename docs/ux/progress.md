@@ -68,3 +68,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - `385680f` uses a text-only `PrimaryTabRow` and English plural keys. Counts come from the selected profile's complete `allApps` inventory, independent of active filters. The old tab string keys remain. `testDebugUnitTest assembleDebug`: **206/206 JVM tests pass** (`/tmp/cana-ux-tabs-build.log`).
 - At 610×1356 with “Only system” active, Personal showed “Installed · 182” and “Removed · 0”; Work showed “Installed · 167” and “Removed · 15”. The tabs became about 36 px shorter. Screenshots: `ux-review/after/phase2/01-tabs-personal-dark.png`, `18-tabs-work-dark.png`.
+
+### Task 2.3 — Counted selection header
+
+- `60608e9` keeps `SelectionSummary` and its visible-only toggle, but presents a 48 dp row with “N apps” or “X of N selected”. The whole row carries one checkbox role and accessible count label; the child checkbox and text do not repeat it. English plural keys were added; the old `selection_visible` key stays.
+- `testDebugUnitTest assembleDebug`: **206/206 JVM tests pass** (`/tmp/cana-ux-selection-header-build.log`); the small spacing follow-up compiled after restoring its `width` import (`/tmp/cana-ux-selection-header-final.log`). On `emulator-5554`, “Only system” yielded a single “179 apps” accessibility node, selecting one app changed it to “1 of 179 selected”, and tapping the row selected all 179 visible apps without an operation. Screenshot: `ux-review/after/phase2/01-selection-header-partial-dark.png` (before the final 8 dp label spacing).
