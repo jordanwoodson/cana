@@ -1,8 +1,14 @@
 package io.github.samolego.canta.ui.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,15 +30,19 @@ fun SelfGrantSettings() {
     var result by remember { mutableStateOf<String?>(null) }
     var failed by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
-    Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(stringResource(R.string.self_grants_title))
-        Text(stringResource(R.string.self_grant_secure_settings,
-            stringResource(if (status.secureSettings) R.string.grant_allowed else R.string.grant_missing)))
-        Text(stringResource(R.string.self_grant_usage_stats,
-            stringResource(if (status.usageStats) R.string.grant_allowed else R.string.grant_missing)))
-        Text(stringResource(R.string.self_grants_description))
+    Column(Modifier.fillMaxWidth()) {
+        ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_secure)) },
+            trailingContent = { StatusChip(stringResource(if (status.secureSettings) R.string.grant_allowed else R.string.settings_permission_missing),
+                if (status.secureSettings) Icons.Default.CheckCircle else Icons.Default.Warning,
+                if (status.secureSettings) StatusTone.NEUTRAL else StatusTone.WARNING) })
+        ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_usage)) },
+            trailingContent = { StatusChip(stringResource(if (status.usageStats) R.string.grant_allowed else R.string.settings_permission_missing),
+                if (status.usageStats) Icons.Default.CheckCircle else Icons.Default.Warning,
+                if (status.usageStats) StatusTone.NEUTRAL else StatusTone.WARNING) })
+        Text(stringResource(R.string.self_grants_description), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (!status.secureSettings || !status.usageStats) {
-            Button(enabled = !busy, onClick = {
+            Button(modifier = Modifier.padding(horizontal = 16.dp), enabled = !busy, onClick = {
                 scope.launch {
                     busy = true
                     try {

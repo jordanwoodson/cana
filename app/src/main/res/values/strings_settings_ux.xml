@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_safety">Safety</string>
+    <string name="settings_bloat_list">Bloat list</string>
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_diagnostics">Diagnostics</string>
+    <string name="settings_about">About</string>
+    <string name="settings_permission_secure">Secure settings</string>
+    <string name="settings_permission_usage">Usage access</string>
+    <string name="settings_permission_missing">Missing</string>
+</resources>

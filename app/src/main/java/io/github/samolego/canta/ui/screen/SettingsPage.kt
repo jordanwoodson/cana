@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
@@ -57,6 +58,7 @@ import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SelfGrantSettings
 import io.github.samolego.canta.ui.component.SectionHeader
+import io.github.samolego.canta.ui.component.RestoreExportButton
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.util.showBiometricPrompt
@@ -67,6 +69,7 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     settingsViewModel: SettingsViewModel,
     onVersionTap: () -> Unit,
+    onOpenLogs: () -> Unit,
 ) {
     val context = LocalContext.current
     val autoUpdateBloatList by settingsViewModel.autoUpdateBloatList.collectAsStateWithLifecycle()
@@ -89,9 +92,27 @@ fun SettingsScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            SelfGrantSettings()
+            SectionHeader(stringResource(R.string.settings_safety))
+            SettingsItem(
+                title = stringResource(R.string.require_auth_setting),
+                description = stringResource(R.string.require_auth_setting_desc),
+                icon = Icons.Default.Lock,
+                isSwitch = true,
+                checked = authEnabled,
+                onCheckedChange = {
+                    showBiometricPrompt(context = context, onSuccess = { settingsViewModel.saveAuthEnabled(it) })
+                },
+            )
+            SettingsItem(
+                title = stringResource(R.string.allow_unsafe_removal),
+                description = stringResource(R.string.allow_unsafe_removal_description),
+                icon = Icons.Default.Close,
+                isSwitch = true,
+                checked = allowUnsafe,
+                onCheckedChange = settingsViewModel::saveAllowUnsafeUninstalls,
+            )
 
-            // Auto-update bloat list
+            SectionHeader(stringResource(R.string.settings_bloat_list))
             SettingsItem(
                 title = stringResource(R.string.auto_update_bloat_list),
                 description = stringResource(R.string.auto_update_bloat_list_description),
@@ -109,21 +130,14 @@ fun SettingsScreen(
                 icon = Icons.Default.Update,
                 isSwitch = true,
                 checked = unmeteredOnly,
+                enabled = autoUpdateBloatList,
                 onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
             )
-
             SettingsItem(
-                title = stringResource(R.string.require_auth_setting),
-                description = stringResource(R.string.require_auth_setting_desc),
-                icon = Icons.Default.Lock,
-                isSwitch = true,
-                checked = authEnabled,
-                onCheckedChange = {
-                    showBiometricPrompt(
-                        context = context,
-                        onSuccess = { settingsViewModel.saveAuthEnabled(it) },
-                    )
-                }
+                title = stringResource(R.string.bloat_list_url),
+                description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
+                icon = Icons.Default.Link,
+                onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
             )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SectionHeader(stringResource(R.string.settings_appearance))
@@ -136,29 +150,16 @@ fun SettingsScreen(
                 onCheckedChange = settingsViewModel::saveUseDynamicColor,
             )
 
-            HorizontalDivider(modifier = Modifier.padding(16.dp))
+            SectionHeader(stringResource(R.string.settings_permissions))
+            SelfGrantSettings()
 
-            SectionHeader(stringResource(R.string.advanced_settings))
-            SettingsItem(
-                title = stringResource(R.string.allow_unsafe_removal),
-                description = stringResource(R.string.allow_unsafe_removal_description),
-                icon = Icons.Default.Close,
-                isSwitch = true,
-                checked = allowUnsafe,
-                onCheckedChange = settingsViewModel::saveAllowUnsafeUninstalls,
-            )
-            SettingsItem(
-                title = stringResource(R.string.bloat_list_url),
-                description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
-                icon = Icons.Default.Link,
-                onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
-            )
+            SectionHeader(stringResource(R.string.settings_diagnostics))
+            SettingsItem(title = stringResource(R.string.logs), icon = Icons.Default.BugReport,
+                onClick = onOpenLogs)
+            Row(Modifier.padding(horizontal = 8.dp)) { RestoreExportButton() }
 
-            // Spacer to push footer to bottom
-            Spacer(modifier = Modifier.weight(1f))
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
-            // App info footer
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            SectionHeader(stringResource(R.string.settings_about))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
