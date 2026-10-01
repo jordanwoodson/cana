@@ -29,7 +29,7 @@ data class BloatData(
     val suggestions: String? = null,
     /** Which list produced this entry, when the list says so (Cana's debloat server does). */
     val source: String? = null,
-    /** Cana's keep-or-uninstall advice, from the verdict overlay on Cana's own lists. */
+    /** Claude's keep-or-uninstall recommendation, from the verdict overlay on Cana's own lists. */
     val verdict: CanaVerdict? = null,
 ) : Parcelable {
     companion object {
@@ -50,7 +50,7 @@ data class BloatData(
 }
 
 /**
- * Whether Cana advises keeping or uninstalling a package when debloating for privacy and performance.
+ * Whether Claude recommends keeping or uninstalling a package when debloating for privacy and performance.
  * Separate from [RemovalRecommendation], which only says how risky removal is.
  */
 @Parcelize

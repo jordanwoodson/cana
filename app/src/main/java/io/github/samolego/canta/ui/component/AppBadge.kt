@@ -1,6 +1,7 @@
 package io.github.samolego.canta.ui.component
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.DisabledByDefault
 import androidx.compose.material.icons.filled.PauseCircle
@@ -38,11 +39,14 @@ fun TrackerBadge(count: Int) = StatusChip(
     pluralStringResource(R.plurals.tracker_badge, count, count), Icons.Default.TrackChanges,
 )
 
-/** Cana's verdict overlay advises uninstalling this app for privacy or performance. */
+/** Claude's keep-or-uninstall recommendation from the verdict overlay, shown on every app that has one. */
 @Composable
-fun VerdictBadge() = StatusChip(stringResource(R.string.verdict_badge), Icons.Default.DeleteSweep, StatusTone.WARNING)
+fun VerdictBadge(verdict: CanaVerdict) = StatusChip(
+    stringResource(if (verdict.uninstall) R.string.filter_verdict_uninstall else R.string.filter_verdict_keep),
+    Icons.Default.AutoAwesome, if (verdict.uninstall) StatusTone.WARNING else StatusTone.NEUTRAL,
+)
 
-/** Cana's keep-or-uninstall advice, with what uninstalling gains and why. */
+/** Claude's keep-or-uninstall recommendation, with what uninstalling gains and why. */
 @Composable
 fun VerdictCard(verdict: CanaVerdict, modifier: Modifier = Modifier) {
     val gains = verdict.benefits.map { stringResource(if (it == CanaVerdict.PRIVACY) R.string.verdict_privacy else R.string.verdict_performance) }

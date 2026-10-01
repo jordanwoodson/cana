@@ -105,8 +105,8 @@ fun AppTile(
                     Row(Modifier.fillMaxWidth().height(26.dp), verticalAlignment = Alignment.CenterVertically) {
                         Row(Modifier.weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.CenterVertically) {
+                            appInfo.bloatData?.verdict?.let { VerdictBadge(it) }
                             appInfo.removalInfo?.let { RiskChip(it) }
-                            if (!appInfo.isUninstalled && appInfo.bloatData?.verdict?.uninstall == true) VerdictBadge()
                             if (appInfo.isDisabled) DisabledBadge()
                             if (appInfo.isSuspended) SuspendedBadge()
                             if (appInfo.isUninstalled && appInfo.isUpdatedSystemApp) StatusChip(

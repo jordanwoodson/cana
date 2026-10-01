@@ -37,10 +37,10 @@ class Filter(
         /** Apps whose APK code matched at least one tracker signature in a Cana scan. */
         val trackers = Filter("With trackers", { app -> (io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans.count(app) ?: 0) > 0 },
             nameRes = R.string.filter_trackers, id = "privacy_trackers")
-        /** Cana's keep-or-uninstall advice for privacy and performance debloating. */
-        val verdictUninstall = Filter("Cana: uninstall", { it.bloatData?.verdict?.uninstall == true },
+        /** Claude's keep-or-uninstall recommendation for privacy and performance debloating. */
+        val verdictUninstall = Filter("Claude: uninstall", { it.bloatData?.verdict?.uninstall == true },
             nameRes = R.string.filter_verdict_uninstall, id = "verdict_uninstall")
-        val verdictKeep = Filter("Cana: keep", { it.bloatData?.verdict?.uninstall == false },
+        val verdictKeep = Filter("Claude: keep", { it.bloatData?.verdict?.uninstall == false },
             nameRes = R.string.filter_verdict_keep, id = "verdict_keep")
         val unused = Filter("Unused for 90 days", { !it.isUninstalled && io.github.samolego.canta.ops.ManagementPolicy.unused90Days(it.lastUsed, it.firstInstallTime, System.currentTimeMillis()) }, nameRes = R.string.unused_90_days)
 

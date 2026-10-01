@@ -359,12 +359,11 @@
     <string name="tracker_scan_summary">Tracker scan finished: %1$d of %2$d successfully scanned apps contain tracker signatures; %3$d failed</string>
     <string name="filter_trackers">With trackers</string>
     <string name="filter_privacy">Privacy</string>
-    <string name="filter_verdict">Cana verdict</string>
+    <string name="filter_verdict">Claude’s recommendation</string>
     <string name="filter_verdict_uninstall">Uninstall</string>
     <string name="filter_verdict_keep">Keep</string>
-    <string name="verdict_badge">Uninstall</string>
-    <string name="verdict_uninstall_title">Cana recommends uninstalling</string>
-    <string name="verdict_keep_title">Cana recommends keeping</string>
+    <string name="verdict_uninstall_title">Claude recommends uninstalling</string>
+    <string name="verdict_keep_title">Claude recommends keeping</string>
     <string name="verdict_gains">Gains: %1$s</string>
     <string name="verdict_privacy">privacy</string>
     <string name="verdict_performance">performance</string>

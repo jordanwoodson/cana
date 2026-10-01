@@ -112,7 +112,7 @@ class OverlayMergeTest(unittest.TestCase):
         self.assertIn('A newly researched app.', records['com.example.new']['description'])
         self.assertIn('example feature', records['com.example.new']['description'])
         self.assertIn('Test-reviewed audit', records['com.example.new']['description'])
-        self.assertIn('Cana verdict: Uninstall. Dead weight here.', records['com.example.new']['description'])
+        self.assertIn("Claude's recommendation: Uninstall. Dead weight here.", records['com.example.new']['description'])
         self.assertEqual(['https://example.org/app'], records['com.example.new']['web'])
 
 if __name__ == '__main__':
