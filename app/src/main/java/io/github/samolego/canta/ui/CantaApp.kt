@@ -31,6 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -44,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -75,6 +77,8 @@ import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModelFactory
 import io.github.samolego.canta.util.apps.Filter
+import io.github.samolego.canta.util.apps.UserProfile
+import io.github.samolego.canta.ui.theme.LocalCanaColors
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.shizuku.AuthorizationState
 import kotlinx.coroutines.launch
@@ -193,6 +197,15 @@ private fun MainContent(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val profileLoadFailed = stringResource(R.string.profiles_load_failed)
+    val profileKind = appListViewModel.selectedProfile?.kind
+        ?: if (appListViewModel.selectedUserId == 0 && UserProfile.currentUserId == 0) UserProfile.Kind.PERSONAL else UserProfile.Kind.OTHER
+    val headerColor = LocalCanaColors.current.profileTint(profileKind)
+    val headerContentColor = when (profileKind) {
+        UserProfile.Kind.PERSONAL -> MaterialTheme.colorScheme.onPrimaryContainer
+        UserProfile.Kind.WORK -> MaterialTheme.colorScheme.onTertiaryContainer
+        else -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     // Selected tab
     var selectedAppsType by remember { mutableStateOf(AppsType.INSTALLED) }
@@ -247,6 +260,7 @@ private fun MainContent(
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(LocalCanaSnackbar.current) },
         topBar = {
             CantaTopBar(
@@ -268,6 +282,8 @@ private fun MainContent(
                     }
                 },
                 onDismissProfilesMenu = { showProfilesMenu = false },
+                containerColor = headerColor,
+                scrollBehavior = scrollBehavior,
             )
 
             if (showExplainBadgeDialog) {
@@ -292,8 +308,8 @@ private fun MainContent(
             io.github.samolego.canta.ui.component.OtaBanner()
             TabRow(
                 selectedTabIndex = selectedAppsType.ordinal,
-                contentColor = MaterialTheme.colorScheme.primary,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = headerContentColor,
+                containerColor = headerColor,
             ) {
                 AppsType.entries.forEach { currentTab ->
                     Tab(
