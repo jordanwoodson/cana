@@ -35,6 +35,7 @@ foreach ($merged as $id => $entry) {
             fn(array $source): bool => in_array($source['kind'], ['primary', 'community'], true)
                 && preg_match('#^https?://#', $source['url']) === 1), 'url')));
     }
+    if (isset($entry['verdict'])) $record['description'] .= "\nCana verdict: " . $entry['verdict']['action'] . '. ' . $entry['verdict']['reason'];
     if (!empty($entry['source'])) $record['description'] .= "\nList source: " . $entry['source'] . '.';
     // Suggestions in merged UAD files are display names, not ADL category IDs.
     if (!empty($entry['suggestions'])) $record['description'] .= "\nRecorded replacement suggestions: " . $entry['suggestions'] . '.';

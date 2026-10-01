@@ -29,6 +29,8 @@ data class BloatData(
     val suggestions: String? = null,
     /** Which list produced this entry, when the list says so (Cana's debloat server does). */
     val source: String? = null,
+    /** Cana's keep-or-uninstall advice, from the verdict overlay on Cana's own lists. */
+    val verdict: CanaVerdict? = null,
 ) : Parcelable {
     companion object {
         fun fromJson(json: JSONObject): BloatData {
@@ -41,15 +43,45 @@ data class BloatData(
                 labels = json.stringList("labels"),
                 suggestions = (json.opt("suggestions") as? String)?.takeIf { it.isNotBlank() },
                 source = (json.opt("source") as? String)?.takeIf { it.isNotBlank() },
+                verdict = CanaVerdict.fromJson(json.optJSONObject("verdict")),
             )
         }
+    }
+}
 
-        private fun JSONObject.stringList(key: String): List<String> {
-            val array = optJSONArray(key) ?: return emptyList()
-            return (0 until array.length()).mapNotNull {
-                (array.opt(it) as? String)?.takeIf(String::isNotBlank)
+/**
+ * Whether Cana advises keeping or uninstalling a package when debloating for privacy and performance.
+ * Separate from [RemovalRecommendation], which only says how risky removal is.
+ */
+@Parcelize
+data class CanaVerdict(
+    val uninstall: Boolean,
+    /** What uninstalling gains: [PRIVACY] and/or [PERFORMANCE]. */
+    val benefits: List<String> = emptyList(),
+    val reason: String? = null,
+) : Parcelable {
+    companion object {
+        const val PRIVACY = "privacy"
+        const val PERFORMANCE = "performance"
+
+        fun fromJson(json: JSONObject?): CanaVerdict? {
+            val action = json?.opt("action") as? String ?: return null
+            val uninstall = when {
+                action.equals("Uninstall", true) -> true
+                action.equals("Keep", true) -> false
+                else -> return null
             }
+            return CanaVerdict(uninstall,
+                json.stringList("benefits").map { it.lowercase() }.filter { it == PRIVACY || it == PERFORMANCE }.distinct(),
+                (json.opt("reason") as? String)?.takeIf { it.isNotBlank() })
         }
+    }
+}
+
+private fun JSONObject.stringList(key: String): List<String> {
+    val array = optJSONArray(key) ?: return emptyList()
+    return (0 until array.length()).mapNotNull {
+        (array.opt(it) as? String)?.takeIf(String::isNotBlank)
     }
 }
 

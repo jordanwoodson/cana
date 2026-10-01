@@ -57,6 +57,18 @@ class OverlayMergeTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual(overlay, json.loads((self.root / 'result.json').read_text()))
 
+    def test_cana_verdict_is_kept_and_validated(self):
+        verdict = {'action': 'Uninstall', 'benefits': ['privacy'], 'reason': 'Privacy: sends diagnostics.'}
+        result = self.run_merge({'com.example.new': entry(verdict=verdict)})
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(verdict, json.loads((self.root / 'result.json').read_text())['com.example.new']['verdict'])
+        for bad in ({'action': 'Disable', 'benefits': [], 'reason': 'x'}, {'action': 'Keep', 'benefits': ['speed'], 'reason': 'x'},
+                    {'action': 'Keep', 'benefits': [], 'reason': ''}, 'Uninstall'):
+            with self.subTest(verdict=bad):
+                (self.root / 'result.json').write_text('previous validated output')
+                self.assertNotEqual(0, self.run_merge({'com.bad': entry(verdict=bad)}).returncode)
+                self.assertEqual('previous validated output', (self.root / 'result.json').read_text())
+
     def test_later_reviewed_overlay_wins_deterministically(self):
         first = {'android': entry('First review.')}
         second = {'android': entry('Later review.')}
@@ -77,7 +89,8 @@ class OverlayMergeTest(unittest.TestCase):
 
     def test_browser_pages_use_reviewed_ids_labels_and_risks(self):
         reviewed = {'android': entry('Reviewed framework.', list='Aosp', removal='Unsafe'),
-                    'com.example.new': entry('A newly researched app.', list='Misc', removal='Advanced')}
+                    'com.example.new': entry('A newly researched app.', list='Misc', removal='Advanced',
+                                             verdict={'action': 'Uninstall', 'benefits': [], 'reason': 'Dead weight here.'})}
         self.assertEqual(0, self.run_merge(reviewed).returncode)
         review = {'packages': {'com.example.new': {'apk_labels': ['New app'], 'confidence': 'high',
                     'features': ['example feature'], 'sources': [{'url': 'https://example.org/app', 'kind': 'primary'}]}}}
@@ -99,6 +112,7 @@ class OverlayMergeTest(unittest.TestCase):
         self.assertIn('A newly researched app.', records['com.example.new']['description'])
         self.assertIn('example feature', records['com.example.new']['description'])
         self.assertIn('Test-reviewed audit', records['com.example.new']['description'])
+        self.assertIn('Cana verdict: Uninstall. Dead weight here.', records['com.example.new']['description'])
         self.assertEqual(['https://example.org/app'], records['com.example.new']['web'])
 
 if __name__ == '__main__':

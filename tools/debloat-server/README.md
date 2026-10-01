@@ -46,7 +46,10 @@ associated features and removal consequences, with conservative treatment of cor
 unresolved proprietary behavior. Overlay resource targets are documented as feature relationships,
 not automatically inserted as hard dependencies.
 
-- `/motorola_packages.json` is the reviewed overlay consumed by Cana's merged list.
+- `/motorola_packages.json` is the reviewed overlay consumed by Cana's merged list. Its system-package
+  entries carry a `verdict` (`Keep`/`Uninstall`, privacy/performance gains, reason) from
+  `docs/package-audit/2026-10-01/cana_verdicts.json`; `uad_lists.php` validates and keeps it, and the
+  browser pages show it as "Cana verdict".
 - `/motorola_review.json` records sources, confidence, feature links and remaining uncertainties.
 - `/tracker_findings.json` records the versioned static APK class-signature findings and completeness.
 - `/exodus-trackers.json` is the attributed, reverified Exodus catalog, compatible with Cana's custom

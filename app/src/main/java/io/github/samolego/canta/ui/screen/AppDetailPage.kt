@@ -143,11 +143,13 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     }
                     HorizontalDivider()
                     Text(stringResource(R.string.about_this_app), style = MaterialTheme.typography.titleMedium)
+                    app.bloatData?.verdict?.let { VerdictCard(it) }
                     val description = app.description
                     if (description != null) {
                         val color = MaterialTheme.colorScheme.onSurface.toArgb()
                         AndroidView(factory = { TextView(it).apply { setTextIsSelectable(true); movementMethod = LinkMovementMethod.getInstance(); textSize = 16f } },
-                            update = { it.text = Html.fromHtml(description, Html.FROM_HTML_MODE_COMPACT); it.setTextColor(color) },
+                            // List descriptions are plain text with \n between lines, which HTML would collapse
+                            update = { it.text = Html.fromHtml(description.replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT); it.setTextColor(color) },
                             modifier = Modifier.fillMaxWidth())
                     } else Text(stringResource(R.string.no_description_available), style = MaterialTheme.typography.bodyLarge)
                     app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }

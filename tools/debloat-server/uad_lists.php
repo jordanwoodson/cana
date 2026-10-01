@@ -143,8 +143,16 @@ foreach ($overlays as $file) {
             }
         }
         if (isset($item['suggestions']) && !is_string($item['suggestions'])) fail("$file: $id suggestions must be text");
+        // Cana's keep-or-uninstall verdict; Canta and UAD-NG ignore it.
+        if (isset($item['verdict'])) {
+            $verdict = $item['verdict'];
+            if (!is_array($verdict) || !in_array($verdict['action'] ?? null, ['Keep', 'Uninstall'], true)
+                || !is_array($verdict['benefits'] ?? null) || !array_is_list($verdict['benefits'])
+                || array_diff($verdict['benefits'], ['privacy', 'performance'])
+                || !is_string($verdict['reason'] ?? null) || trim($verdict['reason']) === '') fail("$file: $id has an invalid verdict");
+        }
         if (isset($uad[$id])) $replaced++; else $added++;
-        $uad[$id] = array_intersect_key($item, array_flip(['list', 'description', 'source', 'dependencies', 'neededBy', 'labels', 'suggestions']));
+        $uad[$id] = array_intersect_key($item, array_flip(['list', 'description', 'source', 'dependencies', 'neededBy', 'labels', 'suggestions', 'verdict']));
         $uad[$id]['removal'] = $item['removal'];
     }
     note(basename($file) . ": $replaced existing entries reviewed, $added new entries");
