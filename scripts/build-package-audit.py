@@ -137,6 +137,8 @@ def main():
     parser.add_argument('--baseline-packages', type=pathlib.Path, required=True,
                         help='Unmodified bundled snapshot, preserved privately before first publication')
     parser.add_argument('--tracker-catalog', type=pathlib.Path, required=True)
+    parser.add_argument('--verdicts', type=pathlib.Path,
+                        help="Cana's keep-or-uninstall overlay, published as each entry's `verdict`")
     args = parser.parse_args()
     inventory = read(args.evidence / 'inventory.json')
     research = {}
@@ -145,6 +147,8 @@ def main():
         assert not set(batch) & set(research), 'Duplicate research ownership'
         research.update(batch)
     assert set(research) == set(inventory['packages']), 'Research/inventory coverage differs'
+    verdicts = read(args.verdicts) if args.verdicts else {}
+    assert set(verdicts) <= set(research), 'Verdict for a package outside the audit'
     catalog = read(args.tracker_catalog)
     tracker_ids = {tracker['name']: tracker['id'] for tracker in catalog['trackers'].values()}
     packages, reviews, findings, containers = {}, {}, {}, {}
@@ -179,30 +183,27 @@ def main():
                 'matches': [{'tracker_id': tracker_ids[name], 'name': name, **match}
                             for name, match in sorted(apk['tracker_matches'].items())],
             })
+        # The scan's limits are documented once in tracker_findings.json; descriptions only name matches.
         names = facts.get('tracker_names', [])
         if facts['apex']:
             status = 'apex_not_apk_scanned'
-            text = 'Tracker review (2026-10-01): this APEX container is outside the APK DEX scan; '
-            text += 'its compiled/native payload was not fully examined. No tracker-free claim is made.'
         elif not any(apk['dex_files'] for apk in apks):
             status = 'no_dex_in_readable_apks'
-            text = 'Tracker review (2026-10-01): no DEX definitions were present in the inspected APK containers. '
-            text += 'Implementation may be native, compiled elsewhere, or provided by another module; this does not establish absence of tracking.'
         elif names:
             status = 'signature_matches'
-            text = 'Static tracker review (2026-10-01): across the inspected APK variants, Exodus code-signature matches were found for '
-            text += ', '.join(names) + '. These identify possible SDK components, including analytics/crash reporting; '
-            text += 'they do not prove execution, network uploads or data collection. Native code, downloaded code and runtime traffic were not scanned.'
-            text += ' Factory and updated versions can differ; the version/hash-specific findings identify which APK contains each match.'
+            entry['description'] += '\nTrackers (static scan): ' + ', '.join(names) + '.'
         else:
             status = 'no_signature_matches'
-            text = 'Static tracker review (2026-10-01): no Exodus code-signature matches were found in the inspected APK DEX definitions. '
-            text += 'This does not establish absence of tracking; native code, downloaded code and runtime traffic were not scanned.'
-        entry['description'] += '\n\n' + text
         if names:
             entry['labels'] = list(dict.fromkeys(entry['labels'] + ['exodus-signature-match']))
-        if review['confidence'] == 'low':
-            entry['description'] += '\nReview confidence: low. Exact proprietary behavior or consuming features remain unresolved; keep pending further evidence.'
+        if review['confidence'] == 'low' and 'Unverified' not in entry['description']:
+            entry['description'] += '\nUnverified: exact behavior is unconfirmed.'
+        if package in verdicts:
+            verdict = verdicts[package]
+            assert verdict['action'] in ('Keep', 'Uninstall') and verdict['reason'].strip()
+            assert set(verdict['benefits']) <= {'privacy', 'performance'}
+            assert verdict['action'] == 'Keep' or entry['removal'] in ('Recommended', 'Advanced'), package + ': uninstall verdict on a risky package'
+            entry['verdict'] = verdict
         packages[package] = entry
         labels = sorted({match for apk in apks for match in re.findall(r"^application-label:'(.*)'$", apk.get('badging', ''), re.M)})
         display_apks = [apk for apk in apks if apk['device_path'] in facts.get('active_apk_paths', [])] or apks
@@ -236,9 +237,9 @@ def main():
             if library['type'] == 'uses-library' and library.get('name') in library_providers]
         relationships['shared_uid_peers'] = sorted(set().union(*(uid_members[uid] for uid in relationships['shared_user_ids'])) - {package}) if relationships['shared_user_ids'] else []
         if containers[package]:
-            packages[package]['description'] += '\nModule association: Package Manager identifies this APK as part of ' + ', '.join(containers[package]) + '. The module container has a separate reviewed record.'
+            packages[package]['description'] += '\nPart of the ' + ', '.join(containers[package]) + ' module.'
         if relationships['contained_apk_packages']:
-            packages[package]['description'] += '\nSeparate APK records within this module: ' + ', '.join(relationships['contained_apk_packages']) + '. These member APKs were inspected separately; this does not cover the entire APEX payload.'
+            packages[package]['description'] += '\nContains: ' + ', '.join(relationships['contained_apk_packages']) + '.'
     for package, entry in packages.items():
         for dependency in entry['dependencies']:
             assert dependency in packages, package + ': unresolved dependency ' + dependency
@@ -264,6 +265,7 @@ def main():
         'no_dex_package_count': sum(finding['status'] == 'no_dex_in_readable_apks' for finding in findings.values()),
         'removal_counts': dict(collections.Counter(entry['removal'] for entry in packages.values())),
         'confidence_counts': dict(collections.Counter(review['confidence'] for review in reviews.values())),
+        'verdict_counts': dict(collections.Counter(verdict['action'] for verdict in verdicts.values())),
         'low_confidence_packages': [package for package, review in reviews.items() if review['confidence'] == 'low'],
         'bundled_package_count_before': before_count, 'bundled_package_count_after': len(baseline),
         'new_bundled_package_ids': new_ids,
