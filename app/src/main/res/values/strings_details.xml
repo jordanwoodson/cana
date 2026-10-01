@@ -11,6 +11,11 @@
     <string name="open_android_settings">Open in Android settings</string>
     <string name="about_tracker_scanning">About tracker scanning</string>
     <plurals name="detail_tracker_summary"><item quantity="one">%1$d tracker signature in %2$s classes</item><item quantity="other">%1$d tracker signatures in %2$s classes</item></plurals>
+    <plurals name="component_disabled_result"><item quantity="one">Disabled %d component</item><item quantity="other">Disabled %d components</item></plurals>
+    <plurals name="component_enabled_result"><item quantity="one">Enabled %d component</item><item quantity="other">Enabled %d components</item></plurals>
+    <plurals name="component_undo_result"><item quantity="one">Undid %d component change</item><item quantity="other">Undid %d component changes</item></plurals>
+    <string name="component_change_failed">Some component changes failed</string>
+    <string name="component_change_verify">Some component changes need verification</string>
     <string name="app_target_unavailable">This app is unavailable in this profile. Refresh the app list to check its current state.</string>
     <string name="app_settings_unavailable">Android could not open Settings for this profile. Check that the profile is unlocked and Shizuku is connected.</string>
     <string name="app_removed_sections">Restore this app in this profile to inspect its privacy controls and components.</string>

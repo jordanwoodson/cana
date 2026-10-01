@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -24,6 +26,8 @@ import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.ui.screen.UndoBatchDialog
+import io.github.samolego.canta.ui.component.InfoDisclosure
+import io.github.samolego.canta.ui.component.StatusChip
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -46,7 +50,6 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     var message by remember { mutableStateOf<String?>(null) }
     var revision by remember { mutableIntStateOf(0) }
     var busy by remember { mutableStateOf(false) }
-    var lastRecord by remember { mutableStateOf<OperationRecord?>(null) }
     var undoReview by remember { mutableStateOf<OperationRecord?>(null) }
     var pending by remember { mutableStateOf<AppComponent?>(null) }
     var sourceDialog by remember { mutableStateOf(false) }
@@ -57,8 +60,10 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     }
     val content: @Composable () -> Unit = {
             Column(Modifier.heightIn(max = 560.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(packageName, style = MaterialTheme.typography.labelMedium)
-                Text(profileName(userId))
+                if (!embedded) {
+                    Text(packageName, style = MaterialTheme.typography.labelMedium)
+                    Text(profileName(userId))
+                }
                 if (busy || catalog == null) LinearProgressIndicator(Modifier.fillMaxWidth())
                 message?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
                 val state = catalog
@@ -67,33 +72,33 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                     state.trackers.error?.let { Text(stringResource(R.string.tracker_fallback, it), style = MaterialTheme.typography.bodySmall) }
                     LazyColumn(Modifier.heightIn(max = 320.dp)) {
                         items(state.components, key = { it.name.flattenToString() }) { component ->
-                            Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Column(Modifier.weight(1f)) {
-                                    Text(component.name.className, style = MaterialTheme.typography.bodySmall)
-                                    Text(stringResource(when (component.kind) {
+                            ListItem(headlineContent = { Text(component.name.className, style = MaterialTheme.typography.bodyMedium) },
+                                supportingContent = {
+                                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    StatusChip(stringResource(when (component.kind) {
                                         "activity" -> R.string.component_activity
                                         "service" -> R.string.component_service
                                         "receiver" -> R.string.component_receiver
                                         else -> R.string.component_provider
-                                    }), style = MaterialTheme.typography.labelSmall)
+                                    }), Icons.Default.Extension)
                                     if (component.trackers.isNotEmpty()) Text(component.trackers.joinToString(),
                                         color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelSmall)
-                                }
-                                Switch(component.enabled, { pending = component }, enabled = !busy && state.editable && packageName !in services.safety.alwaysProtected)
-                            }
+                                    }
+                                }, trailingContent = {
+                                    Switch(component.enabled, { pending = component }, enabled = !busy && state.editable && packageName !in services.safety.alwaysProtected)
+                                })
                         }
                     }
-                    Text(stringResource(R.string.tracker_match_description), style = MaterialTheme.typography.bodySmall)
-                    Text(stringResource(R.string.tracker_active_source, state.trackers.source), style = MaterialTheme.typography.labelSmall)
-                    Text(stringResource(R.string.tracker_attribution), style = MaterialTheme.typography.labelSmall)
-                    Row {
-                        TextButton(onClick = { context.openWebLink("https://reports.exodus-privacy.eu.org/trackers/") }) { Text("Exodus Privacy") }
-                        TextButton(onClick = { context.openWebLink("https://opendatacommons.org/licenses/odbl/1-0/") }) { Text("ODbL 1.0") }
+                    InfoDisclosure(stringResource(R.string.about_tracker_scanning)) {
+                        Text(stringResource(R.string.tracker_match_description), style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.tracker_active_source, state.trackers.source), style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.tracker_attribution), style = MaterialTheme.typography.labelSmall)
+                        Row {
+                            TextButton(onClick = { context.openWebLink("https://reports.exodus-privacy.eu.org/trackers/") }) { Text("Exodus Privacy") }
+                            TextButton(onClick = { context.openWebLink("https://opendatacommons.org/licenses/odbl/1-0/") }) { Text("ODbL 1.0") }
+                        }
                     }
                     TextButton(onClick = { sourceDialog = true }) { Text(stringResource(R.string.tracker_source)) }
-                }
-                lastRecord?.let { record ->
-                    TextButton(enabled = !busy, onClick = { undoReview = record }) { Text(stringResource(R.string.undo_action)) }
                 }
             }
     }
@@ -101,8 +106,9 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
         title = { Text(stringResource(R.string.components)) }, text = content,
         confirmButton = { TextButton(enabled = !busy, onClick = onDismiss) { Text(stringResource(R.string.close)) } })
     undoReview?.let { record -> UndoBatchDialog(listOf(record), { undoReview = null }) { result ->
-        message = result.results.joinToString("\n") { it.message }
-        if (result.successCount > 0) lastRecord = null
+        message = if (result.failureCount > 0 || result.unknownCount > 0) result.results.joinToString("\n") { it.message } else null
+        if (result.failureCount == 0 && result.unknownCount == 0) services.uiMessages.post(
+            resources.getQuantityString(R.plurals.component_undo_result, result.successCount, result.successCount))
         undoReview = null
         revision++
     } }
@@ -145,8 +151,20 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                                 listOf(BatchItem(component.name.flattenToString(), packageName, userId, "component"))) { _, batch ->
                                 services.packageOps.setComponentEnabled(component.name, userId, !component.enabled, approved, batch)
                             }
-                            message = result.results.joinToString("\n") { it.message }
-                            lastRecord = services.history.state.first().records.lastOrNull { it.batchId == result.batchId && it.changed }
+                            val record = services.history.state.first().records.lastOrNull { it.batchId == result.batchId && it.changed }
+                            message = if (result.failureCount > 0 || result.unknownCount > 0) result.results.joinToString("\n") { it.message } else null
+                            val feedback = when {
+                                result.failureCount > 0 -> resources.getString(R.string.component_change_failed)
+                                result.unknownCount > 0 -> resources.getString(R.string.component_change_verify)
+                                component.enabled -> resources.getQuantityString(R.plurals.component_disabled_result,
+                                    result.successCount, result.successCount)
+                                else -> resources.getQuantityString(R.plurals.component_enabled_result,
+                                    result.successCount, result.successCount)
+                            }
+                            services.uiMessages.post(feedback,
+                                actionLabel = if (record != null) resources.getString(R.string.undo_action) else null,
+                                onAction = if (record != null) ({ undoReview = record }) else null,
+                                withDismiss = record != null)
                             revision++
                         } finally { busy = false }
                         }
