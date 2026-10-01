@@ -7,6 +7,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.test.platform.app.InstrumentationRegistry
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.dialog.preset.PresetApplyDialog
@@ -68,7 +71,9 @@ class ManagementUiDeviceTest {
             compose.setContent { CantaTheme {
                 CanaMessageCollector(services.uiMessages, host)
                 CompositionLocalProvider(LocalCanaSnackbar provides host) {
-                    Scaffold(snackbarHost = { SnackbarHost(host) }) { PackageActionDialogs(model) }
+                    Scaffold(snackbarHost = { SnackbarHost(host) }) { innerPadding ->
+                        Box(Modifier.padding(innerPadding)) { PackageActionDialogs(model) }
+                    }
                 }
             } }
             compose.waitUntil(60_000) {
