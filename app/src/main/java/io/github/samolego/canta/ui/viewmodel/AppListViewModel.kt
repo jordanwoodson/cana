@@ -27,8 +27,8 @@ import io.github.samolego.canta.util.apps.UserProfile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import io.github.samolego.canta.ops.BatchItem
+import io.github.samolego.canta.ops.ActionChoices
 import kotlinx.coroutines.flow.first
-import io.github.samolego.canta.util.RemovalRecommendation
 import java.util.Locale
 import java.util.UUID
 import org.json.JSONObject
@@ -105,11 +105,7 @@ class AppListViewModel(
 
     val defaultAction: PackageAction get() {
         val selected = apps.filter { it.packageName in selectedApps }
-        return when {
-            selected.isNotEmpty() && selected.all { it.isDisabled } -> PackageAction.ENABLE
-            selected.any { it.removalInfo in setOf(RemovalRecommendation.EXPERT, RemovalRecommendation.UNSAFE) } -> PackageAction.DISABLE
-            else -> PackageAction.UNINSTALL
-        }
+        return ActionChoices.forSelection(selected, selected.isNotEmpty() && selected.all { it.isUninstalled }).primary
     }
 
     companion object { private const val TAG = "AppListViewModel" }
