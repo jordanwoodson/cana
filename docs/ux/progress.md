@@ -195,6 +195,7 @@ Each later entry records the change, commit, test counts, device checks and scre
 - `ManagementPolicy.undoableBatchIds` derives candidates from the same rules as `lastBatch`, blocks running or incomplete batches, and excludes older batches whose app/profile or device-control keys overlap a later candidate. Successful undo removes the later candidate, exposing an older batch again. Three JVM tests cover the latest/disjoint/overlap, resolved overlap, and incomplete/running cases; the full suite passes 225/225.
 - History uses per-batch Undo buttons, action/count/profile titles, status chips, nonzero counts, Details/Hide details, and app names when an inventory has them. The top Undo last batch button is gone. Empty and older-record copy is plain language. `ManagementUiDeviceTest` now targets its batch card; device execution is pending the Phase 7 gate.
 - `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed.
+- The focused `ManagementUiDeviceTest#historyUndoRestoresWorkAppAndReportsResult` passed **1/1** after its direct `HistoryPage` composition supplied the same snackbar host as `CantaApp`. It disabled the fixture in Work, used the new card Undo, then verified Work restored and Personal stayed enabled. A failed initial test run exposed the missing test provider; the Work fixture was reset before the passing rerun.
 
 ### Task 7.4 — Privacy dashboard
 
