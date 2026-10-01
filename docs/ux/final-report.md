@@ -1,6 +1,6 @@
 # UX overhaul handoff
 
-Implemented on local branch `ux` from `roadmap` at `047ed46`. The implementation and phase-by-phase checks are recorded in [progress.md](progress.md). No push, tag, release, version or signing change was made.
+Implemented on branch `ux` from `roadmap` at `047ed46`. The implementation and phase-by-phase checks are recorded in [progress.md](progress.md). This report captures the UX work before the separate [3.2.2-cana.8 release packaging](../releases/3.2.2-cana.8.md); no signing credentials were changed.
 
 | ID | Status | Result |
 | --- | --- | --- |
@@ -49,16 +49,16 @@ Affected device tests passed on `emulator-5554`: `SelectionUxDeviceTest` 5/5, `D
 
 | Screen | Before | After |
 | --- | --- | --- |
-| Main list | [before](../../../ux-review/before/01-main-list-light.png) | [after](../../../ux-review/after/phase9/01-main-list-light.png) |
-| Selection bar | [before](../../../ux-review/before/05-selection-bar.png) | [after](../../../ux-review/after/phase3/05-selection-bar-work-light.png) |
-| Confirmation | [before](../../../ux-review/before/07-uninstall-confirm-dialog.png) | [after](../../../ux-review/after/phase3/07-confirmation-work-expert-light.png) |
-| App detail | [before](../../../ux-review/before/08-app-detail-top.png) | [after](../../../ux-review/after/phase5/08-overview-ad-privacy-light.png) |
-| Filters | [before](../../../ux-review/before/02-filters-sheet.png) | [after](../../../ux-review/after/phase4/02-filters-light.png) |
-| History | [before](../../../ux-review/before/12-history.png) | [after](../../../ux-review/after/phase7/12-history-light.png) |
-| Device settings | [before](../../../ux-review/before/15-system-page.png) | [after](../../../ux-review/after/phase7/15-device-settings-light.png) |
-| Compare | [before](../../../ux-review/before/14-compare-profiles.png) | [after](../../../ux-review/after/phase7/14-compare-light.png) |
+| Main list | [before](screenshots/before/01-main-list-light.png) | [after](screenshots/after/01-main-list-light.png) |
+| Selection bar | [before](screenshots/before/05-selection-bar.png) | [after](screenshots/after/05-selection-bar-work-light.png) |
+| Confirmation | [before](screenshots/before/07-uninstall-confirm-dialog.png) | [after](screenshots/after/07-confirmation-work-expert-light.png) |
+| App detail | [before](screenshots/before/08-app-detail-top.png) | [after](screenshots/after/08-overview-ad-privacy-light.png) |
+| Filters | [before](screenshots/before/02-filters-sheet.png) | [after](screenshots/after/02-filters-light.png) |
+| History | [before](screenshots/before/12-history.png) | [after](screenshots/after/12-history-light.png) |
+| Device settings | [before](screenshots/before/15-system-page.png) | [after](screenshots/after/15-device-settings-light.png) |
+| Compare | [before](screenshots/before/14-compare-profiles.png) | [after](screenshots/after/14-compare-light.png) |
 
-Additional audit captures: [populated Privacy dashboard](../../../ux-review/after/phase7/13-privacy-dashboard-populated-light.png) and [populated RTL main list](../../../ux-review/after/phase9/01-main-rtl-arabic-complete.png). The full light/dark × Personal/Work × wallpaper-colour matrix and onboarding captures are indexed in [progress.md](progress.md).
+Additional audit captures: [populated Privacy dashboard](screenshots/after/13-privacy-dashboard-populated-light.png) and [populated RTL main list](screenshots/after/01-main-rtl-arabic-complete.png). The full light/dark × Personal/Work × wallpaper-colour matrix and onboarding captures are indexed in [progress.md](progress.md).
 
 ## Decision to revisit
 

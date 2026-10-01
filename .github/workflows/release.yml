@@ -1,7 +1,10 @@
-name: 📦🚀 Build & prepare draft Android release
+name: 📦🚀 Build and publish Android release
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - "3.2.2-cana.*"
 
 permissions:
   id-token: write
@@ -50,10 +53,16 @@ jobs:
           # read version_name
           version=$(grep "^version_name=" app/gradle.properties | cut -d'=' -f2)
           echo "VERSION_NAME=$version" >> $GITHUB_ENV
-          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check release tag matches the APK version
+        if: github.event_name == 'push'
+        run: test "$GITHUB_REF_NAME" = "$VERSION_NAME"
 
       - name: 🤖📦 Build Android APKs
-        run: ./gradlew :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+        run: ./gradlew :app:testDebugUnitTest :app:lintDebug :app:lintRelease :app:assembleRelease
+
+      - name: Name the signed APK for Obtainium
+        run: mv app/build/outputs/apk/release/app-release.apk "app/build/outputs/apk/release/cana-v$VERSION_NAME.apk"
 
       - name: 📝 Generate SHA-256 checksums
         run: |
@@ -75,21 +84,28 @@ jobs:
         with:
           subject-path: 'app/build/outputs/apk/release/*.apk'
 
-      - name: 📦 Create GitHub release draft
+      - name: 📦 Publish tagged GitHub release with its assets
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "v${{ env.VERSION_NAME }}" \
-            --draft \
-            --title "Cana ${{ env.VERSION_NAME }}" \
-            --notes "" \
-            --target "$GITHUB_SHA"
+          gh release create "$VERSION_NAME" \
+            app/build/outputs/apk/release/*.apk \
+            app/build/outputs/apk/release/SHA256SUMS.txt \
+            "${{ steps.attest.outputs.bundle-path }}" \
+            --verify-tag --latest \
+            --title "Cana $VERSION_NAME" \
+            --notes-file "docs/releases/$VERSION_NAME.md"
 
-      - name: 📁 Upload APKs, checksums & attestation
+      - name: 📦 Prepare manual GitHub release draft with its assets
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v${{ env.VERSION_NAME }}"
-          gh release upload "$TAG" app/build/outputs/apk/release/*.apk
-          gh release upload "$TAG" app/build/outputs/apk/release/SHA256SUMS.txt
-          gh release upload "$TAG" "${{ steps.attest.outputs.bundle-path }}"
+          gh release create "$VERSION_NAME" \
+            app/build/outputs/apk/release/*.apk \
+            app/build/outputs/apk/release/SHA256SUMS.txt \
+            "${{ steps.attest.outputs.bundle-path }}" \
+            --draft --target "$GITHUB_SHA" \
+            --title "Cana $VERSION_NAME" \
+            --notes-file "docs/releases/$VERSION_NAME.md"
