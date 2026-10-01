@@ -56,7 +56,6 @@ import io.github.samolego.canta.extension.showFor
 import io.github.samolego.canta.ui.component.AppList
 import io.github.samolego.canta.ui.component.CantaTopBar
 import io.github.samolego.canta.ui.component.fab.PresetEditFAB
-import io.github.samolego.canta.ui.dialog.ExplainBadgesDialog
 import io.github.samolego.canta.ui.dialog.NoWarrantyDialog
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
 import io.github.samolego.canta.ui.dialog.PackageActionDialogs
@@ -230,7 +229,6 @@ private fun MainContent(
     }
 
 
-    var showExplainBadgeDialog by rememberSaveable { mutableStateOf(false) }
     var showProfilesMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(appListViewModel) {
@@ -260,7 +258,6 @@ private fun MainContent(
         snackbarHost = { SnackbarHost(LocalCanaSnackbar.current) },
         topBar = {
             CantaTopBar(
-                openBadgesInfoDialog = { showExplainBadgeDialog = true },
                 navigateToPage = navigateToPage,
                 appListViewModel = appListViewModel,
                 selectedAppsType = selectedAppsType,
@@ -283,9 +280,6 @@ private fun MainContent(
                 scrollBehavior = scrollBehavior,
             )
 
-            if (showExplainBadgeDialog) {
-                ExplainBadgesDialog(onDismissRequest = { showExplainBadgeDialog = false })
-            }
         },
         bottomBar = {
             if (!presetEditMode) io.github.samolego.canta.ui.component.SelectionActionBar(appListViewModel, selectedAppsType)

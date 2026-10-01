@@ -37,7 +37,6 @@ import io.github.samolego.canta.util.apps.UserProfile
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CantaTopBar(
-    openBadgesInfoDialog: () -> Unit,
     navigateToPage: (route: String) -> Unit,
     appListViewModel: AppListViewModel,
     selectedAppsType: AppsType,
@@ -90,7 +89,7 @@ fun CantaTopBar(
                 IconClickButton(onClick = { filters = true }, icon = Icons.Default.FilterAlt, contentDescription = stringResource(R.string.filters_action))
                 Box {
                     IconClickButton(onClick = { more = true }, icon = Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options_action))
-                    MoreOptionsMenu(more, openBadgesInfoDialog, navigateToPage, { startTrackerScan(context, appListViewModel) }) { more = false }
+                    MoreOptionsMenu(more, navigateToPage, { startTrackerScan(context, appListViewModel) }) { more = false }
                 }
             })
         if (searchActive || appListViewModel.searchQuery.isNotEmpty()) {

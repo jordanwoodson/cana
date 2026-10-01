@@ -158,3 +158,7 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Phase 5 verification gate
 
 - Overview actions were visible without scrolling on the 610×1356 viewport. The Work Privacy tab showed denied permissions unchecked, a disabled Revoke 0, and review before restriction; device tests cover these behaviors. Components retained its safety lock on this non-root emulator. No Privacy or component state was changed during visual review.
+
+### Task 6.1 — Grouped overflow navigation
+
+- The main overflow now uses flexible minimum width, leading icons, and four divider-separated groups: Presets/History; Privacy dashboard/Compare profiles/Device settings; tracker scan; Settings. Badge info lives in Filters and the detail risk chip; Logs will move to Settings → Diagnostics in Task 6.3. Existing destination routes and scanner action are unchanged. `compileDebugKotlin` passed; the final Phase 6 gate will capture the menu and run the full checks.
