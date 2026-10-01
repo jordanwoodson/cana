@@ -34,6 +34,7 @@ import io.github.samolego.canta.ops.TrackerScanProgress
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.util.apps.AppInfo
 import kotlinx.coroutines.CancellationException
+import java.text.NumberFormat
 
 /** Tracker signatures found in an app's APK code; scanned when first shown and cached per version. */
 @OptIn(ExperimentalLayoutApi::class)
@@ -65,20 +66,12 @@ fun TrackerSummary(app: AppInfo) {
             }
             error != null -> Text(stringResource(R.string.tracker_scan_failed, error), color = MaterialTheme.colorScheme.error)
             scan != null -> {
-                Text(pluralStringResource(R.plurals.tracker_count, scan.trackers.size, scan.trackers.size))
+                Text(pluralStringResource(R.plurals.detail_tracker_summary, scan.trackers.size,
+                    scan.trackers.size, NumberFormat.getIntegerInstance().format(scan.classCount)))
                 if (scan.trackers.isNotEmpty()) Text(scan.trackers.joinToString(" · "), color = MaterialTheme.colorScheme.tertiary)
-                Text(stringResource(R.string.tracker_scan_classes, scan.classCount, scan.apkCount), style = MaterialTheme.typography.labelSmall)
             }
             else -> Text(stringResource(R.string.tracker_not_scanned), style = MaterialTheme.typography.bodySmall)
         }
-        Text(stringResource(R.string.tracker_scan_description), style = MaterialTheme.typography.bodySmall)
-        Text(stringResource(R.string.tracker_match_description), style = MaterialTheme.typography.bodySmall)
-        repository.catalog?.let {
-            Text(stringResource(R.string.tracker_active_source, it.source), style = MaterialTheme.typography.labelSmall)
-            it.error?.let { error -> Text(stringResource(R.string.tracker_fallback, error), color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall) }
-        }
-        Text(stringResource(R.string.tracker_attribution), style = MaterialTheme.typography.labelSmall)
         FlowRow {
             TextButton(enabled = !busy, onClick = { request++ }) { Text(stringResource(R.string.tracker_rescan_action)) }
             TextButton(onClick = {
@@ -86,6 +79,18 @@ fun TrackerSummary(app: AppInfo) {
             }) {
                 Text(stringResource(R.string.tracker_exodus_report))
             }
+        }
+        InfoDisclosure(stringResource(R.string.about_tracker_scanning)) {
+            Text(stringResource(R.string.tracker_scan_description), style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.tracker_match_description), style = MaterialTheme.typography.bodySmall)
+            scan?.let { Text(stringResource(R.string.tracker_scan_classes, it.classCount, it.apkCount),
+                style = MaterialTheme.typography.labelSmall) }
+            repository.catalog?.let {
+                Text(stringResource(R.string.tracker_active_source, it.source), style = MaterialTheme.typography.labelSmall)
+                it.error?.let { error -> Text(stringResource(R.string.tracker_fallback, error), color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall) }
+            }
+            Text(stringResource(R.string.tracker_attribution), style = MaterialTheme.typography.labelSmall)
         }
     }
 }

@@ -133,3 +133,10 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Phase 4 verification gate
 
 - The filter count and active chips respond together to scope and state changes, while saved-view fields remain compatible. The device tests above cover the category and Work usage-sort behavior. Full theme/profile/accessibility matrix remains scheduled for Phase 9.
+
+### Task 5.1 — App overview hierarchy
+
+- The overview now starts with a 56 dp profile-badged icon, title and package name with a copy icon. A compact row shows risk (opening the badge explanation), live state, system/user status, version and APK size (opening the size explanation). `ActionChoices` drives the primary action; Uninstall is an error-coloured outline when secondary, and remaining verbs sit in the overflow menu. They still route through the existing confirmation flow.
+- “About this app” leads with the UAD description, then source, suggestions and dependents when present; usage follows. The tracker summary keeps names and rescan/report actions visible while method, limitations, source and attribution move into `InfoDisclosure`. A tappable Android settings `ListItem` closes the overview.
+- On `emulator-5554` at 610×1356 in light theme, Ad Privacy's primary Uninstall button appeared without scrolling at y≈529, and the description began at y≈711 (`ux-review/after/phase5/08-overview-ad-privacy-light.png`). Tapping its risk chip opened the explanation; tapping the size info icon opened the size explanation. `DebloatUiDeviceTest` has no detail-page locator to update. The APK install required AOT compilation before this cold inventory load; no device state was changed.
+- `testDebugUnitTest assembleDebug lintDebug` passed **217/217 JVM tests**, APK build, **0 lint errors, 595 warnings, 1 hint**.

@@ -2,6 +2,15 @@
 <resources>
     <string name="app_overview">Overview</string>
     <string name="app_version_details">Version %1$s (%2$d)</string>
+    <string name="app_version_short">v%1$s (%2$d)</string>
+    <string name="copy_package_name">Copy package name</string>
+    <string name="app_state_disabled">Disabled</string>
+    <string name="app_state_suspended">Suspended</string>
+    <string name="about_this_app">About this app</string>
+    <string name="app_needed_by">Needed by: %1$s</string>
+    <string name="open_android_settings">Open in Android settings</string>
+    <string name="about_tracker_scanning">About tracker scanning</string>
+    <plurals name="detail_tracker_summary"><item quantity="one">%1$d tracker signature in %2$s classes</item><item quantity="other">%1$d tracker signatures in %2$s classes</item></plurals>
     <string name="app_target_unavailable">This app is unavailable in this profile. Refresh the app list to check its current state.</string>
     <string name="app_settings_unavailable">Android could not open Settings for this profile. Check that the profile is unlocked and Shizuku is connected.</string>
     <string name="app_removed_sections">Restore this app in this profile to inspect its privacy controls and components.</string>
