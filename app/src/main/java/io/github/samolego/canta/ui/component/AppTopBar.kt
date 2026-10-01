@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ui.AppsType
 import io.github.samolego.canta.ui.menu.*
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.util.apps.UserProfile
@@ -39,6 +40,7 @@ fun CantaTopBar(
     openBadgesInfoDialog: () -> Unit,
     navigateToPage: (route: String) -> Unit,
     appListViewModel: AppListViewModel,
+    selectedAppsType: AppsType,
     showProfilesMenu: Boolean,
     onProfilesClick: () -> Unit,
     onProfileSelected: (UserProfile) -> Unit,
@@ -101,6 +103,6 @@ fun CantaTopBar(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }))
             LaunchedEffect(searchActive) { if (searchActive) { focus.requestFocus(); keyboard?.show() } }
         }
-        FiltersMenu(filters, { filters = false }, appListViewModel)
+        FiltersMenu(filters, { filters = false }, appListViewModel, selectedAppsType)
     }
 }

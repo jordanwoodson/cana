@@ -3,6 +3,7 @@ package io.github.samolego.canta.ui
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -20,12 +21,22 @@ class CategoryFilterDeviceTest {
 
     @Test fun allCategoriesAreReachableAndSelectionUpdatesTheMenu() {
         val model = AppListViewModel()
-        compose.setContent { CantaTheme { FiltersMenu(true, {}, model) } }
+        compose.setContent { CantaTheme { FiltersMenu(true, {}, model, AppsType.INSTALLED) } }
         for (category in listOf("Google", "OEM", "Carrier", "AOSP", "Misc")) {
             compose.onNodeWithText(category).performScrollTo().assertIsDisplayed()
         }
         compose.onNodeWithText("AOSP").performScrollTo().performClick()
         compose.onNodeWithText("AOSP").assertIsDisplayed()
         assertEquals("AOSP", model.selectedFilter.name)
+    }
+
+    @Test fun userScopeAndDisabledStateRemainSelectedTogether() {
+        val model = AppListViewModel()
+        compose.setContent { CantaTheme { FiltersMenu(true, {}, model, AppsType.INSTALLED) } }
+        compose.onNodeWithTag("scope-user").performClick()
+        compose.onNodeWithText("Disabled").performScrollTo().performClick()
+        assertEquals(false, model.onlySystem)
+        org.junit.Assert.assertTrue(io.github.samolego.canta.util.apps.Filter.user.id in model.activeFilterIds)
+        org.junit.Assert.assertTrue(model.activeFilterIds.any { it == "disabled" })
     }
 }

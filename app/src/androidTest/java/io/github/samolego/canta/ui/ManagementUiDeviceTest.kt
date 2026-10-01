@@ -68,9 +68,9 @@ class ManagementUiDeviceTest {
         val profiles = ShizukuUserUtils.getUsers()
         try {
             model.selectUser(profiles.single { it.id == 10 }, context.packageManager, context)
-            compose.setContent { CantaTheme { FiltersMenu(true, {}, model) } }
-            compose.onNodeWithText("Sort by APK size").assertIsDisplayed()
-            compose.onNodeWithText("Sort by last used").assertDoesNotExist()
+            compose.setContent { CantaTheme { FiltersMenu(true, {}, model, AppsType.INSTALLED) } }
+            compose.onNodeWithText("Size").assertIsDisplayed()
+            compose.onNodeWithText("Last used").assertDoesNotExist()
             assertFalse(model.usageAvailable)
         } finally { model.selectUser(profiles.single { it.id == 0 }, context.packageManager, context) }
     }

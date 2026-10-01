@@ -23,6 +23,22 @@
     <string name="risk_system">System</string>
     <string name="filters_title">Filters and saved views</string>
     <string name="filter_sort">Sort order</string>
+    <string name="filter_scope">Scope</string>
+    <string name="scope_all">All</string>
+    <string name="scope_system">System</string>
+    <string name="scope_user">User</string>
+    <string name="scope_system_apps">System apps</string>
+    <string name="scope_user_apps">User apps</string>
+    <string name="sort_short_name">Name</string>
+    <string name="sort_short_size">Size</string>
+    <string name="sort_short_last_used">Last used</string>
+    <string name="sort_short_trackers">Trackers</string>
+    <string name="save_current_view">Save current view</string>
+    <string name="delete_saved_view_title">Delete saved view?</string>
+    <string name="delete_saved_view_message">Delete “%1$s”? This only removes the saved view.</string>
+    <string name="risk_levels_explain">What do the risk levels mean?</string>
+    <string name="clear">Clear</string>
+    <plurals name="show_app_count"><item quantity="one">Show %d app</item><item quantity="other">Show %d apps</item></plurals>
     <string name="filter_state">App state</string>
     <string name="filter_risk">Removal risk</string>
     <string name="filter_category">Category</string>

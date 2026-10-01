@@ -138,12 +138,15 @@ fun ActiveFilterChips(model: AppListViewModel) {
     if (model.activeFilterIds.isEmpty() && model.collectionPackages.isEmpty() && !model.onlySystem) return
     FlowRow(Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         model.activeFilterIds.mapNotNull(io.github.samolego.canta.util.apps.Filter::fromId).forEach { filter ->
-            InputChip(selected = true, onClick = { model.activeFilterIds -= filter.id },
-                label = { Text(filter.nameRes?.let { stringResource(it) } ?: filter.name) },
-                trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, filter.nameRes?.let { stringResource(it) } ?: filter.name)) })
+            val label = if (filter == io.github.samolego.canta.util.apps.Filter.user) stringResource(R.string.scope_user_apps)
+                else filter.nameRes?.let { stringResource(it) } ?: filter.name
+            InputChip(selected = true, onClick = { if (filter == io.github.samolego.canta.util.apps.Filter.user)
+                    model.setScope(io.github.samolego.canta.util.apps.AppScope.ALL) else model.activeFilterIds -= filter.id },
+                label = { Text(label) },
+                trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, label)) })
         }
-        if (model.onlySystem) InputChip(selected = true, onClick = { model.onlySystem = false }, label = { Text(stringResource(R.string.only_system)) },
-            trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, stringResource(R.string.only_system))) })
+        if (model.onlySystem) InputChip(selected = true, onClick = { model.setScope(io.github.samolego.canta.util.apps.AppScope.ALL) }, label = { Text(stringResource(R.string.scope_system_apps)) },
+            trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, stringResource(R.string.scope_system_apps))) })
         if (model.collectionPackages.isNotEmpty()) InputChip(selected = true, onClick = { model.collectionPackages = emptySet() }, label = { Text(stringResource(R.string.collection_filter)) },
             trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, stringResource(R.string.collection_filter))) })
     }

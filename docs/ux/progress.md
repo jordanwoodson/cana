@@ -122,3 +122,14 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - The required Work Expert uninstall kept Personal WebView installed, and Undo restored Work installation. A Work fixture Disable and Undo restored its enabled state. The forced absent-package failure produced the result dialog; the fixture was restored. The relevant Phase 3 safety, debloat and cleanup instrumentation classes passed under Task 3.3. Task 3.4 raised the JVM suite to 215 and passed lint with zero errors.
 - The profile chooser still showed raw “User ID” subtitles despite Task 1.2's no-ID intent. A small follow-up removes those subtitles while retaining the old string resource for translation compatibility; profile names and restriction warnings remain visible.
+
+### Task 4.1 — Scope and filter sheet
+
+- `AppScope` maps All/System/User to the existing `onlySystem` field and `Filter.user` ID, leaving saved-view IDs unchanged. `Filter.user` now belongs to `FilterGroup.SCOPE`, so User and Disabled can coexist. Applying a legacy saved view with contradictory system/user fields resolves to User. `AppScopeTest` was red before implementation and then passed its two mapping/coexistence cases.
+- The sheet now shows saved views first in a horizontal row, with Save current view and deletion confirmation; Scope uses the shared segmented `ChoiceRow`. Sort labels are short. State, risk, category, and compact privacy controls follow, ending with a risk-explanation link. A sticky footer shows Clear and a live Show N apps count for the selected tab, replacing Close. Active scope chips say “System apps” or “User apps.”
+- At 610×1356 in light theme, the sheet showed the initial System scope with “Show 179 apps” (`ux-review/after/phase4/02-filters-light.png`). Selecting User and Disabled together updated the footer to “Show 0 apps” (`02-filters-user-disabled-light.png`). `CategoryFilterDeviceTest` passed **2/2** on `emulator-5554`, including the combined state; the affected Work sort test passed **1/1**. After APK reinstall, a cold-start ANR was dismissed with Wait before inspecting the sheet.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest lintDebug` passed: **217/217 JVM tests**, both APKs, **0 lint errors, 581 warnings, 1 hint**. Existing translations were untouched; new copy is in the base English resources only.
+
+### Phase 4 verification gate
+
+- The filter count and active chips respond together to scope and state changes, while saved-view fields remain compatible. The device tests above cover the category and Work usage-sort behavior. Full theme/profile/accessibility matrix remains scheduled for Phase 9.

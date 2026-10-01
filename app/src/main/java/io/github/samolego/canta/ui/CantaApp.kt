@@ -263,6 +263,7 @@ private fun MainContent(
                 openBadgesInfoDialog = { showExplainBadgeDialog = true },
                 navigateToPage = navigateToPage,
                 appListViewModel = appListViewModel,
+                selectedAppsType = selectedAppsType,
                 showProfilesMenu = showProfilesMenu,
                 onProfilesClick = {
                     // Other profiles can only be seen through Shizuku

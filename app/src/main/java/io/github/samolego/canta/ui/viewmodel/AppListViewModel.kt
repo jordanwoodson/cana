@@ -134,6 +134,13 @@ class AppListViewModel(
 
     var searchQuery by mutableStateOf("")
     var onlySystem by mutableStateOf(true)
+    val scope: io.github.samolego.canta.util.apps.AppScope
+        get() = io.github.samolego.canta.util.apps.AppScope.from(onlySystem, activeFilterIds)
+    fun setScope(value: io.github.samolego.canta.util.apps.AppScope) {
+        val mapped = value.applyTo(activeFilterIds)
+        onlySystem = mapped.onlySystem
+        activeFilterIds = mapped.filterIds
+    }
     val isLoading: Boolean get() = inventoryState.loading
     val isLoadingBadges: Boolean get() = inventoryState.loadingMetadata
 
@@ -144,9 +151,13 @@ class AppListViewModel(
         get() = activeFilterIds.lastOrNull()?.let(Filter::fromId) ?: Filter.any
         set(value) { activeFilterIds = if (value == Filter.any) emptySet() else setOf(value.id) }
     fun toggleFilter(filter: Filter) {
+        if (filter == Filter.user) {
+            setScope(if (scope == io.github.samolego.canta.util.apps.AppScope.USER)
+                io.github.samolego.canta.util.apps.AppScope.ALL else io.github.samolego.canta.util.apps.AppScope.USER)
+            return
+        }
         activeFilterIds = if (filter.id in activeFilterIds) activeFilterIds - filter.id else
             activeFilterIds.filterNot { Filter.fromId(it)?.group == filter.group }.toSet() + filter.id
-        if (filter == Filter.user && filter.id in activeFilterIds) onlySystem = false
     }
     fun clearFilters() {
         activeFilterIds = emptySet(); collectionPackages = emptySet(); onlySystem = false; searchQuery = ""
@@ -159,7 +170,7 @@ class AppListViewModel(
         activeFilterIds = view.filterIds.filter { id ->
             Filter.fromId(id)?.let { it != Filter.unused || usageAvailable } == true
         }.toSet()
-        onlySystem = view.onlySystem
+        setScope(io.github.samolego.canta.util.apps.AppScope.from(view.onlySystem, activeFilterIds))
         collectionPackages = view.packages
         sortOrder = AppSort.entries.find { it.name == view.sort && (it != AppSort.LAST_USED || usageAvailable) } ?: AppSort.NAME
     }

@@ -18,6 +18,7 @@ class Filter(
     val id: String = name.lowercase(Locale.ROOT).replace(' ', '_'),
 ) {
     val group: FilterGroup get() = when {
+        this == user -> FilterGroup.SCOPE
         removalRecommendation != null -> FilterGroup.RISK
         id.startsWith("privacy_") -> FilterGroup.PRIVACY
         id.startsWith("category_") -> FilterGroup.CATEGORY
@@ -99,4 +100,4 @@ class Filter(
     }
 }
 
-enum class FilterGroup { STATE, RISK, CATEGORY, PRIVACY }
+enum class FilterGroup { SCOPE, STATE, RISK, CATEGORY, PRIVACY }
