@@ -37,10 +37,11 @@ class ManagementUiDeviceTest {
         val batch = UUID.randomUUID().toString()
         assertTrue(services.packageOps.setEnabled(pkg, 10, false, batchId = batch).success)
         compose.setContent { CantaTheme { HistoryPage {} } }
-        compose.onNodeWithText("Undo last batch").performClick()
+        compose.waitUntil(30_000) { compose.onAllNodesWithTag("history-undo-$batch").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("history-undo-$batch").performClick()
         compose.waitUntil(30_000) { compose.onAllNodesWithText("Undo").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Undo").performClick()
-        compose.waitUntil(60_000) { compose.onAllNodesWithText("1 succeeded · 0 failed").fetchSemanticsNodes().isNotEmpty() }
+        compose.onAllNodesWithText("Undo").onLast().performClick()
+        compose.waitUntil(60_000) { runBlocking { services.packageOps.getPackageInfo(pkg, 10)?.applicationInfo?.enabled == true } }
         assertTrue(services.packageOps.getPackageInfo(pkg, 10)!!.applicationInfo!!.enabled)
         assertTrue(services.packageOps.getPackageInfo(pkg, 0)!!.applicationInfo!!.enabled)
     }

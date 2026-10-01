@@ -1,14 +1,40 @@
 package io.github.samolego.canta.ops
 
 import io.github.samolego.canta.data.proto.OperationRecord
+import io.github.samolego.canta.data.proto.PlannedBatch
 import org.junit.Assert.*
 import org.junit.Test
 
 class ManagementPolicyTest {
+    private fun batch(id: String, completed: Boolean = true) = PlannedBatch.newBuilder().setId(id).setCompleted(completed).build()
     private fun record(id: String, batch: String, action: String = "disable", user: Int = 10,
         pkg: String = "test.app", after: String = "{}") = OperationRecord.newBuilder()
         .setId(id).setBatchId(batch).setAction(action).setUserId(user).setPackageName(pkg)
         .setPreviousState("{\"installed\":true}").setAfterState(after).setCompleted(true).setChanged(true).build()
+
+    @Test fun undoableBatchesIncludeLatestAndOlderDisjointButExcludeOverlap() {
+        val older = record("a", "one", pkg = "same")
+        val disjoint = record("b", "two", pkg = "other")
+        val latest = record("c", "three", pkg = "same")
+        val records = listOf(older, disjoint, latest)
+        val plans = listOf(batch("one"), batch("two"), batch("three"))
+        assertEquals(setOf("two", "three"), ManagementPolicy.undoableBatchIds(records, plans, null))
+        assertEquals(emptySet<String>(), ManagementPolicy.undoableBatchIds(records, plans, "three"))
+        assertEquals(setOf("two", "three"), ManagementPolicy.undoableBatchIds(records, plans, null))
+    }
+
+    @Test fun undoingLaterOverlapMakesOlderBatchUndoableAgain() {
+        val older = record("a", "one", pkg = "same")
+        val later = record("b", "two", pkg = "same")
+        val undo = record("u", "undo", pkg = "same").toBuilder().setUndoOf("b").setSuccess(true).build()
+        assertEquals(setOf("one"), ManagementPolicy.undoableBatchIds(listOf(older, later, undo),
+            listOf(batch("one"), batch("two")), null))
+    }
+
+    @Test fun incompleteBatchCannotBeUndone() {
+        val records = listOf(record("a", "one"))
+        assertEquals(emptySet<String>(), ManagementPolicy.undoableBatchIds(records, listOf(batch("one", false)), null))
+    }
 
     @Test fun lastBatchReversesPartialChangesAndSkipsAutomationAndUnchanged() {
         val first = record("a", "one")

@@ -10,11 +10,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
@@ -24,6 +31,9 @@ import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.RestoreExportButton
+import io.github.samolego.canta.ui.component.EmptyState
+import io.github.samolego.canta.ui.component.StatusChip
+import io.github.samolego.canta.ui.component.StatusTone
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import java.text.DateFormat
@@ -45,32 +55,68 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     var pending by remember { mutableStateOf<List<OperationRecord>?>(null) }
     var result by remember { mutableStateOf<BatchResult?>(null) }
-    val last = remember(records) { ManagementPolicy.lastBatch(records) }
+    val undoableIds = remember(records, batches, active) { ManagementPolicy.undoableBatchIds(records, batches, active?.id) }
+    val candidatesByBatch = remember(records) { ManagementPolicy.candidates(records).groupBy { it.batchId } }
     val recovered = remember(records) { records.filter { it.undoOf.isNotEmpty() && it.completed && (it.success || it.recoveryComplete) }.map { it.undoOf }.toSet() }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
         topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.history)) },
         actions = { RestoreExportButton(iconOnly = true) }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item { Button(enabled = active == null && last.isNotEmpty() && batches.none { !it.completed && it.id == last.firstOrNull()?.batchId }, onClick = { pending = last }) { Text(stringResource(R.string.undo_last_batch)) } }
             result?.let { batch -> item {
-                Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
+                Text(historyCounts(batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
                 batch.results.forEach { Text(it.message, style = MaterialTheme.typography.bodySmall) }
             } }
             if (stored.unavailable) item { Text(stringResource(R.string.batch_store_unavailable), color = MaterialTheme.colorScheme.error) }
             if (historyState.unavailable) item { Text(stringResource(R.string.history_store_unavailable), color = MaterialTheme.colorScheme.error) }
             if (quarantined.isNotEmpty()) item {
-                Text(stringResource(R.string.history_quarantined, quarantined.size))
-                TextButton(onClick = { showQuarantined = !showQuarantined }) { Text(stringResource(if (showQuarantined) R.string.close else R.string.review_actions)) }
+                Text(stringResource(R.string.history_quarantined_plain, quarantined.size))
+                TextButton(onClick = { showQuarantined = !showQuarantined }) { Text(stringResource(if (showQuarantined) R.string.history_hide_details else R.string.history_show_details)) }
             }
             if (showQuarantined) items(quarantined, key = { "quarantined:${it.id}" }) { HistoryRecordContent(it) }
-            if (groups.isEmpty() && !historyState.unavailable) item { Text(stringResource(R.string.history_empty)) }
+            if (groups.isEmpty() && !historyState.unavailable) item { EmptyState(Icons.Default.History,
+                stringResource(R.string.history_empty_title), stringResource(R.string.history_empty_body)) }
             items(groups, key = { it.id }) { group ->
                 var expanded by remember(group.id) { mutableStateOf(false) }
                 ElevatedCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         val plan = group.plan
-                        Text(plan?.title ?: actionLabel(group.records.firstOrNull()?.action.orEmpty()), style = MaterialTheme.typography.titleMedium)
-                        Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(group.timestamp)), style = MaterialTheme.typography.bodySmall)
+                        val items = plan?.itemsList.orEmpty()
+                        val action = items.firstOrNull()?.action ?: group.records.firstOrNull()?.action.orEmpty()
+                        val count = if (items.isNotEmpty()) items.size else group.records.count { it.undoOf.isEmpty() }.coerceAtLeast(1)
+                        val userIds = (items.map { it.userId } + group.records.map { it.userId }).distinct()
+                        val profiles = userIds.map { profileName(it) }.joinToString(", ")
+                        Text("${actionLabel(action)} · ${pluralStringResource(R.plurals.history_app_count, count, count)} · $profiles",
+                            style = MaterialTheme.typography.titleMedium)
+                        val failed = if (items.isNotEmpty()) items.count { it.status == "completed" && !it.success }
+                            else group.records.count { it.completed && !it.success }
+                        val succeeded = if (items.isNotEmpty()) items.count { it.status == "completed" && it.success && !it.skipped }
+                            else group.records.count { it.completed && it.success }
+                        val skipped = items.count { it.skipped || it.status == "not_started" }
+                        val awaiting = if (items.isNotEmpty()) items.count { it.status == "pending" || it.status == "interrupted" }
+                            else group.records.count { !it.completed }
+                        val running = active?.id == group.id || plan?.completed == false && plan?.interrupted == false
+                        val status = when {
+                            running -> R.string.history_status_running
+                            plan?.interrupted == true || awaiting > 0 -> R.string.history_status_interrupted
+                            failed > 0 && succeeded > 0 -> R.string.history_status_partial
+                            failed > 0 -> R.string.history_status_failed
+                            else -> R.string.history_status_succeeded
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(group.timestamp)),
+                                style = MaterialTheme.typography.bodySmall)
+                            StatusChip(stringResource(status), when (status) {
+                                R.string.history_status_succeeded -> Icons.Default.CheckCircle
+                                R.string.history_status_failed -> Icons.Default.Error
+                                R.string.history_status_running -> Icons.Default.Schedule
+                                else -> Icons.Default.Warning
+                            }, when (status) {
+                                R.string.history_status_failed -> StatusTone.ERROR
+                                R.string.history_status_partial, R.string.history_status_interrupted -> StatusTone.WARNING
+                                else -> StatusTone.NEUTRAL
+                            })
+                        }
+                        Text(historyCounts(succeeded, failed, skipped, awaiting), style = MaterialTheme.typography.bodySmall)
                         val changes = group.records.filter { it.undoOf.isEmpty() && (it.changed || !it.completed) }
                         if (changes.isNotEmpty()) Text(stringResource(R.string.history_recovery_counts,
                             changes.count { it.id in recovered || it.recoveryComplete },
@@ -81,15 +127,15 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                                 Text(stringResource(R.string.batch_reviewed))
                             }
                         }
-                        if (plan != null) {
-                            Text(stringResource(R.string.batch_outcome_counts,
-                                plan.itemsList.count { it.status == "completed" && it.success && !it.skipped },
-                                plan.itemsList.count { it.status == "completed" && !it.success },
-                                plan.itemsList.count { it.skipped || it.status == "not_started" },
-                                plan.itemsList.count { it.status == "pending" || it.status == "interrupted" }))
-                            if (!plan.completed) Text(stringResource(R.string.batch_running))
+                        Row {
+                            if (group.id in undoableIds) TextButton(modifier = Modifier.testTag("history-undo-${group.id}"),
+                                onClick = { pending = candidatesByBatch[group.id].orEmpty().asReversed() }) {
+                                Text(stringResource(R.string.undo_action))
+                            }
+                            TextButton(onClick = { expanded = !expanded }) {
+                                Text(stringResource(if (expanded) R.string.history_hide_details else R.string.history_show_details))
+                            }
                         }
-                        TextButton(onClick = { expanded = !expanded }) { Text(stringResource(if (expanded) R.string.close else R.string.review_actions)) }
                         if (expanded) {
                             group.records.forEach { record -> HistoryRecordContent(record, record.id in historyState.activeOperationIds) }
                             plan?.itemsList?.filter { item -> group.records.none {
@@ -118,8 +164,13 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
 @Composable
 private fun HistoryRecordContent(record: OperationRecord, running: Boolean = false) {
     var diagnostics by remember(record.id) { mutableStateOf(false) }
+    val appName = if (record.packageName.isBlank()) stringResource(R.string.device_wide)
+        else CanaServices.getInstance().inventory.state(record.userId).apps
+            .firstOrNull { it.packageName == record.packageName }?.name ?: record.packageName
     HorizontalDivider()
-    Text(record.packageName.ifBlank { stringResource(R.string.device_wide) }, style = MaterialTheme.typography.titleSmall)
+    Text(appName, style = MaterialTheme.typography.titleSmall)
+    if (appName != record.packageName && record.packageName.isNotBlank())
+        Text(record.packageName, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Text(actionLabel(record.action) + " · " + if (record.action == "system") stringResource(R.string.device_wide) else profileName(record.userId))
     Text(if (!record.completed) stringResource(if (running) R.string.batch_running else R.string.history_pending) else record.resultMessage,
         color = if (record.completed && !record.success) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
@@ -130,6 +181,17 @@ private fun HistoryRecordContent(record: OperationRecord, running: Boolean = fal
         Text(stringResource(R.string.history_before, record.previousState), style = MaterialTheme.typography.bodySmall)
         Text(stringResource(R.string.history_after, record.afterState), style = MaterialTheme.typography.bodySmall)
     }
+}
+
+@Composable
+private fun historyCounts(succeeded: Int, failed: Int, skipped: Int, awaiting: Int): String {
+    val parts = listOfNotNull(
+        succeeded.takeIf { it > 0 }?.let { stringResource(R.string.history_succeeded_count, it) },
+        failed.takeIf { it > 0 }?.let { stringResource(R.string.history_failed_count, it) },
+        skipped.takeIf { it > 0 }?.let { stringResource(R.string.history_skipped_count, it) },
+        awaiting.takeIf { it > 0 }?.let { stringResource(R.string.history_awaiting_count, it) },
+    )
+    return parts.joinToString(" · ").ifBlank { stringResource(R.string.history_no_results) }
 }
 
 @Composable

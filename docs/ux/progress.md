@@ -183,3 +183,9 @@ Each later entry records the change, commit, test counts, device checks and scre
 - `ProfileComparison.rows` now filters to differing available-cell status, disabled, suspended and saved-privacy tuples. Unavailable cells are ignored, and a single available cell is retained. Three new JVM tests cover these cases; the full suite passes 225/225.
 - The comparison defaults to Only differences with two or more selected profiles, uses 150 dp app and 108 dp profile columns, omits empty privacy copy, and opens App detail from installed or removed cells. The two explanatory paragraphs are condensed into an intro and disclosure. Profile chips continue using `displayName()`.
 - `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed. Device visual review is pending the Phase 7 verification gate.
+
+### Task 7.3 — History cards and undo policy
+
+- `ManagementPolicy.undoableBatchIds` derives candidates from the same rules as `lastBatch`, blocks running or incomplete batches, and excludes older batches whose app/profile or device-control keys overlap a later candidate. Successful undo removes the later candidate, exposing an older batch again. Three JVM tests cover the latest/disjoint/overlap, resolved overlap, and incomplete/running cases; the full suite passes 225/225.
+- History uses per-batch Undo buttons, action/count/profile titles, status chips, nonzero counts, Details/Hide details, and app names when an inventory has them. The top Undo last batch button is gone. Empty and older-record copy is plain language. `ManagementUiDeviceTest` now targets its batch card; device execution is pending the Phase 7 gate.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed.

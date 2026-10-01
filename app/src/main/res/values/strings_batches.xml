@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="history_apps">apps</string>
+    <plurals name="history_app_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+    <string name="history_show_details">Details</string>
+    <string name="history_hide_details">Hide details</string>
+    <string name="history_empty_title">No changes yet</string>
+    <string name="history_empty_body">Actions you take appear here, with undo.</string>
+    <string name="history_quarantined_plain">%1$d older records can’t be undone automatically. They’re kept for reference.</string>
+    <string name="history_status_succeeded">Succeeded</string>
+    <string name="history_status_partial">Partly failed</string>
+    <string name="history_status_failed">Failed</string>
+    <string name="history_status_interrupted">Interrupted</string>
+    <string name="history_status_running">Running</string>
+    <string name="history_succeeded_count">%1$d succeeded</string>
+    <string name="history_failed_count">%1$d failed</string>
+    <string name="history_skipped_count">%1$d skipped</string>
+    <string name="history_awaiting_count">%1$d awaiting verification</string>
+    <string name="history_no_results">No results yet</string>
     <string name="history_recovery_counts">Recovery: %1$d restored · %2$d changes not restored</string>
     <string name="history_store_unavailable">Operation history is unavailable. Changes require a readable recovery journal. Restart Cana to retry; do not clear app data.</string>
     <string name="batch_outcome_counts">%1$d succeeded · %2$d failed · %3$d skipped · %4$d awaiting verification</string>
