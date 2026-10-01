@@ -149,7 +149,7 @@ internal fun actionLabel(action: String): String {
         "component" -> R.string.components
         "network_forget" -> R.string.history_forget_network
         "metered_forget" -> R.string.history_forget_metered
-        "system" -> R.string.system_controls
+        "system" -> R.string.device_settings
         else -> R.string.operation_results
     }
     return stringResource(resource)

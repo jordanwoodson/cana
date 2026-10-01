@@ -3,9 +3,6 @@ package io.github.samolego.canta.ui.screen
 import android.content.Intent
 import android.os.Build
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,12 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
@@ -80,7 +74,6 @@ fun SettingsScreen(
     val unmeteredOnly by settingsViewModel.bloatUnmeteredOnly.collectAsStateWithLifecycle()
     val urlEditor by settingsViewModel.bloatListUrlEditorState.collectAsStateWithLifecycle()
 
-    var advancedSettingsExpanded by remember { mutableStateOf(false) }
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
     val hideSuccessDialog by settingsViewModel.hideSuccessDialog.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
@@ -158,70 +151,21 @@ fun SettingsScreen(
 
             HorizontalDivider(modifier = Modifier.padding(16.dp))
 
-            // Advanced Settings Section
-            Row(
-                    modifier =
-                            Modifier.fillMaxWidth()
-                                    .clickable {
-                                        advancedSettingsExpanded = !advancedSettingsExpanded
-                                    }
-                                    .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 16.dp).size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                )
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                            text = stringResource(R.string.advanced_settings),
-                            style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                            text = stringResource(R.string.click_to_expand),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                Icon(
-                        imageVector =
-                                if (advancedSettingsExpanded) Icons.Default.ExpandLess
-                                else Icons.Default.ExpandMore,
-                        contentDescription = stringResource(if (advancedSettingsExpanded) R.string.maintenance_collapse else R.string.maintenance_expand),
-                        tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            AnimatedVisibility(
-                    visible = advancedSettingsExpanded,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-            ) {
-                Column {
-                    SettingsItem(
-                        title = stringResource(R.string.allow_unsafe_removal),
-                        description = stringResource(R.string.allow_unsafe_removal_description),
-                        icon = Icons.Default.Close,
-                        isSwitch = true,
-                        checked = allowUnsafe,
-                        onCheckedChange = {
-                            settingsViewModel.saveAllowUnsafeUninstalls(it)
-                        }
-                    )
-
-                    SettingsItem(
-                        title = stringResource(R.string.bloat_list_url),
-                        description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
-                        icon = Icons.Default.Link,
-                        onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
-                    )
-
-                }
-            }
+            SectionHeader(stringResource(R.string.advanced_settings))
+            SettingsItem(
+                title = stringResource(R.string.allow_unsafe_removal),
+                description = stringResource(R.string.allow_unsafe_removal_description),
+                icon = Icons.Default.Close,
+                isSwitch = true,
+                checked = allowUnsafe,
+                onCheckedChange = settingsViewModel::saveAllowUnsafeUninstalls,
+            )
+            SettingsItem(
+                title = stringResource(R.string.bloat_list_url),
+                description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
+                icon = Icons.Default.Link,
+                onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
+            )
 
             // Spacer to push footer to bottom
             Spacer(modifier = Modifier.weight(1f))

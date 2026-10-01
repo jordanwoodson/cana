@@ -67,7 +67,7 @@ fun SystemPage(onNavigateBack: () -> Unit) {
         scope.launch { try { showResult(services.system.apply(control, values, saver)) } finally { busy = false } }
     }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
-        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.system_controls)) }) }) { padding ->
+        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.device_settings)) }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.system_scope))
             Text(stringResource(R.string.system_permission_description), style = MaterialTheme.typography.bodySmall)

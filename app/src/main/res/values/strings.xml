@@ -273,6 +273,7 @@
     <string name="last_used_date">Last recorded use: %1$s</string>
     <string name="app_suggestions">UAD suggestions: %1$s</string>
     <string name="system_controls">System</string>
+    <string name="device_settings">Device settings</string>
     <string name="system_quad9" translatable="false">Quad9</string>
     <string name="system_cloudflare" translatable="false">Cloudflare</string>
     <string name="system_graphene" translatable="false">GrapheneOS</string>

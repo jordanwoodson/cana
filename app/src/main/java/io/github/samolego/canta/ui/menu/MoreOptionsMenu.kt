@@ -31,7 +31,7 @@ fun MoreOptionsMenu(
         DropdownMenuItem(text = { Text(stringResource(R.string.comparison_title)) }, onClick = {
             navigateToPage(Screen.Comparison.route); onDismiss()
         })
-        DropdownMenuItem(text = { Text(stringResource(R.string.system_controls)) }, onClick = {
+        DropdownMenuItem(text = { Text(stringResource(R.string.device_settings)) }, onClick = {
             navigateToPage(Screen.System.route); onDismiss()
         })
         DropdownMenuItem(text = { Text(stringResource(R.string.history)) }, onClick = {
