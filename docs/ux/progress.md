@@ -79,3 +79,16 @@ Each later entry records the change, commit, test counts, device checks and scre
 - `40bd3e7` replaces elevated cards with 88 dp `ListItem` rows and inset dividers. Names and packages each use one ellipsized line; the second supporting line holds semantic chips and a short size. Selected rows use `secondaryContainer`; disabled content uses 0.38 alpha. The per-row System badge and repeated “APK files” label are gone. Leftover updated-system apps get a status chip and known update size. A long press selects the row with haptic feedback, while a tap still opens details. Other-profile icons use Android's user badge.
 - `AppSizeUiTest` was updated first and passed **2/2** on `emulator-5554` (`/tmp/cana-ux-app-row-device.log`). `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed (`/tmp/cana-ux-app-row-build.log`), and `lintDebug` passed (`/tmp/cana-ux-task24-lint.log`).
 - The collapsed Personal list showed eight full rows at 610×1356 (`ux-review/after/phase2/01-compact-rows-collapsed-dark.png`). The Work list displayed briefcase badges on each icon (`18-compact-rows-work-dark.png`); long pressing one row selected it and changed the header to “1 of 165 selected” (`18-compact-rows-longpress-dark.png`). Shizuku permission was restored through its Application management UI after the device test reset the app.
+
+### Task 2.5 — Banners, loading and empty states
+
+- `4fc9493` adds a details slot to `CanaBanner` and moves tracker scan progress, recommendation refresh, OTA notices, and batch progress/recovery notices onto it. The leftover-updates and inventory-error notices already used `CanaBanner` after Task 1.4. Full-screen loading now appears only when the profile inventory is empty; a refresh with existing apps shows a linear indicator above the retained list. The empty Removed tab offers “Clear filters” only when removed apps exist but filters hide them.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest lintDebug` passed after these changes and the Task 2.6 label fix (`/tmp/cana-ux-task25-final.log`): **206/206 JVM tests**, both APKs, **0 lint errors, 521 warnings, 1 hint**; 429 warnings are `MissingTranslation` for English-only keys. On `emulator-5554`, the empty Personal Removed tab with “Only system” active showed no “Clear filters” action (`ux-review/after/phase2/11-empty-removed-dark.png`).
+
+### Task 2.6 — Active filter chip labels
+
+- `7110400` adds descriptive remove-filter labels to the “Only system” and “Saved collection” close icons. The scope-label change (“System apps” / “User apps”) depends on Task 4.1's `AppScope` and remains to be finished there. The Phase 2 build/lint above includes this commit.
+
+### Phase 2 verification gate
+
+- `AppSizeUiTest` **2/2**, `CategoryFilterDeviceTest` **1/1** (`/tmp/cana-ux-phase2-category-device.log`), and `SelectionUxDeviceTest` **5/5** (`/tmp/cana-ux-phase2-selection-device.log`) passed on `emulator-5554`. The latter two were run after the Phase 2 code commits; neither performs package mutations. Main-list and Work screenshots are recorded under Tasks 2.1–2.5. Task 4.1 will complete the scope-chip wording, and the full theme/profile matrix remains for Phase 9.
