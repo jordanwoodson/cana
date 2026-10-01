@@ -15,22 +15,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoDelete
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.InstallMobile
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -46,9 +40,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -206,6 +200,8 @@ private fun MainContent(
         else -> MaterialTheme.colorScheme.onSecondaryContainer
     }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val installedCount = appListViewModel.allApps.count { !it.isUninstalled }
+    val removedCount = appListViewModel.allApps.count { it.isUninstalled }
 
     // Selected tab
     var selectedAppsType by remember { mutableStateOf(AppsType.INSTALLED) }
@@ -306,7 +302,7 @@ private fun MainContent(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             io.github.samolego.canta.ui.component.OtaBanner()
-            TabRow(
+            PrimaryTabRow(
                 selectedTabIndex = selectedAppsType.ordinal,
                 contentColor = headerContentColor,
                 containerColor = headerColor,
@@ -320,8 +316,13 @@ private fun MainContent(
                                                 }
                             selectedAppsType = currentTab
                         },
-                        text = { Text(stringResource(if (currentTab == AppsType.INSTALLED) R.string.tab_installed else R.string.tab_removed)) },
-                        icon = { Icon(currentTab.icon, contentDescription = null) },
+                        text = {
+                            val count = if (currentTab == AppsType.INSTALLED) installedCount else removedCount
+                            Text(pluralStringResource(
+                                if (currentTab == AppsType.INSTALLED) R.plurals.tab_installed_count else R.plurals.tab_removed_count,
+                                count, count,
+                            ), maxLines = 1)
+                        },
                     )
                 }
             }
@@ -362,7 +363,4 @@ private fun MainContent(
     }
 }
 
-enum class AppsType(val icon: ImageVector) {
-    INSTALLED(Icons.Default.AutoDelete),
-    UNINSTALLED(Icons.Default.DeleteForever),
-}
+enum class AppsType { INSTALLED, UNINSTALLED }

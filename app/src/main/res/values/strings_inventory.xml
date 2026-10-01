@@ -4,6 +4,14 @@
     <string name="allow_unsafe_removal_description">Allow reviewed removal of apps marked Unsafe, including preset actions. These apps can affect essential device functions.</string>
     <string name="tab_installed">Installed</string>
     <string name="tab_removed">Removed</string>
+    <plurals name="tab_installed_count">
+        <item quantity="one">Installed · %d</item>
+        <item quantity="other">Installed · %d</item>
+    </plurals>
+    <plurals name="tab_removed_count">
+        <item quantity="one">Removed · %d</item>
+        <item quantity="other">Removed · %d</item>
+    </plurals>
     <string name="filter_any">Any</string>
     <string name="filter_user">User apps</string>
     <string name="filter_unclassified">Unclassified</string>
