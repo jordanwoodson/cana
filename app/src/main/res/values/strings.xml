@@ -285,7 +285,16 @@
     <string name="system_quad9" translatable="false">Quad9</string>
     <string name="system_cloudflare" translatable="false">Cloudflare</string>
     <string name="system_graphene" translatable="false">GrapheneOS</string>
-    <string name="system_scope">These settings affect the whole device and every profile.</string>
+    <string name="system_scope">Changes affect every profile on this device.</string>
+    <string name="system_more_info">How device settings work</string>
+    <string name="system_choice_default">Default</string>
+    <string name="system_custom">Custom</string>
+    <string name="system_dns_description">Choose how Android resolves private DNS.</string>
+    <string name="system_portal_summary">Choose how Android checks network sign-in and access.</string>
+    <string name="system_wifi_description">Allow Wi-Fi scans even when Wi-Fi is off.</string>
+    <string name="system_ble_description">Allow nearby Bluetooth scans when Bluetooth is off.</string>
+    <string name="system_mobile_description">Keep mobile data ready while Wi-Fi is active.</string>
+    <string name="system_saver_description">Limit background mobile data use.</string>
     <string name="system_permission_description">The settings permission keeps most controls available when Shizuku stops. Data Saver needs Shizuku. Revert restores the values captured before your last change.</string>
     <string name="system_refresh">Refresh values</string>
     <string name="system_private_dns">Private DNS</string>

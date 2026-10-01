@@ -178,6 +178,12 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - The overflow, Settings sections, dependent toggle, Diagnostics route and Logs top bar were inspected on `emulator-5554`. Existing `ScreenTopBar` users were confirmed in code; History and Privacy dashboard actions were moved to icons and built successfully. The full light/dark, profile and accessibility pass remains in Phase 9.
 
+### Task 7.1 — Device settings
+
+- The page now leads with a short device-wide warning and an information disclosure. Each control card has a description and a selected segmented choice: Default/On/Off for the three global scanning/data controls, Off/On for Data Saver, Default/GrapheneOS/Off for portal checks, and Default/Automatic/Off/Custom for Private DNS. Hostname entry, suggestions and Apply appear only for Custom; portal Off still requires confirmation. Revert buttons and existing test tags remain. Successful operations use a snackbar, while invalid input and failed operations stay visible as errors.
+- `SystemUiDeviceTest` passed **1/1** on `emulator-5554`. Its UI assertions cover the DNS custom flow, invalid hostname, portal confirmation, changed Wi-Fi value, Revert affordance, Data Saver state, and a direct undo of the exact recorded Wi-Fi operation with state restoration. Shizuku's manager repeatedly stole focus after shell startup, so injected taps on the Revert control were unreliable; a manual app-side tap is scheduled for the Phase 7 visual gate. The test's direct undo verified the backend and returned Wi-Fi to its starting value.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest lintDebug` passed **225/225 JVM tests**, both APKs, **0 lint errors, 699 warnings, 1 hint** across the then-current Phase 7/8 working tree. Device visual review is pending the Phase 7 gate.
+
 ### Task 7.2 — Compare profiles
 
 - `ProfileComparison.rows` now filters to differing available-cell status, disabled, suspended and saved-privacy tuples. Unavailable cells are ignored, and a single available cell is retained. Three new JVM tests cover these cases; the full suite passes 225/225.

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -121,7 +122,7 @@ fun CanaBanner(
 fun InfoDisclosure(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Column(modifier) {
-        Row(Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(vertical = 8.dp),
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { expanded = !expanded }.padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
             Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
@@ -165,14 +166,16 @@ fun <T> ChoiceRow(
     selected: T,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         options.forEachIndexed { index, option ->
             SegmentedButton(
                 selected = selected == option.value,
                 onClick = { onSelect(option.value) },
+                enabled = enabled,
                 shape = SegmentedButtonDefaults.itemShape(index, options.size),
-                modifier = Modifier.weight(1f).testTag(option.testTag),
+                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(option.testTag),
                 label = { Text(option.label, maxLines = 1) },
             )
         }
