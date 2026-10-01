@@ -45,12 +45,12 @@ class UpdateCleanupUiTest {
                 }) }
             }
             compose.waitUntil(30_000) { compose.onAllNodesWithText("Checking updates and other profiles…").fetchSemanticsNodes().isEmpty() }
-            compose.onNodeWithText("Work profile").assertIsDisplayed()
+            compose.onNodeWithText("Work profile", substring = true).assertIsDisplayed()
             compose.onNode(hasText("Removing updates also downgrades", substring = true)).performScrollTo().assertIsDisplayed()
-            compose.onNode(hasText("Apply reviewed changes") and hasClickAction()).assertIsNotEnabled()
+            compose.onNode(hasText("Remove updates") and hasClickAction()).assertIsNotEnabled()
             compose.onNodeWithText(app.name).performScrollTo().performClick()
             compose.onNodeWithText("I understand these warnings and want to continue.").performScrollTo().performClick()
-            compose.onNode(hasText("Apply reviewed changes") and hasClickAction()).assertIsEnabled().performClick()
+            compose.onNode(hasText("Remove updates") and hasClickAction()).assertIsEnabled().performClick()
             assertEquals(setOf(0), consent)
             assertFalse(ops.inspectUpdates(name, 10).installed)
         } finally {

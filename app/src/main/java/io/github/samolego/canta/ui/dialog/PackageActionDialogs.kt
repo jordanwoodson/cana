@@ -3,6 +3,8 @@ package io.github.samolego.canta.ui.dialog
 import io.github.samolego.canta.ui.menu.profileName
 
 import android.text.format.Formatter.formatFileSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
@@ -14,7 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
@@ -25,6 +29,10 @@ import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
 import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
+import io.github.samolego.canta.ui.component.CanaBanner
+import io.github.samolego.canta.ui.component.RiskChip
+import io.github.samolego.canta.ui.component.StatusTone
+import io.github.samolego.canta.util.RemovalRecommendation
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.util.apps.knownApkTotal
@@ -122,22 +130,28 @@ internal fun PackageActionConfirmation(
     }
     val checked = impacts
     val warnings = if (cleanup) emptyMap() else safety.filter { it.key in included && it.value.warnings.isNotEmpty() }
-    val title = request.action.label
+    val includedApps = request.apps.filter { it.packageName in included }
+    val riskyRemoval = request.action in setOf(PackageAction.UNINSTALL, PackageAction.UNINSTALL_KEEP_DATA) &&
+        includedApps.any { it.removalInfo in setOf(RemovalRecommendation.EXPERT, RemovalRecommendation.UNSAFE) }
+    val skipped = request.requestedPackages.size - included.size
+    val profile = profileName(request.userId)
+    val title = pluralStringResource(request.action.confirmationTitle(), included.size, included.size, profile)
     val updateConsent = (cleanup || reset) && checked.orEmpty().any { it.packageName in included && it.otherInstalledProfiles.isNotEmpty() }
     val needsConsent = warnings.isNotEmpty() || updateConsent
     AlertDialog(onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.plan_title)) },
+        title = { Text(title) },
         text = {
             Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
-                Text(profileName(request.userId))
-                Text(stringResource(R.string.plan_summary, request.requestedPackages.size, included.size,
-                    request.requestedPackages.size - included.size))
+                if (skipped > 0) Text(pluralStringResource(R.plurals.confirm_skipped_count, skipped, skipped),
+                    style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(stringResource(when (request.action) {
-                    PackageAction.UNINSTALL -> R.string.plan_remove_data
+                    PackageAction.UNINSTALL -> if (includedApps.any { !it.isSystemApp }) R.string.confirm_uninstall_user_consequence
+                        else R.string.confirm_uninstall_system_consequence
                     PackageAction.UNINSTALL_KEEP_DATA -> R.string.plan_keep_data
                     PackageAction.REINSTALL -> R.string.plan_restore
                     PackageAction.REMOVE_UPDATES -> R.string.plan_update_loss
+                    PackageAction.DISABLE -> R.string.confirm_disable_consequence
+                    PackageAction.SUSPEND -> R.string.confirm_suspend_consequence
                     else -> R.string.plan_reversible
                 }))
                 inspectionError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -148,17 +162,30 @@ internal fun PackageActionConfirmation(
                     request.requestedPackages.forEach { pkg ->
                         val app = request.apps.find { it.packageName == pkg }
                         val assessment = safety[pkg]
-                        val eligible = app != null && assessment?.protected != true && assessment?.error == null && checked.orEmpty().none { it.packageName == pkg && it.error != null } &&
-                            (!cleanup || checked.orEmpty().any { it.packageName == pkg && it.updated && it.error == null })
+                        val impact = checked.orEmpty().find { it.packageName == pkg }
+                        val eligible = app != null && assessment?.protected != true && assessment?.error == null && impact?.error == null &&
+                            (!cleanup || impact?.updated == true)
                         Row(Modifier.fillMaxWidth().toggleable(pkg in included, enabled = eligible, role = Role.Checkbox,
                             onValueChange = { included = if (it) included + pkg else included - pkg }), verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(pkg in included, enabled = eligible, onCheckedChange = null)
                             Column(Modifier.weight(1f)) {
-                                Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium)
-                                if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall)
-                                if (app == null) Text(stringResource(R.string.plan_unavailable), style = MaterialTheme.typography.bodySmall)
-                                else if (pkg !in included) Text(stringResource(R.string.plan_excluded), style = MaterialTheme.typography.bodySmall)
+                                Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                val reason = when {
+                                    app == null -> stringResource(R.string.plan_unavailable)
+                                    assessment?.protected == true -> stringResource(R.string.safety_protected, pkg)
+                                    assessment?.error != null -> assessment.error
+                                    impact?.error != null -> impact.error
+                                    cleanup && impact?.updated != true -> stringResource(R.string.no_leftover_updates)
+                                    pkg !in included -> stringResource(R.string.plan_excluded)
+                                    else -> null
+                                }
+                                reason?.let { Text(it, style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant) }
                             }
+                            app?.removalInfo?.let { RiskChip(it) }
                         }
                     }
                     if (included.isEmpty()) Text(stringResource(R.string.plan_empty))
@@ -166,47 +193,55 @@ internal fun PackageActionConfirmation(
                     safety.filterValues { it.protected || it.error != null }.forEach { (name, assessment) ->
                         Text(assessment.error ?: stringResource(R.string.safety_protected, name), color = MaterialTheme.colorScheme.error)
                     }
-                    warnings.forEach { (name, assessment) ->
-                        Text(name, style = MaterialTheme.typography.labelLarge)
-                        assessment.warnings.forEach { warning ->
-                            Text(stringResource(when (warning.kind) {
-                                "role" -> R.string.safety_role
-                                "keyboard" -> R.string.safety_keyboard
-                                "admin" -> R.string.safety_admin
-                                else -> R.string.safety_dependent
-                            }, warning.detail))
-                        }
-                    }
+                    if (warnings.isNotEmpty()) CanaBanner(Icons.Default.Warning,
+                        stringResource(R.string.confirm_warning_title), StatusTone.ERROR,
+                        details = {
+                            warnings.forEach { (name, assessment) ->
+                                Text(name, style = MaterialTheme.typography.labelLarge)
+                                assessment.warnings.forEach { warning ->
+                                    Text(stringResource(when (warning.kind) {
+                                        "role" -> R.string.safety_role
+                                        "keyboard" -> R.string.safety_keyboard
+                                        "admin" -> R.string.safety_admin
+                                        else -> R.string.safety_dependent
+                                    }, warning.detail))
+                                }
+                            }
+                        })
+                    if (checked.orEmpty().any { it.updated }) {
+                        CanaBanner(Icons.Default.Warning, stringResource(R.string.update_global_warning), StatusTone.ERROR,
+                            details = {
+                                val selectedUpdateBytes = knownApkTotal(checked.orEmpty()
+                                    .filter { it.updated && it.packageName in included }.map { it.sizeBytes })
+                                Text(stringResource(R.string.selected_update_apks, selectedUpdateBytes?.let {
+                                    formatFileSize(context, it)
+                                } ?: stringResource(R.string.app_size_unavailable)))
+                                if (!cleanup) {
+                                    Row(Modifier.fillMaxWidth().clickable { reset = !reset }, verticalAlignment = Alignment.CenterVertically) {
+                                        Checkbox(checked = reset, onCheckedChange = { reset = it })
+                                        Text(stringResource(R.string.reset_to_factory_version))
+                                    }
+                                }
+                                checked.orEmpty().filter { it.updated }.forEach { impact ->
+                                    if (impact.otherInstalledProfiles.isNotEmpty()) {
+                                        Text(impact.packageName, style = MaterialTheme.typography.labelMedium)
+                                        Text(stringResource(if (cleanup) R.string.update_shared_warning else R.string.update_shared_uninstall_warning,
+                                            impact.otherInstalledProfiles.joinToString { "${it.name ?: it.kind.name} (${it.id})" }),
+                                            style = MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                            })
+                    } else if (cleanup && checked.orEmpty().none { it.error != null }) Text(stringResource(R.string.no_leftover_updates))
                     if (needsConsent) {
                         Row(Modifier.fillMaxWidth().clickable { warningsAccepted = !warningsAccepted }, verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(warningsAccepted, { warningsAccepted = it })
                             Text(stringResource(R.string.safety_acknowledge))
                         }
                     }
-                    if (checked.orEmpty().any { it.updated }) {
-                        Text(stringResource(R.string.update_global_warning))
-                        val selectedUpdateBytes = knownApkTotal(checked.orEmpty()
-                            .filter { it.updated && it.packageName in included }.map { it.sizeBytes })
-                        Text(stringResource(R.string.selected_update_apks, selectedUpdateBytes?.let {
-                            formatFileSize(context, it)
-                        } ?: stringResource(R.string.app_size_unavailable)))
-                        if (!cleanup) {
-                            Row(Modifier.fillMaxWidth().clickable { reset = !reset }, verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = reset, onCheckedChange = { reset = it })
-                                Text(stringResource(R.string.reset_to_factory_version))
-                            }
-                        }
-                        checked.orEmpty().filter { it.updated }.forEach { impact ->
-                            Column {
-                                if (impact.otherInstalledProfiles.isNotEmpty()) {
-                                    Text(impact.packageName, style = MaterialTheme.typography.labelMedium)
-                                    Text(stringResource(if (cleanup) R.string.update_shared_warning else R.string.update_shared_uninstall_warning,
-                                        impact.otherInstalledProfiles.joinToString { "${it.name ?: it.kind.name} (${it.id})" }),
-                                        style = MaterialTheme.typography.bodySmall)
-                                }
-                            }
-                        }
-                    } else if (cleanup && checked.orEmpty().none { it.error != null }) Text(stringResource(R.string.no_leftover_updates))
+                    if (riskyRemoval) TextButton(onClick = {
+                        onDismiss()
+                        model.requestAction(PackageAction.DISABLE, included.toList(), request.userId)
+                    }) { Text(stringResource(R.string.confirm_disable_instead)) }
                 }
             }
         },
@@ -216,8 +251,21 @@ internal fun PackageActionConfirmation(
                 onAgree(included, reset, checked.orEmpty().associate { impact ->
                     impact.packageName to impact.otherInstalledProfiles.map { it.id }.toSet()
                 }, warnings.mapValues { (_, report) -> report.warnings.map { it.key }.toSet() })
-            }) { Text(stringResource(R.string.plan_execute)) }
+            }, colors = ButtonDefaults.textButtonColors(contentColor = if (request.action in setOf(PackageAction.UNINSTALL,
+                    PackageAction.UNINSTALL_KEEP_DATA, PackageAction.REMOVE_UPDATES)) MaterialTheme.colorScheme.error
+                else MaterialTheme.colorScheme.primary)) { Text(stringResource(request.action.label)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
+}
+
+private fun PackageAction.confirmationTitle(): Int = when (this) {
+    PackageAction.UNINSTALL -> R.plurals.confirm_uninstall_title
+    PackageAction.UNINSTALL_KEEP_DATA -> R.plurals.confirm_uninstall_keep_data_title
+    PackageAction.DISABLE -> R.plurals.confirm_disable_title
+    PackageAction.ENABLE -> R.plurals.confirm_enable_title
+    PackageAction.SUSPEND -> R.plurals.confirm_suspend_title
+    PackageAction.UNSUSPEND -> R.plurals.confirm_unsuspend_title
+    PackageAction.REINSTALL -> R.plurals.confirm_reinstall_title
+    PackageAction.REMOVE_UPDATES -> R.plurals.confirm_remove_updates_title
 }

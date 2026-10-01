@@ -28,6 +28,21 @@
     <string name="plan_reversible">Cana records the previous state for recovery. Review History after applying these changes.</string>
     <string name="plan_update_loss">Removing updates changes the shared app version across profiles. The exact previous version may need to be downloaded again.</string>
     <string name="plan_empty">No eligible changes. Close this review and update your selection.</string>
+    <plurals name="confirm_uninstall_title"><item quantity="one">Uninstall %1$d app from %2$s?</item><item quantity="other">Uninstall %1$d apps from %2$s?</item></plurals>
+    <plurals name="confirm_uninstall_keep_data_title"><item quantity="one">Uninstall %1$d app from %2$s and keep its data?</item><item quantity="other">Uninstall %1$d apps from %2$s and keep their data?</item></plurals>
+    <plurals name="confirm_disable_title"><item quantity="one">Disable %1$d app in %2$s?</item><item quantity="other">Disable %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_enable_title"><item quantity="one">Enable %1$d app in %2$s?</item><item quantity="other">Enable %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_suspend_title"><item quantity="one">Suspend %1$d app in %2$s?</item><item quantity="other">Suspend %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_unsuspend_title"><item quantity="one">Unsuspend %1$d app in %2$s?</item><item quantity="other">Unsuspend %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_reinstall_title"><item quantity="one">Reinstall %1$d app in %2$s?</item><item quantity="other">Reinstall %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_remove_updates_title"><item quantity="one">Remove updates for %1$d app in %2$s?</item><item quantity="other">Remove updates for %1$d apps in %2$s?</item></plurals>
+    <plurals name="confirm_skipped_count"><item quantity="one">%d will be skipped</item><item quantity="other">%d will be skipped</item></plurals>
+    <string name="confirm_uninstall_system_consequence">You can reinstall system apps from Removed. Their data in this profile is deleted.</string>
+    <string name="confirm_uninstall_user_consequence">If no other profile has an app, it is removed from the device and must be installed again from its source.</string>
+    <string name="confirm_disable_consequence">Reversible: you can enable these apps again any time.</string>
+    <string name="confirm_suspend_consequence">Reversible: you can unsuspend these apps again any time.</string>
+    <string name="confirm_warning_title">Review these warnings</string>
+    <string name="confirm_disable_instead">Disable instead</string>
     <string name="batch_storage_failed">The batch could not be fully saved. Review History and the current app state before retrying.</string>
     <string name="batch_store_unavailable">Saved batch progress could not be read. Restart Cana to retry. No unfinished actions were replayed.</string>
     <string name="batch_stop_failed">Could not save the stop request. Check progress and try again.</string>

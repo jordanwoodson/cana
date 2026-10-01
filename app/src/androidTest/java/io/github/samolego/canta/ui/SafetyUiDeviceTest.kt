@@ -35,9 +35,10 @@ class SafetyUiDeviceTest {
             PackageActionConfirmation(request, model, false, {}, { _, _, _, warnings -> consent = warnings[name] })
         } }
         compose.waitUntil(40_000) { compose.onAllNodesWithText("Current or enabled keyboard:", substring = true).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNode(hasText("Apply reviewed changes") and hasClickAction()).assertIsNotEnabled()
+        compose.onNodeWithText("Uninstall 1 app from Personal?").assertIsDisplayed()
+        compose.onNode(hasText("Uninstall") and hasClickAction()).assertIsNotEnabled()
         compose.onNodeWithText("I understand these warnings and want to continue.").performScrollTo().performClick()
-        compose.onNode(hasText("Apply reviewed changes") and hasClickAction()).assertIsEnabled().performClick()
+        compose.onNode(hasText("Uninstall") and hasClickAction()).assertIsEnabled().performClick()
         assertTrue(consent.orEmpty().any { it.contains("keyboard") && it.contains(name) })
     }
 }
