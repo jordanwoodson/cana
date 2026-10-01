@@ -177,3 +177,9 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Phase 6 verification gate
 
 - The overflow, Settings sections, dependent toggle, Diagnostics route and Logs top bar were inspected on `emulator-5554`. Existing `ScreenTopBar` users were confirmed in code; History and Privacy dashboard actions were moved to icons and built successfully. The full light/dark, profile and accessibility pass remains in Phase 9.
+
+### Task 7.2 — Compare profiles
+
+- `ProfileComparison.rows` now filters to differing available-cell status, disabled, suspended and saved-privacy tuples. Unavailable cells are ignored, and a single available cell is retained. Three new JVM tests cover these cases; the full suite passes 225/225.
+- The comparison defaults to Only differences with two or more selected profiles, uses 150 dp app and 108 dp profile columns, omits empty privacy copy, and opens App detail from installed or removed cells. The two explanatory paragraphs are condensed into an intro and disclosure. Profile chips continue using `displayName()`.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed. Device visual review is pending the Phase 7 verification gate.

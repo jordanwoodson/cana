@@ -4,6 +4,35 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class ProfileComparisonTest {
+    @Test fun onlyDifferencesComparesStatusFlagsAndSavedPrivacy() {
+        val profiles = listOf(
+            ComparisonProfileInventory(0, listOf(
+                ComparisonPackage("same", "Same"), ComparisonPackage("disabled", "Disabled"),
+                ComparisonPackage("privacy", "Privacy")), mapOf("privacy" to ComparisonSavedPrivacy(blockNetwork = true))),
+            ComparisonProfileInventory(10, listOf(
+                ComparisonPackage("same", "Same"), ComparisonPackage("disabled", "Disabled", disabled = true),
+                ComparisonPackage("privacy", "Privacy")), emptyMap()),
+        )
+        assertEquals(setOf("disabled", "privacy"), ProfileComparison.rows(profiles, onlyDifferences = true).map { it.packageName }.toSet())
+    }
+
+    @Test fun unavailableCellsDoNotCreateFalseDifferences() {
+        val profiles = listOf(
+            ComparisonProfileInventory(0, listOf(ComparisonPackage("same", "Same"))),
+            ComparisonProfileInventory(10, listOf(ComparisonPackage("same", "Same"))),
+            ComparisonProfileInventory(11, null),
+        )
+        assertTrue(ProfileComparison.rows(profiles, onlyDifferences = true).isEmpty())
+    }
+
+    @Test fun singleAvailableProfileKeepsAllRows() {
+        val profiles = listOf(
+            ComparisonProfileInventory(0, listOf(ComparisonPackage("only", "Only"))),
+            ComparisonProfileInventory(10, null),
+        )
+        assertEquals("only", ProfileComparison.rows(profiles, onlyDifferences = true).single().packageName)
+    }
+
     @Test fun unavailableProfileIsNeverReportedAsAbsentAndRowsRetainUserIdentity() {
         val rows = ProfileComparison.rows(listOf(
             ComparisonProfileInventory(0, listOf(ComparisonPackage("only.personal", "Personal app"))),

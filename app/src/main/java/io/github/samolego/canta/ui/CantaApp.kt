@@ -109,7 +109,10 @@ fun CantaApp(
             io.github.samolego.canta.ui.screen.PrivacyDashboardPage { navController.navigateUp() }
         }
         composable(Screen.Comparison.route) {
-            io.github.samolego.canta.ui.screen.ProfileComparisonPage { navController.navigateUp() }
+            io.github.samolego.canta.ui.screen.ProfileComparisonPage(
+                onNavigateBack = { navController.navigateUp() },
+                onOpenApp = { pkg, user -> navController.navigate(Screen.AppDetail.path(pkg, user)) },
+            )
         }
         composable(Screen.Main.route) {
             val presetSaveError = stringResource(R.string.preset_save_error)

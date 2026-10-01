@@ -33,7 +33,7 @@ data class ProfileComparisonCell(
 data class ProfileComparisonRow(val packageName: String, val name: String, val cells: List<ProfileComparisonCell>)
 
 object ProfileComparison {
-    fun rows(profiles: List<ComparisonProfileInventory>, query: String = ""): List<ProfileComparisonRow> {
+    fun rows(profiles: List<ComparisonProfileInventory>, query: String = "", onlyDifferences: Boolean = false): List<ProfileComparisonRow> {
         val inventories = profiles.distinctBy { it.userId }
         val packagesByUser = inventories.associate { profile -> profile.userId to profile.packages?.associateBy { it.packageName } }
         val names = inventories.flatMap { it.packages.orEmpty() }.groupBy { it.packageName }
@@ -59,6 +59,11 @@ object ProfileComparison {
                     savedPrivacy = profile.savedPrivacy?.let { it[packageName] ?: ComparisonSavedPrivacy() },
                 )
             })
+        }.filter { row ->
+            if (!onlyDifferences) true else {
+                val available = row.cells.filter { it.status != ComparisonPackageStatus.UNAVAILABLE }
+                available.size < 2 || available.map { listOf(it.status, it.disabled, it.suspended, it.savedPrivacy) }.distinct().size > 1
+            }
         }.sortedWith(compareBy<ProfileComparisonRow> { it.name.lowercase(Locale.ROOT) }.thenBy { it.packageName }).toList()
     }
 }
