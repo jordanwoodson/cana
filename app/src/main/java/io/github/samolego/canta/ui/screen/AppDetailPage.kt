@@ -98,7 +98,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         }
                     }
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        app.removalInfo?.let { RiskChip(it, Modifier.clickable { showRiskInfo = true }) }
+                        app.removalInfo?.let { RiskChip(it, Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true }) }
                         val stateLabel = when {
                             app.isUninstalled -> R.string.tab_removed
                             app.isDisabled -> R.string.app_state_disabled
@@ -116,7 +116,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                             style = MaterialTheme.typography.labelMedium)
                         Text(if (app.apkSizeBytes > 0) formatShortFileSize(context, app.apkSizeBytes)
                             else stringResource(R.string.app_size_unavailable), style = MaterialTheme.typography.labelMedium)
-                        IconButton(onClick = { showSizeInfo = true }, modifier = Modifier.size(32.dp)) {
+                        IconButton(onClick = { showSizeInfo = true }, modifier = Modifier.size(48.dp)) {
                             Icon(Icons.Default.Info, stringResource(R.string.app_apk_size_details), modifier = Modifier.size(18.dp))
                         }
                     }

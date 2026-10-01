@@ -57,13 +57,13 @@ fun CantaTopBar(
     BackHandler(searchActive, closeSearch)
     Column(Modifier.background(containerColor)) {
         TopAppBar(title = {
-            Row(Modifier.widthIn(max = 216.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.widthIn(max = 232.dp), verticalAlignment = Alignment.CenterVertically) {
                 CanaWordmark(style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
                     Surface(
                         onClick = onProfilesClick,
-                        modifier = Modifier.fillMaxWidth().testTag("profile-chip"),
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("profile-chip"),
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
                         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.42f),
                     ) {

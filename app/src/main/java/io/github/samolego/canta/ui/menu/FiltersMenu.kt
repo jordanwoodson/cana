@@ -64,7 +64,7 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
                         leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) })
                     available.forEach { view ->
                         FilterChip(selected = false, onClick = { model.applySavedView(view); onDismiss() }, label = { Text(view.name) })
-                        IconButton(onClick = { deleteTarget = view }, modifier = Modifier.size(40.dp)) {
+                        IconButton(onClick = { deleteTarget = view }, modifier = Modifier.size(48.dp)) {
                             Icon(Icons.Default.Delete, stringResource(R.string.saved_view_delete, view.name))
                         }
                     }
