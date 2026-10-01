@@ -26,10 +26,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TabRow
@@ -95,17 +93,7 @@ fun CantaApp(
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val uiMessages = remember { io.github.samolego.canta.ops.CanaServices.getInstance().uiMessages }
-    LaunchedEffect(uiMessages, snackbarHostState) {
-        uiMessages.messages.collect { message ->
-            val result = snackbarHostState.showSnackbar(
-                message = message.text,
-                actionLabel = message.actionLabel,
-                withDismissAction = message.withDismiss,
-                duration = if (message.actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Long,
-            )
-            if (result == SnackbarResult.ActionPerformed) message.onAction?.invoke()
-        }
-    }
+    CanaMessageCollector(uiMessages, snackbarHostState)
 
     CompositionLocalProvider(LocalCanaSnackbar provides snackbarHostState) {
     Column(Modifier.fillMaxSize()) {
