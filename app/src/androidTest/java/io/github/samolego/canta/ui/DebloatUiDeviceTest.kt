@@ -37,12 +37,14 @@ class DebloatUiDeviceTest {
             assertEquals(PackageAction.DISABLE, model.defaultAction)
         }
         compose.setContent { CantaTheme { SelectionActionBar(model, AppsType.INSTALLED) } }
-        compose.onNodeWithText("1 selected · 1 hidden by this view").assertIsDisplayed()
-        compose.onNodeWithText("Review actions").performClick()
+        compose.onNodeWithText("1 selected · 1 hidden").assertIsDisplayed()
         compose.onNodeWithText("Disable").assertIsDisplayed()
-        for (action in listOf("Enable", "Suspend", "Unsuspend", "Uninstall keeping data", "Uninstall")) {
+        compose.onNodeWithContentDescription("More actions").performClick()
+        for (action in listOf("Suspend", "Uninstall keeping data", "Uninstall")) {
             compose.onNodeWithText(action).assertIsDisplayed()
         }
+        compose.onNodeWithText("Enable").assertDoesNotExist()
+        compose.onNodeWithText("Unsuspend").assertDoesNotExist()
         compose.onNodeWithText("Uninstall keeping data").performClick()
         assertEquals(PackageAction.UNINSTALL_KEEP_DATA, model.pendingAction?.action)
         assertEquals(name, model.pendingAction?.apps?.single()?.packageName)

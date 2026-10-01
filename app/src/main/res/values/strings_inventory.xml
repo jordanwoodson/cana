@@ -40,6 +40,14 @@
     <string name="review_selection">Review selection</string>
     <string name="clear_selection">Clear selection</string>
     <string name="selection_summary">%1$d selected · %2$d hidden by this view</string>
+    <plurals name="selection_selected_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
+    <string name="selection_hidden_short">%1$d selected · %2$d hidden</string>
+    <string name="selection_more_actions">More actions</string>
+    <string name="selection_reversible">Reversible</string>
+    <string name="selection_removes_app">Removes app</string>
     <string name="profile_current">Current profile · user %1$d</string>
     <string name="profile_context">%1$s · user %2$d</string>
     <string name="selection_visible">Select visible apps</string>

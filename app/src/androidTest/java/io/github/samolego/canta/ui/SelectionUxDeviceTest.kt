@@ -96,22 +96,21 @@ class SelectionUxDeviceTest {
         model.selectedApps.add("example.unavailable")
         model.searchQuery = "no matches"
         compose.setContent { CantaTheme { SelectionActionBar(model, AppsType.INSTALLED) } }
-        compose.onNodeWithText("1 selected · 1 hidden by this view").assertIsDisplayed()
-        compose.onNodeWithText("Review selection").performClick()
+        compose.onNodeWithText("1 selected · 1 hidden").assertIsDisplayed().performClick()
         compose.onNodeWithText("example.unavailable").assertIsDisplayed()
         compose.onNodeWithText("Close").performClick()
-        compose.onNodeWithText("Clear selection").performClick()
+        compose.onNodeWithContentDescription("Clear selection").performClick()
         compose.runOnIdle { assertTrue(model.selectedApps.isEmpty()) }
-        compose.onNodeWithText("1 selected · 1 hidden by this view").assertDoesNotExist()
+        compose.onNodeWithText("1 selected · 1 hidden").assertDoesNotExist()
     }
 
     @Test fun actionRequestRetainsUnavailableSelectedTargetsForPreflight() {
         val model = AppListViewModel()
         model.selectedApps.add("example.unavailable")
         compose.setContent { CantaTheme { SelectionActionBar(model, AppsType.INSTALLED) } }
-        compose.onNodeWithText("Review actions").performClick()
-        compose.onNodeWithText("Disable").performClick()
+        compose.onNodeWithText("Uninstall").performClick()
         compose.runOnIdle {
+            assertEquals(PackageAction.UNINSTALL, model.pendingAction!!.action)
             assertEquals(listOf("example.unavailable"), model.pendingAction!!.requestedPackages)
             assertEquals(model.selectedUserId, model.pendingAction!!.userId)
             assertTrue(model.pendingAction!!.apps.isEmpty())
