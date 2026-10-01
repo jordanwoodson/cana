@@ -5,6 +5,10 @@
     <string name="privacy_dashboard">Privacy dashboard</string>
     <string name="privacy_dashboard_description">Review saved restrictions and their verified state in each profile.</string>
     <string name="privacy_dashboard_empty">No saved network or metered restrictions. Open an app’s Privacy tab to review its controls.</string>
+    <string name="privacy_dashboard_verified">Verified</string>
+    <string name="privacy_dashboard_waiting">Waiting for Shizuku</string>
+    <string name="privacy_dashboard_failed">Couldn’t apply</string>
+    <string name="privacy_dashboard_review">Needs review</string>
     <string name="privacy_disconnected_title">Connect to verify privacy settings</string>
     <string name="privacy_disconnected_body">Live state is unavailable while Shizuku is disconnected. Saved restrictions remain visible and can be forgotten.</string>
     <string name="privacy_retry">Retry</string>

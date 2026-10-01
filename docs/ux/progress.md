@@ -189,3 +189,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 - `ManagementPolicy.undoableBatchIds` derives candidates from the same rules as `lastBatch`, blocks running or incomplete batches, and excludes older batches whose app/profile or device-control keys overlap a later candidate. Successful undo removes the later candidate, exposing an older batch again. Three JVM tests cover the latest/disjoint/overlap, resolved overlap, and incomplete/running cases; the full suite passes 225/225.
 - History uses per-batch Undo buttons, action/count/profile titles, status chips, nonzero counts, Details/Hide details, and app names when an inventory has them. The top Undo last batch button is gone. Empty and older-record copy is plain language. `ManagementUiDeviceTest` now targets its batch card; device execution is pending the Phase 7 gate.
 - `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed.
+
+### Task 7.4 — Privacy dashboard
+
+- Saved restriction cards resolve app names from each profile inventory, falling back to the package, and show the profile as a subtitle. Restriction type and verification state use status chips; live enforcement has its own line. The existing Review and Forget actions remain. The empty view uses `EmptyState`, and refresh remains in the top bar.
+- `testDebugUnitTest assembleDebug assembleDebugAndroidTest` passed 225/225 JVM tests. Device visual review is pending the Phase 7 gate.

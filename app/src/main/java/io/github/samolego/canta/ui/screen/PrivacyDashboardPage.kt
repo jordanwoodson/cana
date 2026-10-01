@@ -8,6 +8,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -21,6 +26,9 @@ import io.github.samolego.canta.data.proto.NetworkBlock
 import io.github.samolego.canta.data.proto.PrivacyDesiredState
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.ScreenTopBar
+import io.github.samolego.canta.ui.component.EmptyState
+import io.github.samolego.canta.ui.component.StatusChip
+import io.github.samolego.canta.ui.component.StatusTone
 import io.github.samolego.canta.ui.dialog.*
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
@@ -74,6 +82,16 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
         finally { loading = false }
     }
     val entries = stored.networkBlocksList.map { it to PrivacyAction.NETWORK } + stored.meteredBlocksList.map { it to PrivacyAction.METERED }
+    var appNames by remember { mutableStateOf<Map<Pair<Int, String>, String>>(emptyMap()) }
+    LaunchedEffect(entries.map { it.first.userId }.distinct()) {
+        val names = mutableMapOf<Pair<Int, String>, String>()
+        entries.map { it.first.userId }.distinct().forEach { userId ->
+            runCatching { services.inventory.snapshot(userId) }.getOrNull()?.apps?.forEach { app ->
+                names[userId to app.packageName] = app.name
+            }
+        }
+        appNames = names
+    }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
         topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) },
             actions = { IconButton(enabled = !loading, onClick = { revision++ }) {
@@ -86,21 +104,33 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
             message?.let { Text(it) }
             if (unavailable) Text(stringResource(R.string.privacy_store_unavailable), color = MaterialTheme.colorScheme.error)
-            else if (!loading && entries.isEmpty()) Text(stringResource(R.string.privacy_dashboard_empty))
+            else if (!loading && entries.isEmpty()) EmptyState(Icons.Default.Security,
+                stringResource(R.string.privacy_dashboard), stringResource(R.string.privacy_dashboard_empty))
             for ((block, action) in entries.sortedWith(compareBy({ it.first.userId }, { it.first.packageName }, { it.second.key }))) {
                 ElevatedCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(block.packageName, style = MaterialTheme.typography.titleMedium)
-                        Text(profileName(block.userId))
-                        Text(stringResource(action.title))
-                        Text(stringResource(R.string.privacy_saved_restriction))
-                        Text(stringResource(privacyStatusLabel(if (!connected && block.status != "needs_review") "disconnected" else block.status)))
+                        Text(appNames[block.userId to block.packageName] ?: block.packageName, style = MaterialTheme.typography.titleMedium)
+                        Text(profileName(block.userId), style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        val status = if (!connected && block.status != "needs_review") "disconnected" else block.status
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            StatusChip(stringResource(action.title), Icons.Default.WifiOff)
+                            StatusChip(stringResource(privacyDashboardStatus(status)), when (status) {
+                                "verified" -> Icons.Default.CheckCircle
+                                "failed" -> Icons.Default.Error
+                                else -> Icons.Default.Warning
+                            }, when (status) {
+                                "failed" -> StatusTone.ERROR
+                                "verified" -> StatusTone.NEUTRAL
+                                else -> StatusTone.WARNING
+                            })
+                        }
                         val verified = if (connected) live[Triple(block.packageName, block.userId, action)] else null
                         Text(stringResource(when (verified) {
                             null -> R.string.privacy_live_unavailable
                             true -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_blocked else R.string.privacy_live_restricted
                             false -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_allowed else R.string.privacy_live_unrestricted
-                        }))
+                        }), style = MaterialTheme.typography.bodySmall)
                         if (block.status == "needs_review") Text(stringResource(R.string.privacy_review_required), style = MaterialTheme.typography.bodySmall)
                         if (diagnostics && block.statusMessage.isNotBlank()) Text(block.statusMessage, style = MaterialTheme.typography.bodySmall)
                         FlowRow {
@@ -133,4 +163,11 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
             }) { Text(stringResource(R.string.privacy_forget)) } },
             dismissButton = { TextButton(onClick = { forget = null }) { Text(stringResource(R.string.cancel)) } })
     }
+}
+
+private fun privacyDashboardStatus(status: String): Int = when (status) {
+    "verified" -> R.string.privacy_dashboard_verified
+    "disconnected", "pending" -> R.string.privacy_dashboard_waiting
+    "failed" -> R.string.privacy_dashboard_failed
+    else -> R.string.privacy_dashboard_review
 }
