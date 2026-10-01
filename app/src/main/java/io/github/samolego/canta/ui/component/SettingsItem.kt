@@ -27,6 +27,7 @@ fun SettingsItem(
     icon: ImageVector? = null,
     isSwitch: Boolean = false,
     checked: Boolean = false,
+    enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
@@ -34,7 +35,7 @@ fun SettingsItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(
-                enabled = onClick != null || (isSwitch && onCheckedChange != null),
+                enabled = enabled && (onClick != null || (isSwitch && onCheckedChange != null)),
                 onClick = {
                     onClick?.invoke()
                     if (isSwitch) {
@@ -50,7 +51,7 @@ fun SettingsItem(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.padding(end = 16.dp).size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             )
         }
 
@@ -59,20 +60,21 @@ fun SettingsItem(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             )
             if (description != null) {
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 )
             }
         }
 
         if (isSwitch) {
             Box(modifier = Modifier.padding(4.dp)) {
-                Switch(checked = checked, onCheckedChange = onCheckedChange)
+                Switch(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
             }
         }
     }

@@ -166,3 +166,7 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Task 6.2 — Secondary top bars
 
 - History, Privacy dashboard, Device settings, App detail, Settings, Logs, Presets and Compare already used `ScreenTopBar`; the remaining action mismatches were corrected. History now exports through a SaveAlt icon in the bar, Privacy dashboard refreshes through a bar icon, and Logs copies all through a bar icon instead of a FAB. Compare already had its Refresh icon. These actions have content descriptions and retain their existing behavior. `compileDebugKotlin` passed; Phase 6 gate will inspect the bars on-device.
+
+### Task 6.3 — Settings structure
+
+- A standalone upstreamable `SettingsItem` change adds an `enabled` parameter, prevents disabled row/switch interaction and dims its content. `compileDebugKotlin` passed. The dependent Bloat list control will use this in the Settings restructuring commit.
