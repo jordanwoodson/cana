@@ -17,22 +17,24 @@ class AppSizeUiTest {
     private val baseApp get() = AppInfo("Example", "example.app", "1", 1,
         isSystemApp = false, isUninstalled = false, isDisabled = false, bloatData = null, apkSizeBytes = 2_000_000)
 
-    @Test fun ordinaryAppRowShowsApkSizeWithoutAnUpdateLine() {
+    @Test fun ordinaryAppRowShowsCompactSizeWithoutRepeatedApkLabel() {
         compose.setContent { MaterialTheme { AppTile(appInfo = baseApp, isSelected = false,
             onCheckChanged = {}, onShowDialog = {}) } }
-        compose.onNodeWithText(context.getString(R.string.app_apk_size, Formatter.formatFileSize(context, 2_000_000)))
+        compose.onNodeWithText(Formatter.formatShortFileSize(context, 2_000_000))
             .assertIsDisplayed()
+        compose.onNodeWithText("APK files:", substring = true).assertDoesNotExist()
         compose.onNodeWithText("System update:", substring = true).assertDoesNotExist()
     }
 
-    @Test fun removedUpdatedSystemAppRowShowsUnknownTotalAndKnownUpdate() {
+    @Test fun removedUpdatedSystemAppRowLabelsTheKnownLeftoverUpdateSize() {
         compose.setContent { MaterialTheme { AppTile(appInfo = baseApp.copy(
             isSystemApp = true, isUninstalled = true, isUpdatedSystemApp = true,
             apkSizeBytes = 0, updateSizeBytes = 1_000_000), isSelected = false,
             onCheckChanged = {}, onShowDialog = {}) } }
-        compose.onNodeWithText(context.getString(R.string.app_apk_size, context.getString(R.string.app_size_unavailable)))
+        compose.onNodeWithText(context.getString(R.string.leftover_update_chip))
             .assertIsDisplayed()
-        compose.onNodeWithText(context.getString(R.string.app_update_apk_size, Formatter.formatFileSize(context, 1_000_000)))
+        compose.onNodeWithText(Formatter.formatShortFileSize(context, 1_000_000))
             .assertIsDisplayed()
+        compose.onNodeWithText("APK files:", substring = true).assertDoesNotExist()
     }
 }

@@ -144,8 +144,9 @@ fun AppList(
                 ) {
                     items(appList, key = { it.packageName }) { appInfo ->
                         AppTile(
-                                modifier = Modifier.padding(vertical = 2.dp),
+                                modifier = Modifier,
                                 appInfo = appInfo,
+                                userId = appListModel.selectedUserId,
                                 isSelected =
                                         appListModel.selectedApps.contains(appInfo.packageName),
                                 enabled = !appListModel.isOperating,

@@ -57,6 +57,7 @@
     <string name="inventory_empty_title">Nothing here yet</string>
     <string name="inventory_no_matches_title">No matches</string>
     <string name="inventory_unavailable_title">Apps unavailable</string>
+    <string name="leftover_update_chip">Leftover update</string>
     <string name="inventory_empty_removed">No removed apps in this profile.</string>
     <string name="inventory_no_matches">No apps match this view.</string>
     <string name="inventory_unavailable">Apps could not be refreshed. Check the connection and profile access, then retry.</string>
