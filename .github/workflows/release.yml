@@ -20,8 +20,6 @@ concurrency:
 
 permissions:
   contents: write
-  id-token: write
-  attestations: write
 
 env:
   # Cana release certificate; Android refuses updates signed with any other key
@@ -80,11 +78,6 @@ jobs:
           mv app-release.apk "cana-v$VERSION.apk"
           sha256sum "cana-v$VERSION.apk" > SHA256SUMS.txt
           cat SHA256SUMS.txt
-
-      - name: 🛡️ Generate artifact attestation
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: app/build/outputs/apk/release/*.apk
 
       - name: 🚀 Publish the GitHub release
         env:
