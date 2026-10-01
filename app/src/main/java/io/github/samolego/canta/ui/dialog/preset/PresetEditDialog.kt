@@ -1,6 +1,5 @@
 package io.github.samolego.canta.ui.dialog.preset
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -8,11 +7,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.util.CantaPresetData
@@ -113,7 +112,7 @@ fun PresetCreateDialog(
     presetViewModel: PresetsViewModel,
     closeDialog: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val uiMessages = remember { CanaServices.getInstance().uiMessages }
     val presetSaveErrorText = stringResource(R.string.preset_save_error)
     PresetDialog(
         title = stringResource(R.string.create_preset),
@@ -135,12 +134,7 @@ fun PresetCreateDialog(
                     .toSet(),
                 onSuccess = { closeDialog() },
                 onError = {
-                    Toast.makeText(
-                        context,
-                        presetSaveErrorText,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    uiMessages.post(presetSaveErrorText)
                 },
             )
         }
@@ -153,7 +147,7 @@ fun PresetEditDialog(
     presetViewModel: PresetsViewModel,
     closeDialog: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val uiMessages = remember { CanaServices.getInstance().uiMessages }
     val presetSaveErrorText = stringResource(R.string.preset_save_error)
     PresetDialog(
         title = stringResource(R.string.edit),
@@ -169,12 +163,7 @@ fun PresetEditDialog(
                 profileKind = kind,
                 onSuccess = { closeDialog() },
                 onError = {
-                    Toast.makeText(
-                        context,
-                        presetSaveErrorText,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    uiMessages.post(presetSaveErrorText)
                 },
             )
         }

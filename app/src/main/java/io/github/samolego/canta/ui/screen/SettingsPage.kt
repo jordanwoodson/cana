@@ -87,6 +87,7 @@ fun SettingsScreen(
     val useDynamicColor by settingsViewModel.useDynamicColor.collectAsStateWithLifecycle()
 
     Scaffold(
+        snackbarHost = { androidx.compose.material3.SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
         topBar = {
             ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.settings)) })
         }

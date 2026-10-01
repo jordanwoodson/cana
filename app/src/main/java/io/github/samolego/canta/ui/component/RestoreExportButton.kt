@@ -1,6 +1,5 @@
 package io.github.samolego.canta.ui.component
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
@@ -33,7 +32,7 @@ fun RestoreExportButton() {
                 resources.getString(R.string.restore_export_saved)
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) { resources.getString(R.string.restore_export_failed, e.message.orEmpty()) }
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            CanaServices.getInstance().uiMessages.post(message)
         }
     }
     TextButton(onClick = { picker.launch("cana-restore.sh") }) { Text(stringResource(R.string.restore_export)) }

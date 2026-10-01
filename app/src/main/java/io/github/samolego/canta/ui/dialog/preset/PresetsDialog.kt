@@ -36,7 +36,9 @@ import io.github.samolego.canta.ui.component.ChoiceRow
 fun ImportPresetDialog(
     onDismiss: () -> Unit,
     onImportFromClipboard: () -> Unit,
-    onImportFromText: (String) -> Unit
+    onImportFromText: (String) -> Unit,
+    importError: String? = null,
+    onTextChanged: () -> Unit = {},
 ) {
     var selectedTab by remember { mutableStateOf(Tab.CLIPBOARD) }
     var jsonText by remember { mutableStateOf("") }
@@ -72,6 +74,8 @@ fun ImportPresetDialog(
                     selected = selectedTab,
                     onSelect = { selectedTab = it },
                 )
+
+                importError?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -114,6 +118,7 @@ fun ImportPresetDialog(
                                 onValueChange = {
                                     jsonText = it
                                     textError = false
+                                    onTextChanged()
                                 },
                                 placeholder = { Text(stringResource(R.string.paste_preset_json_here)) },
                                 isError = textError,

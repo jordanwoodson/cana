@@ -1,6 +1,5 @@
 package io.github.samolego.canta.ui.screen
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -32,11 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.RestoreExportButton
 import io.github.samolego.canta.ui.component.ScreenTopBar
@@ -49,6 +48,7 @@ fun LogsPage(onNavigateBack: () -> Unit) {
     val logs = LogUtils.getLogs()
 
     Scaffold(
+            snackbarHost = { androidx.compose.material3.SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
             topBar = {
                 ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.logs)) },
                     actions = { RestoreExportButton() })
@@ -84,7 +84,8 @@ fun LogsPage(onNavigateBack: () -> Unit) {
 private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
     var expanded by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
-    val context = LocalContext.current
+    val copiedText = stringResource(R.string.log_copied)
+    val uiMessages = remember { CanaServices.getInstance().uiMessages }
 
     Surface(
         modifier = Modifier
@@ -96,7 +97,7 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
                 onLongClick = {
                     val logText = "[${logEntry.getFormattedTime()}] ${logEntry.level} ${logEntry.tag}: ${logEntry.message}"
                     clipboardManager.setText(AnnotatedString(logText))
-                    Toast.makeText(context, R.string.log_copied, Toast.LENGTH_SHORT).show()
+                    uiMessages.post(copiedText)
                 }
             ),
         color = logEntry.level.color.copy(alpha = 0.2f),

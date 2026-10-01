@@ -27,6 +27,7 @@ import java.io.File
 class CanaServices private constructor(context: Context) {
     private val appContext = context.applicationContext
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    val uiMessages = UiMessages()
     val batchStore = io.github.samolego.canta.data.BatchStore(appContext.batchDataStore)
     val profiles = ProfileDirectory()
     val inventory = InventoryRepository(appContext, scope)

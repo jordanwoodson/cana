@@ -2,7 +2,6 @@ package io.github.samolego.canta.ui.component
 
 import android.content.Context
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -115,10 +114,11 @@ fun TrackerScanProgressRow(progress: TrackerScanProgress, modifier: Modifier = M
     }
 }
 
-/** Scans every installed app of the selected profile in the background and reports the outcome in a toast. */
+/** Scans every installed app of the selected profile in the background and reports the outcome globally. */
 fun startTrackerScan(context: Context, model: AppListViewModel) {
     val appContext = context.applicationContext
-    CanaServices.getInstance().trackerScans.scanAll(model.allApps, model.selectedUserId) { scanned, withTrackers, failed ->
-        Toast.makeText(appContext, appContext.getString(R.string.tracker_scan_summary, withTrackers, scanned, failed), Toast.LENGTH_LONG).show()
+    val services = CanaServices.getInstance()
+    services.trackerScans.scanAll(model.allApps, model.selectedUserId) { scanned, withTrackers, failed ->
+        services.uiMessages.post(appContext.getString(R.string.tracker_scan_summary, withTrackers, scanned, failed))
     }
 }

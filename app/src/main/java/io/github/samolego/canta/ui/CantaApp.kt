@@ -1,6 +1,5 @@
 package io.github.samolego.canta.ui
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,11 +26,16 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +47,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -85,13 +88,26 @@ fun CantaApp(
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val resources = LocalResources.current
 
     val appListViewModel = viewModel<AppListViewModel>()
     val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory())
     val presetViewModel = viewModel<PresetsViewModel>()
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val uiMessages = remember { io.github.samolego.canta.ops.CanaServices.getInstance().uiMessages }
+    LaunchedEffect(uiMessages, snackbarHostState) {
+        uiMessages.messages.collect { message ->
+            val result = snackbarHostState.showSnackbar(
+                message = message.text,
+                actionLabel = message.actionLabel,
+                withDismissAction = message.withDismiss,
+                duration = if (message.actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Long,
+            )
+            if (result == SnackbarResult.ActionPerformed) message.onAction?.invoke()
+        }
+    }
 
+    CompositionLocalProvider(LocalCanaSnackbar provides snackbarHostState) {
     Column(Modifier.fillMaxSize()) {
     io.github.samolego.canta.ui.component.BatchProgressBanner { navController.navigate(Screen.History.route) { launchSingleTop = true } }
     NavHost(navController = navController, startDestination = Screen.Main.route, modifier = Modifier.weight(1f)) {
@@ -127,13 +143,7 @@ fun CantaApp(
                                 navController.navigate(Screen.Presets.route)
                             },
                             onError = {
-                                // Show error message to user
-                                Toast.makeText(
-                                    context,
-                                    presetSaveError,
-                                    Toast.LENGTH_LONG
-                                )
-                                    .show()
+                                uiMessages.post(presetSaveError)
                             }
                         )
                     }
@@ -178,6 +188,7 @@ fun CantaApp(
     }
 }
 }
+}
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -193,6 +204,7 @@ private fun MainContent(
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val profileLoadFailed = stringResource(R.string.profiles_load_failed)
 
     // Selected tab
     var selectedAppsType by remember { mutableStateOf(AppsType.INSTALLED) }
@@ -236,7 +248,7 @@ private fun MainContent(
             if (appListViewModel.loadUsers()) {
                 showProfilesMenu = true
             } else {
-                Toast.makeText(context, R.string.profiles_load_failed, Toast.LENGTH_LONG).show()
+                io.github.samolego.canta.ops.CanaServices.getInstance().uiMessages.post(profileLoadFailed)
             }
         }
     }
@@ -247,6 +259,7 @@ private fun MainContent(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(LocalCanaSnackbar.current) },
         topBar = {
             CantaTopBar(
                 openBadgesInfoDialog = { showExplainBadgeDialog = true },

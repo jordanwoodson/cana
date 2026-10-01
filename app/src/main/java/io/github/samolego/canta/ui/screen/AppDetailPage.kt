@@ -48,7 +48,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
     val state = services.inventory.state(target.userId)
     val app = state.apps.find { it.packageName == target.packageName }
     LaunchedEffect(target) { if (!state.loaded || state.stale) services.inventory.snapshot(target.userId) }
-    Scaffold(topBar = { ScreenTopBar(
+    Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) }, topBar = { ScreenTopBar(
         onNavigateBack = onNavigateBack,
         title = { Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium) },
         subtitle = profileName(target.userId),

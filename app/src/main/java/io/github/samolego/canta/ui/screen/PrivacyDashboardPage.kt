@@ -73,7 +73,8 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
         finally { loading = false }
     }
     val entries = stored.networkBlocksList.map { it to PrivacyAction.NETWORK } + stored.meteredBlocksList.map { it to PrivacyAction.METERED }
-    Scaffold(topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) }) }) { padding ->
+    Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
+        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.privacy_dashboard_description))

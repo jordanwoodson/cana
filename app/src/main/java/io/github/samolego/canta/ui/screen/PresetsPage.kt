@@ -1,7 +1,6 @@
 package io.github.samolego.canta.ui.screen
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.fab.ExpandableFAB
 import io.github.samolego.canta.ui.dialog.preset.ImportPresetDialog
@@ -73,6 +73,7 @@ fun PresetsPage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val uiMessages = remember { CanaServices.getInstance().uiMessages }
 
     var currentDialog by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
 
@@ -88,6 +89,7 @@ fun PresetsPage(
 
     LaunchedEffect(Unit) { presetViewModel.initialize(context) }
     Scaffold(
+            snackbarHost = { androidx.compose.material3.SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
             topBar = {
                 ScreenTopBar(
                         onNavigateBack = { onNavigateBack(null) },
@@ -172,20 +174,10 @@ fun PresetsPage(
                                     presetViewModel.deletePreset(
                                             preset = preset,
                                             onSuccess = {
-                                                Toast.makeText(
-                                                                context,
-                                                                presetDeletedText,
-                                                                Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
+                                                uiMessages.post(presetDeletedText)
                                             },
                                             onError = {
-                                                Toast.makeText(
-                                                                context,
-                                                                presetDeleteErrorText,
-                                                                Toast.LENGTH_SHORT
-                                                        )
-                                                        .show()
+                                                uiMessages.post(presetDeleteErrorText)
                                             },
                                     )
                                 },
@@ -194,12 +186,7 @@ fun PresetsPage(
                                             context = context,
                                             preset = preset,
                                     )
-                                    Toast.makeText(
-                                                    context,
-                                                    presetCopiedText,
-                                                    Toast.LENGTH_SHORT
-                                            )
-                                            .show()
+                                    uiMessages.post(presetCopiedText)
                                 },
                         )
                     }
@@ -213,7 +200,7 @@ fun PresetsPage(
         val importedText = stringResource(R.string.preset_import_saved)
         PresetImportReviewDialog(review, presetViewModel.checkingImport, presetViewModel.isLoading,
             presetViewModel.importError,
-            onConfirm = { presetViewModel.confirmImport { Toast.makeText(context, importedText, Toast.LENGTH_SHORT).show() } },
+            onConfirm = { presetViewModel.confirmImport { uiMessages.post(importedText) } },
             onDismiss = presetViewModel::cancelImport)
     }
 }
@@ -226,17 +213,21 @@ private fun ImportDialog(
     context: Context,
 ) {
     val importFailedText = stringResource(R.string.import_failed)
+    val uiMessages = remember { CanaServices.getInstance().uiMessages }
+    var importError by remember { mutableStateOf<String?>(null) }
     val review: (CantaPresetData) -> Unit = { preset ->
         val profile = appListViewModel.selectedProfile
             ?: appListViewModel.users.firstOrNull { it.id == appListViewModel.selectedUserId }
         presetViewModel.prepareImport(preset, context, appListViewModel.selectedUserId, profile?.name, profile?.kind?.name)
         hideDialog()
     }
-    val failure = { Toast.makeText(context, importFailedText, Toast.LENGTH_SHORT).show() }
+    val failure = { importError = importFailedText; uiMessages.post(importFailedText) }
     ImportPresetDialog(
         onDismiss = hideDialog,
         onImportFromClipboard = { presetViewModel.importFromClipboard(context, review, failure) },
         onImportFromText = { presetViewModel.importFromJson(it, review, failure) },
+        importError = importError,
+        onTextChanged = { importError = null },
     )
 }
 

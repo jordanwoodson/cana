@@ -115,7 +115,8 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit) {
     val errors = listOfNotNull(profileError, privacyError) + snapshots.values.mapNotNull { it.error }
     var showDetails by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.comparison_title)) }, actions = {
+    Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
+        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.comparison_title)) }, actions = {
         IconButton(onClick = { refresh++ }, enabled = !loading) {
             Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.comparison_refresh))
         }
