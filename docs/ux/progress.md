@@ -162,3 +162,7 @@ Each later entry records the change, commit, test counts, device checks and scre
 ### Task 6.1 — Grouped overflow navigation
 
 - The main overflow now uses flexible minimum width, leading icons, and four divider-separated groups: Presets/History; Privacy dashboard/Compare profiles/Device settings; tracker scan; Settings. Badge info lives in Filters and the detail risk chip; Logs will move to Settings → Diagnostics in Task 6.3. Existing destination routes and scanner action are unchanged. `compileDebugKotlin` passed; the final Phase 6 gate will capture the menu and run the full checks.
+
+### Task 6.2 — Secondary top bars
+
+- History, Privacy dashboard, Device settings, App detail, Settings, Logs, Presets and Compare already used `ScreenTopBar`; the remaining action mismatches were corrected. History now exports through a SaveAlt icon in the bar, Privacy dashboard refreshes through a bar icon, and Logs copies all through a bar icon instead of a FAB. Compare already had its Refresh icon. These actions have content descriptions and retain their existing behavior. `compileDebugKotlin` passed; Phase 6 gate will inspect the bars on-device.

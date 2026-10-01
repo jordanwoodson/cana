@@ -49,7 +49,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
     val recovered = remember(records) { records.filter { it.undoOf.isNotEmpty() && it.completed && (it.success || it.recoveryComplete) }.map { it.undoOf }.toSet() }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
         topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.history)) },
-        actions = { RestoreExportButton() }) }) { padding ->
+        actions = { RestoreExportButton(iconOnly = true) }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             item { Button(enabled = active == null && last.isNotEmpty() && batches.none { !it.completed && it.id == last.firstOrNull()?.batchId }, onClick = { pending = last }) { Text(stringResource(R.string.undo_last_batch)) } }
             result?.let { batch -> item {

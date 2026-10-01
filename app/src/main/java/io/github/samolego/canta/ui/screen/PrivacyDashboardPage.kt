@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -74,12 +75,14 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
     }
     val entries = stored.networkBlocksList.map { it to PrivacyAction.NETWORK } + stored.meteredBlocksList.map { it to PrivacyAction.METERED }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
-        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) }) }) { padding ->
+        topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.privacy_dashboard)) },
+            actions = { IconButton(enabled = !loading, onClick = { revision++ }) {
+                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.system_refresh))
+            } }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.privacy_dashboard_description))
             if (!connected) PrivacyDisconnectedNotice({ connect = true }, { revision++ })
-            else TextButton(enabled = !loading, onClick = { revision++ }) { Text(stringResource(R.string.system_refresh)) }
             if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
             message?.let { Text(it) }
             if (unavailable) Text(stringResource(R.string.privacy_store_unavailable), color = MaterialTheme.colorScheme.error)

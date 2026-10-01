@@ -4,6 +4,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
@@ -18,7 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun RestoreExportButton() {
+fun RestoreExportButton(iconOnly: Boolean = false) {
     val context = LocalContext.current
     val resources = LocalResources.current
     val scope = rememberCoroutineScope()
@@ -35,5 +39,7 @@ fun RestoreExportButton() {
             CanaServices.getInstance().uiMessages.post(message)
         }
     }
-    TextButton(onClick = { picker.launch("cana-restore.sh") }) { Text(stringResource(R.string.restore_export)) }
+    if (iconOnly) IconButton(onClick = { picker.launch("cana-restore.sh") }) {
+        Icon(Icons.Default.SaveAlt, contentDescription = stringResource(R.string.restore_export))
+    } else TextButton(onClick = { picker.launch("cana-restore.sh") }) { Text(stringResource(R.string.restore_export)) }
 }

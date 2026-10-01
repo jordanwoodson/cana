@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.IconClickButton
-import io.github.samolego.canta.ui.component.RestoreExportButton
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.util.LogUtils
 
@@ -46,28 +44,21 @@ import io.github.samolego.canta.util.LogUtils
 fun LogsPage(onNavigateBack: () -> Unit) {
     val clipboardManager = LocalClipboardManager.current
     val logs = LogUtils.getLogs()
+    val copiedText = stringResource(R.string.log_copied)
+    val copyAll = {
+        val logText = logs.joinToString("\n") { log ->
+            "[${log.getFormattedTime()}] ${log.level} ${log.tag}: ${log.message}"
+        }
+        clipboardManager.setText(AnnotatedString(logText))
+        CanaServices.getInstance().uiMessages.post(copiedText)
+    }
 
     Scaffold(
             snackbarHost = { androidx.compose.material3.SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
             topBar = {
                 ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.logs)) },
-                    actions = { RestoreExportButton() })
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                        onClick = {
-                            val logText =
-                                    logs.joinToString("\n") { log ->
-                                        "[${log.getFormattedTime()}] ${log.level} ${log.tag}: ${log.message}"
-                                    }
-                            clipboardManager.setText(AnnotatedString(logText))
-                        }
-                ) {
-                    Icon(
-                            Icons.Default.ContentCopy,
-                            contentDescription = stringResource(R.string.copy_logs)
-                    )
-                }
+                    actions = { IconClickButton(onClick = copyAll, icon = Icons.Default.ContentCopy,
+                        contentDescription = stringResource(R.string.copy_logs)) })
             }
     ) { padding ->
         Column(
