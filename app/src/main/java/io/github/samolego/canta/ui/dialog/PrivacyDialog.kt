@@ -5,6 +5,10 @@ import io.github.samolego.canta.ui.menu.profileName
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,6 +22,8 @@ import androidx.compose.ui.platform.testTag
 import io.github.samolego.canta.R
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
+import io.github.samolego.canta.ui.component.StatusChip
+import io.github.samolego.canta.ui.component.StatusTone
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
 import kotlinx.coroutines.CancellationException
@@ -52,8 +58,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
             state = services.privacy.load(packageName, userId)
             records = services.history.records.first()
             val entries = state?.values?.get(PrivacyAction.PERMISSIONS)?.getJSONArray("permissions")
-            selected = if (entries == null) emptySet() else (0 until entries.length()).map { entries.getJSONObject(it) }
-                .filter { PrivacyPolicy.mutablePermission(it.getInt("flags")) }.map { it.getString("name") }.toSet()
+            selected = if (entries == null) emptySet() else PrivacyUiPolicy.preselectedPermissionNames(entries)
         } catch (e: CancellationException) { throw e }
         catch (e: Exception) { message = resources.getString(R.string.privacy_store_unavailable) }
         finally { busy = false }
@@ -74,30 +79,33 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
     val content: @Composable () -> Unit = {
         Column((if (embedded) Modifier.fillMaxWidth() else Modifier.heightIn(max = 560.dp))
             .verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(packageName, style = MaterialTheme.typography.labelMedium)
-            Text(profileName(userId))
+            if (!embedded) {
+                Text(packageName, style = MaterialTheme.typography.labelMedium)
+                Text(profileName(userId))
+            }
             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
             message?.let { Text(it) }
             val connected = state?.connected ?: ShizukuPermission.isCantaAuthorized()
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.privacy_controls_title), modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.titleMedium)
+                IconButton(enabled = !busy, onClick = { revision++ }) {
+                    Icon(Icons.Default.Refresh, stringResource(R.string.privacy_refresh))
+                }
+            }
             if (!connected) PrivacyDisconnectedNotice(onConnect = { authorize = true }, onRetry = { revision++ })
-            else TextButton(enabled = !busy, onClick = { revision++ }) { Text(stringResource(R.string.privacy_retry)) }
             state?.let { current ->
                 if (current.sharedPackages.size > 1) Text(stringResource(R.string.privacy_shared_uid, current.sharedPackages.joinToString()))
                 for (action in PrivacyAction.entries) {
                     HorizontalDivider()
-                    Text(stringResource(action.title), style = MaterialTheme.typography.titleSmall)
                     val value = current.values[action]
-                    if (action == PrivacyAction.NETWORK) Text(stringResource(R.string.privacy_network_description), style = MaterialTheme.typography.bodySmall)
-                    if (action == PrivacyAction.METERED) Text(stringResource(R.string.privacy_metered_description), style = MaterialTheme.typography.bodySmall)
-                    current.saved[action]?.let { saved ->
-                        Text(stringResource(R.string.privacy_saved_restriction))
-                        Text(stringResource(privacyStatusLabel(if (!connected && saved.status != "needs_review") "disconnected" else saved.status)))
-                    }
-                    if (action in setOf(PrivacyAction.NETWORK, PrivacyAction.METERED) && action !in current.saved)
-                        Text(stringResource(R.string.privacy_no_saved_restriction))
-                    if (value == null) Text(stringResource(R.string.privacy_live_unavailable))
-                    else when (action) {
-                        PrivacyAction.PERMISSIONS -> {
+                    val previous = records.lastOrNull { candidate -> candidate.packageName == packageName && candidate.userId == userId &&
+                        candidate.action == action.key && candidate.undoOf.isEmpty() && (candidate.changed || !candidate.completed) &&
+                        records.none { it.undoOf == candidate.id && it.completed && it.success } }
+                    if (action == PrivacyAction.PERMISSIONS) {
+                        Text(stringResource(action.title), style = MaterialTheme.typography.titleSmall)
+                        if (value == null) Text(stringResource(R.string.privacy_live_unavailable))
+                        else {
                             val entries = value.getJSONArray("permissions")
                             if (entries.length() == 0) Text(stringResource(R.string.privacy_no_permissions))
                             else Text(stringResource(R.string.privacy_select_permissions))
@@ -119,37 +127,55 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                                 }
                             }
                         }
-                        PrivacyAction.BACKGROUND -> {
-                            Text(stringResource(when (value.getString("runAnyInBackground")) {
+                        FlowRow {
+                            TextButton(enabled = !busy && connected && value != null && selected.isNotEmpty() &&
+                                packageName !in services.safety.alwaysProtected, onClick = { pendingUndo = null; pending = action }) {
+                                Text(stringResource(R.string.privacy_revoke_count, selected.size))
+                            }
+                            if (previous != null) TextButton(enabled = !busy && connected && value != null,
+                                onClick = { pendingUndo = previous; pending = action }) {
+                                Text(stringResource(R.string.privacy_revert))
+                            }
+                        }
+                    } else {
+                        val restricted = value?.let { PrivacyUiPolicy.isRestricted(action, it) } == true
+                        val externalRestriction = restricted && previous == null
+                        val liveLabel = when (action) {
+                            PrivacyAction.BACKGROUND -> when (value?.optString("runAnyInBackground")) {
                                 "allow" -> R.string.privacy_live_unrestricted
                                 "ignore", "deny" -> R.string.privacy_live_restricted
                                 "foreground" -> R.string.privacy_live_foreground_only
                                 else -> R.string.privacy_live_system_default
-                            }))
-                            if (value.getInt("standbyBucket") == 5) Text(stringResource(R.string.privacy_exempt), style = MaterialTheme.typography.bodySmall)
+                            }
+                            PrivacyAction.METERED -> if (restricted) R.string.privacy_live_restricted else R.string.privacy_live_unrestricted
+                            PrivacyAction.NETWORK -> if (restricted) R.string.privacy_live_blocked else R.string.privacy_live_allowed
+                            PrivacyAction.PERMISSIONS -> R.string.privacy_live_unavailable
                         }
-                        PrivacyAction.METERED -> Text(stringResource(if (value.getInt("meteredPolicy") and 1 != 0) R.string.privacy_live_restricted else R.string.privacy_live_unrestricted))
-                        PrivacyAction.NETWORK -> Text(stringResource(if (value.getBoolean("chainEnabled") && value.getInt("networkRule") == 2)
-                            R.string.privacy_live_blocked else R.string.privacy_live_allowed))
-                    }
-                    FlowRow {
-                        TextButton(enabled = !busy && value != null && packageName !in services.safety.alwaysProtected &&
-                            (action != PrivacyAction.PERMISSIONS || selected.isNotEmpty()), onClick = { pendingUndo = null; pending = action }) {
-                            Text(stringResource(when (action) {
-                                PrivacyAction.PERMISSIONS -> R.string.privacy_revoke_selected
-                                PrivacyAction.BACKGROUND, PrivacyAction.METERED -> R.string.privacy_restrict
-                                PrivacyAction.NETWORK -> R.string.privacy_block
-                            }))
-                        }
-                        val previous = records.lastOrNull { candidate -> candidate.packageName == packageName && candidate.userId == userId &&
-                            candidate.action == action.key && candidate.undoOf.isEmpty() && (candidate.changed || !candidate.completed) &&
-                            records.none { it.undoOf == candidate.id && it.completed && it.success } }
-                        if (previous != null) TextButton(enabled = !busy && value != null, onClick = {
-                            val needsConsent = runCatching { PrivacyReviewPolicy.undoNeedsConsent(action.key,
-                                SnapshotState.read(previous.previousState), checkNotNull(value)) }.getOrDefault(true)
-                            if (needsConsent) { pendingUndo = previous; pending = action }
-                            else perform(action.key) { batch -> services.privacy.undo(previous, batch) }
-                        }) { Text(stringResource(R.string.privacy_revert)) }
+                        ListItem(headlineContent = { Text(stringResource(action.title)) },
+                            supportingContent = {
+                                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    if (action == PrivacyAction.NETWORK) Text(stringResource(R.string.privacy_network_description))
+                                    if (action == PrivacyAction.METERED) Text(stringResource(R.string.privacy_metered_description))
+                                    Text(stringResource(if (value == null) R.string.privacy_live_unavailable else liveLabel))
+                                    if (action == PrivacyAction.BACKGROUND && value?.optInt("standbyBucket") == 5)
+                                        Text(stringResource(R.string.privacy_exempt))
+                                    if (externalRestriction) Text(stringResource(R.string.privacy_restricted_outside))
+                                    current.saved[action]?.let { saved ->
+                                        val status = if (!connected && saved.status != "needs_review") "disconnected" else saved.status
+                                        StatusChip(stringResource(privacyStatusLabel(status)),
+                                            if (status == "verified") Icons.Default.CheckCircle else Icons.Default.Warning,
+                                            if (status == "failed") StatusTone.ERROR else if (status == "verified") StatusTone.NEUTRAL else StatusTone.WARNING)
+                                    }
+                                }
+                            }, trailingContent = {
+                                Switch(checked = restricted, modifier = Modifier.testTag("privacy-switch-${action.key}"),
+                                    enabled = !busy && connected && value != null && packageName !in services.safety.alwaysProtected &&
+                                        (!restricted || previous != null),
+                                    onCheckedChange = { checked ->
+                                        pendingUndo = if (checked) null else previous
+                                        pending = action
+                                    })
+                            })
                         if (action in current.saved) TextButton(enabled = !busy, onClick = { forget = action }) {
                             Text(stringResource(R.string.privacy_forget))
                         }
@@ -187,7 +213,11 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
             catch (e: CancellationException) { throw e }
             catch (e: Exception) { error = e.message }
         }
-        val warning = reports?.values?.any { it.warnings.isNotEmpty() } == true || (reports?.size ?: 0) > 1
+        val revertNeedsConsent = pendingUndo?.let { previous -> runCatching {
+            PrivacyReviewPolicy.undoNeedsConsent(action.key, SnapshotState.read(previous.previousState),
+                checkNotNull(state?.values?.get(action)))
+        }.getOrDefault(true) } == true
+        val warning = reports?.values?.any { it.warnings.isNotEmpty() } == true || (reports?.size ?: 0) > 1 || revertNeedsConsent
         AlertDialog(onDismissRequest = { pending = null; pendingUndo = null }, title = {
             Text(stringResource(if (pendingUndo != null) R.string.privacy_revert else R.string.privacy_confirm))
         }, text = {
@@ -196,6 +226,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                 Text(profileName(userId))
                 Text(stringResource(action.title))
                 if (action == PrivacyAction.PERMISSIONS && pendingUndo == null) Text(stringResource(R.string.privacy_selected_permission_count, selected.size))
+                if (revertNeedsConsent) Text(stringResource(R.string.privacy_revert_consent))
                 error?.let { Text(it) }
                 if (reports == null && error == null) LinearProgressIndicator()
                 reports?.forEach { (name, report) ->
@@ -218,7 +249,7 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                 perform(action.key) { batch -> if (undoRecord != null) services.privacy.undo(undoRecord, batch, approved)
                     else services.privacy.restrict(packageName, userId, action, approved, batch, selectedPermissions = permissions) }
             }) { Text(stringResource(R.string.ok)) }
-        }, dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.cancel)) } })
+        }, dismissButton = { TextButton(onClick = { pending = null; pendingUndo = null }) { Text(stringResource(R.string.cancel)) } })
     }
 }
 

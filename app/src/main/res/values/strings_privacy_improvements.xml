@@ -20,6 +20,11 @@
     <string name="privacy_permission_fixed">Managed by policy</string>
     <string name="privacy_select_permissions">Select permissions to revoke</string>
     <string name="privacy_revoke_selected">Revoke selected</string>
+    <string name="privacy_revoke_count">Revoke %1$d</string>
+    <string name="privacy_controls_title">Privacy controls</string>
+    <string name="privacy_refresh">Refresh privacy controls</string>
+    <string name="privacy_restricted_outside">Restricted outside Cana</string>
+    <string name="privacy_revert_consent">Restoring this setting may broaden access.</string>
     <string name="privacy_selected_permission_count">%1$d permissions selected</string>
     <string name="privacy_saved_restriction">Saved restriction</string>
     <string name="privacy_no_saved_restriction">No saved restriction</string>

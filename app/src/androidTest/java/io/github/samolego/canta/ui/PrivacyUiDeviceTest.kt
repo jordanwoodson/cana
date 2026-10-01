@@ -33,12 +33,25 @@ class PrivacyUiDeviceTest {
         ready()
         compose.setContent { CantaTheme { PrivacyDialog(pkg, 10, {}) } }
         compose.waitUntil(90_000) { compose.onAllNodesWithTag("privacy-permission-android.permission.CAMERA").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithText("Work profile").assertIsDisplayed()
+        compose.onAllNodesWithText("Work profile").onFirst().assertIsDisplayed()
         compose.onNodeWithTag("privacy-permission-android.permission.CAMERA").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Background activity").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("All network access").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Not blocked").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Revoke 0").performScrollTo().assertIsNotEnabled()
         Unit
+    }
+    @Test fun backgroundSwitchOpensReviewBeforeChangingLiveState() = runBlocking {
+        ready()
+        val services = CanaServices.getInstance()
+        val before = services.privacy.snapshot(pkg, 10, PrivacyAction.BACKGROUND).toString()
+        compose.setContent { CantaTheme { PrivacyDialog(pkg, 10, {}) } }
+        compose.waitUntil(90_000) { compose.onAllNodesWithTag("privacy-switch-background").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("privacy-switch-background").performScrollTo().performClick()
+        compose.onNodeWithText("Review privacy change").assertIsDisplayed()
+        assertEquals(before, services.privacy.snapshot(pkg, 10, PrivacyAction.BACKGROUND).toString())
+        compose.onNodeWithText("Cancel").performClick()
+        assertEquals(before, services.privacy.snapshot(pkg, 10, PrivacyAction.BACKGROUND).toString())
     }
     @Test fun lockdownPresetRoundtripAndApplyOnlyAffectCapturedWorkProfile() = runBlocking {
         ready()
@@ -55,7 +68,7 @@ class PrivacyUiDeviceTest {
         compose.setContent { CantaTheme { PresetApplyDialog(preset, 10, {}) } }
         compose.waitUntil(60_000) { compose.onAllNodesWithText("Apply Preset").fetchSemanticsNodes().size == 2 &&
             compose.onAllNodesWithText("Apply Preset")[1].fetchSemanticsNode().config.contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled).not() }
-        compose.onNodeWithText("Work profile").assertIsDisplayed()
+        compose.onAllNodesWithText("Work profile").onFirst().assertIsDisplayed()
         compose.onAllNodesWithText("Apply Preset")[1].performClick()
         val expected = InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.batch_outcome_counts, 1, 0, 0, 0)
         compose.waitUntil(60_000) { compose.onAllNodesWithText(expected).fetchSemanticsNodes().isNotEmpty() }
