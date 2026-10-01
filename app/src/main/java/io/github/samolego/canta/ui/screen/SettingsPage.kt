@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
@@ -75,7 +74,6 @@ fun SettingsScreen(
     val urlEditor by settingsViewModel.bloatListUrlEditorState.collectAsStateWithLifecycle()
 
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
-    val hideSuccessDialog by settingsViewModel.hideSuccessDialog.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
     val useDynamicColor by settingsViewModel.useDynamicColor.collectAsStateWithLifecycle()
 
@@ -112,17 +110,6 @@ fun SettingsScreen(
                 isSwitch = true,
                 checked = unmeteredOnly,
                 onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
-            )
-
-            SettingsItem(
-                title = stringResource(R.string.hide_success_dialog),
-                description = stringResource(R.string.hide_success_dialog_description),
-                icon = Icons.AutoMirrored.Default.Message,
-                isSwitch = true,
-                checked = hideSuccessDialog,
-                onCheckedChange = {
-                    settingsViewModel.saveHideSuccessDialog(it)
-                }
             )
 
             SettingsItem(

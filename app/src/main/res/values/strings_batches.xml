@@ -43,6 +43,18 @@
     <string name="confirm_suspend_consequence">Reversible: you can unsuspend these apps again any time.</string>
     <string name="confirm_warning_title">Review these warnings</string>
     <string name="confirm_disable_instead">Disable instead</string>
+    <plurals name="feedback_disabled"><item quantity="one">Disabled %d app</item><item quantity="other">Disabled %d apps</item></plurals>
+    <plurals name="feedback_enabled"><item quantity="one">Enabled %d app</item><item quantity="other">Enabled %d apps</item></plurals>
+    <plurals name="feedback_suspended"><item quantity="one">Suspended %d app</item><item quantity="other">Suspended %d apps</item></plurals>
+    <plurals name="feedback_unsuspended"><item quantity="one">Unsuspended %d app</item><item quantity="other">Unsuspended %d apps</item></plurals>
+    <plurals name="feedback_uninstalled"><item quantity="one">Uninstalled %d app</item><item quantity="other">Uninstalled %d apps</item></plurals>
+    <plurals name="feedback_uninstalled_keep_data"><item quantity="one">Uninstalled %d app and kept its data</item><item quantity="other">Uninstalled %d apps and kept their data</item></plurals>
+    <plurals name="feedback_reinstalled"><item quantity="one">Reinstalled %d app</item><item quantity="other">Reinstalled %d apps</item></plurals>
+    <plurals name="feedback_removed_updates"><item quantity="one">Removed updates for %1$d app · %2$s freed</item><item quantity="other">Removed updates for %1$d apps · %2$s freed</item></plurals>
+    <string name="feedback_no_changes">No changes were applied</string>
+    <string name="feedback_failed_title">Some changes failed</string>
+    <string name="feedback_verification_title">Some changes need verification</string>
+    <plurals name="feedback_undid"><item quantity="one">Undid %d change</item><item quantity="other">Undid %d changes</item></plurals>
     <string name="batch_storage_failed">The batch could not be fully saved. Review History and the current app state before retrying.</string>
     <string name="batch_store_unavailable">Saved batch progress could not be read. Restart Cana to retry. No unfinished actions were replayed.</string>
     <string name="batch_stop_failed">Could not save the stop request. Check progress and try again.</string>

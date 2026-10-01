@@ -3,6 +3,7 @@ package io.github.samolego.canta.ui.dialog
 import io.github.samolego.canta.ui.menu.profileName
 
 import android.text.format.Formatter.formatFileSize
+import android.text.format.Formatter.formatShortFileSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.foundation.clickable
@@ -22,13 +23,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
+import io.github.samolego.canta.data.proto.OperationRecord
+import io.github.samolego.canta.ops.BatchFeedbackPolicy
+import io.github.samolego.canta.ops.BatchFeedbackPresentation
 import io.github.samolego.canta.ops.BatchResult
+import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ops.UpdateImpact
 import io.github.samolego.canta.ops.SafetyAssessment
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.ui.viewmodel.PackageActionRequest
-import io.github.samolego.canta.ui.viewmodel.SettingsViewModel
 import io.github.samolego.canta.ui.component.CanaBanner
 import io.github.samolego.canta.ui.component.RiskChip
 import io.github.samolego.canta.ui.component.StatusTone
@@ -41,12 +45,18 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 
 /** Requests contain immutable package/profile snapshots, including while authorization is pending. */
+private data class PackageOutcome(val action: PackageAction, val batch: BatchResult,
+    val records: List<OperationRecord>, val presentation: BatchFeedbackPresentation)
+
 @Composable
-fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
+fun PackageActionDialogs(model: AppListViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var outcome by remember { mutableStateOf<Pair<PackageAction, BatchResult>?>(null) }
-    var undoRecords by remember { mutableStateOf<List<io.github.samolego.canta.data.proto.OperationRecord>?>(null) }
+    val services = CanaServices.getInstance()
+    val noChangesMessage = stringResource(R.string.feedback_no_changes)
+    val undoLabel = stringResource(R.string.undo_action)
+    var outcome by remember { mutableStateOf<PackageOutcome?>(null) }
+    var undoRecords by remember { mutableStateOf<List<OperationRecord>?>(null) }
     val request = model.pendingAction
     if (request != null) key(request) {
         var authorized by remember { mutableStateOf(ShizukuPermission.isCantaAuthorized()) }
@@ -62,8 +72,23 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
                     val run = {
                         scope.launch { withPackageAuthentication(context) {
                             val batch = model.processRequest(context, request, included, reset, approvals, warnings)
-                            if (batch.failureCount > 0 || batch.unknownCount > 0 || request.action == PackageAction.REMOVE_UPDATES || !settings.hideSuccessDialog.value) {
-                                outcome = request.action to batch
+                            val records = batch.batchId?.let { id -> services.history.records.first()
+                                .filter { it.batchId == id && it.changed }.asReversed() }.orEmpty()
+                            val decision = BatchFeedbackPolicy.decide(batch, records.isNotEmpty())
+                            if (decision.presentation == BatchFeedbackPresentation.SUCCESS_SNACKBAR) {
+                                val count = batch.successCount
+                                val text = when {
+                                    count == 0 -> noChangesMessage
+                                    request.action == PackageAction.REMOVE_UPDATES -> context.resources.getQuantityString(
+                                        R.plurals.feedback_removed_updates, count, count, formatShortFileSize(context, batch.freedBytes))
+                                    else -> context.resources.getQuantityString(request.action.successPlural(), count, count)
+                                }
+                                services.uiMessages.post(text,
+                                    actionLabel = if (decision.canUndo) undoLabel else null,
+                                    onAction = if (decision.canUndo) ({ undoRecords = records }) else null,
+                                    withDismiss = decision.canUndo)
+                            } else {
+                                outcome = PackageOutcome(request.action, batch, records, decision.presentation)
                             }
                         } }
                         Unit
@@ -73,31 +98,45 @@ fun PackageActionDialogs(model: AppListViewModel, settings: SettingsViewModel) {
             )
         }
     }
-    outcome?.let { (action, batch) ->
+    outcome?.let { result ->
+        val action = result.action
+        val batch = result.batch
         AlertDialog(onDismissRequest = { outcome = null },
-            title = { Text(stringResource(R.string.operation_results)) },
+            title = { Text(stringResource(if (result.presentation == BatchFeedbackPresentation.FAILURE_DIALOG)
+                R.string.feedback_failed_title else if (result.presentation == BatchFeedbackPresentation.VERIFICATION_DIALOG)
+                R.string.feedback_verification_title else R.string.operation_results)) },
             text = {
                 Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))
                     if (action == PackageAction.REMOVE_UPDATES) Text(stringResource(R.string.update_bytes_freed, formatFileSize(context, batch.freedBytes)))
-                    batch.results.filter { !it.success }.forEach { Text(it.message) }
+                    batch.results.sortedBy { item -> when {
+                        !item.success && !item.outcomeUnknown -> 0
+                        item.outcomeUnknown -> 1
+                        else -> 2
+                    } }.forEach { Text(it.message,
+                        color = if (!it.success && !it.outcomeUnknown) MaterialTheme.colorScheme.error
+                            else MaterialTheme.colorScheme.onSurface) }
                 }
             },
             confirmButton = { TextButton(onClick = { outcome = null }) { Text(stringResource(R.string.ok)) } },
             dismissButton = {
-                batch.batchId?.let { id ->
+                if (result.records.isNotEmpty()) {
                     TextButton(enabled = !model.isOperating, onClick = {
-                        scope.launch {
-                            undoRecords = io.github.samolego.canta.ops.CanaServices.getInstance().history.records.first()
-                                .filter { it.batchId == id && it.changed }.asReversed()
-                            outcome = null
-                        }
+                        undoRecords = result.records
+                        outcome = null
                     }) { Text(stringResource(R.string.undo_action)) }
                 }
             })
     }
     undoRecords?.let { records -> io.github.samolego.canta.ui.screen.UndoBatchDialog(records,
-        { undoRecords = null }) { result -> outcome = PackageAction.REINSTALL to result; undoRecords = null } }
+        { undoRecords = null }) { result ->
+            val decision = BatchFeedbackPolicy.decide(result, false)
+            if (decision.presentation == BatchFeedbackPresentation.SUCCESS_SNACKBAR) {
+                services.uiMessages.post(context.resources.getQuantityString(R.plurals.feedback_undid,
+                    result.successCount, result.successCount))
+            } else outcome = PackageOutcome(PackageAction.REINSTALL, result, emptyList(), decision.presentation)
+            undoRecords = null
+        } }
 }
 
 @Composable
@@ -268,4 +307,15 @@ private fun PackageAction.confirmationTitle(): Int = when (this) {
     PackageAction.UNSUSPEND -> R.plurals.confirm_unsuspend_title
     PackageAction.REINSTALL -> R.plurals.confirm_reinstall_title
     PackageAction.REMOVE_UPDATES -> R.plurals.confirm_remove_updates_title
+}
+
+private fun PackageAction.successPlural(): Int = when (this) {
+    PackageAction.DISABLE -> R.plurals.feedback_disabled
+    PackageAction.ENABLE -> R.plurals.feedback_enabled
+    PackageAction.SUSPEND -> R.plurals.feedback_suspended
+    PackageAction.UNSUSPEND -> R.plurals.feedback_unsuspended
+    PackageAction.UNINSTALL -> R.plurals.feedback_uninstalled
+    PackageAction.UNINSTALL_KEEP_DATA -> R.plurals.feedback_uninstalled_keep_data
+    PackageAction.REINSTALL -> R.plurals.feedback_reinstalled
+    PackageAction.REMOVE_UPDATES -> R.plurals.feedback_removed_updates
 }

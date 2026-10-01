@@ -92,6 +92,7 @@ fun CantaApp(
     val snackbarHostState = remember { SnackbarHostState() }
     val uiMessages = remember { io.github.samolego.canta.ops.CanaServices.getInstance().uiMessages }
     CanaMessageCollector(uiMessages, snackbarHostState)
+    PackageActionDialogs(appListViewModel)
 
     CompositionLocalProvider(LocalCanaSnackbar provides snackbarHostState) {
     Column(Modifier.fillMaxSize()) {
@@ -219,7 +220,6 @@ private fun MainContent(
         )
     }
 
-    PackageActionDialogs(appListViewModel, settingsViewModel)
 
     val pagerState = rememberPagerState(pageCount = { AppsType.entries.size })
 

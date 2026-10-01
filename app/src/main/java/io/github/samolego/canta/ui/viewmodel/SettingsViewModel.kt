@@ -41,8 +41,6 @@ class SettingsViewModel(
     private val _allowUnsafeUninstalls = MutableStateFlow(false)
     val allowUnsafeUninstall = _allowUnsafeUninstalls.asStateFlow()
 
-    private val _hideSuccessDialog = MutableStateFlow(false)
-    val hideSuccessDialog = _hideSuccessDialog.asStateFlow()
 
     private val _useDynamicColor = MutableStateFlow(false)
     val useDynamicColor = _useDynamicColor.asStateFlow()
@@ -62,7 +60,6 @@ class SettingsViewModel(
         observeBloatListUrl()
         settingsStore.bloatUnmeteredOnlyFlow.onEach { _bloatUnmeteredOnly.value = it }.launchIn(viewModelScope)
         observeAllowUnsafeUninstalls()
-        observeHideSuccessDialog()
         settingsStore.useDynamicColorFlow.onEach { _useDynamicColor.value = it }.launchIn(viewModelScope)
         observeAuthEnabled()
     }
@@ -92,13 +89,6 @@ class SettingsViewModel(
         settingsStore
             .allowUnsafeUninstallsFlow
             .onEach { _allowUnsafeUninstalls.value = it }
-            .launchIn(viewModelScope)
-    }
-
-    private fun observeHideSuccessDialog() {
-        settingsStore
-            .hideSuccessDialogFlow
-            .onEach { _hideSuccessDialog.value = it }
             .launchIn(viewModelScope)
     }
 
@@ -142,10 +132,6 @@ class SettingsViewModel(
 
     fun saveAllowUnsafeUninstalls(allow: Boolean) {
         viewModelScope.launch { settingsStore.setAllowUnsafeUninstalls(allow) }
-    }
-
-    fun saveHideSuccessDialog(hide: Boolean) {
-        viewModelScope.launch { settingsStore.setHideSuccessDialog(hide) }
     }
 
     fun saveUseDynamicColor(enabled: Boolean) {
