@@ -63,3 +63,8 @@ Each later entry records the change, commit, test counts, device checks and scre
 
 - `b4deab6` moves the selected profile into a dropdown chip beside the wordmark, removes the old profile icon action and subtitle row, and keeps Shizuku gating. The header and tabs use `LocalCanaColors.profileTint(kind)`; Personal is green and Work is teal. `enterAlwaysScrollBehavior` collapses the title bar while the tabs and filter chips stay pinned.
 - `testDebugUnitTest assembleDebug`: **206/206 JVM tests pass** (`/tmp/cana-ux-header-build.log`); the corrected constrained title slot also built (`/tmp/cana-ux-header-width-build.log`). On the 610×1356 emulator, first render let the chip extend over Filters and More; constraining the title row to 216 dp restored all three action icons. Screenshots: `ux-review/after/phase2/01-header-personal-dark.png`, `18-header-work-dark.png`, `18-header-work-collapsed-dark.png`. The collapsed state moves tabs from y≈228 to y≈132, freeing 96 px. The three-extra-rows target awaits the denser rows in Task 2.4.
+
+### Task 2.2 — Compact counted tabs
+
+- `385680f` uses a text-only `PrimaryTabRow` and English plural keys. Counts come from the selected profile's complete `allApps` inventory, independent of active filters. The old tab string keys remain. `testDebugUnitTest assembleDebug`: **206/206 JVM tests pass** (`/tmp/cana-ux-tabs-build.log`).
+- At 610×1356 with “Only system” active, Personal showed “Installed · 182” and “Removed · 0”; Work showed “Installed · 167” and “Removed · 15”. The tabs became about 36 px shorter. Screenshots: `ux-review/after/phase2/01-tabs-personal-dark.png`, `18-tabs-work-dark.png`.
