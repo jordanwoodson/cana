@@ -76,7 +76,9 @@ fun ActiveFilterChips(model: AppListViewModel) {
                 label = { Text(filter.nameRes?.let { stringResource(it) } ?: filter.name) },
                 trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, filter.nameRes?.let { stringResource(it) } ?: filter.name)) })
         }
-        if (model.onlySystem) InputChip(selected = true, onClick = { model.onlySystem = false }, label = { Text(stringResource(R.string.only_system)) }, trailingIcon = { Icon(Icons.Default.Close, null) })
-        if (model.collectionPackages.isNotEmpty()) InputChip(selected = true, onClick = { model.collectionPackages = emptySet() }, label = { Text(stringResource(R.string.collection_filter)) }, trailingIcon = { Icon(Icons.Default.Close, null) })
+        if (model.onlySystem) InputChip(selected = true, onClick = { model.onlySystem = false }, label = { Text(stringResource(R.string.only_system)) },
+            trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, stringResource(R.string.only_system))) })
+        if (model.collectionPackages.isNotEmpty()) InputChip(selected = true, onClick = { model.collectionPackages = emptySet() }, label = { Text(stringResource(R.string.collection_filter)) },
+            trailingIcon = { Icon(Icons.Default.Close, stringResource(R.string.remove_filter, stringResource(R.string.collection_filter))) })
     }
 }
