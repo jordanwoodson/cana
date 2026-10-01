@@ -84,8 +84,11 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                         val action = items.firstOrNull()?.action ?: group.records.firstOrNull()?.action.orEmpty()
                         val count = if (items.isNotEmpty()) items.size else group.records.count { it.undoOf.isEmpty() }.coerceAtLeast(1)
                         val userIds = (items.map { it.userId } + group.records.map { it.userId }).distinct()
-                        val profiles = userIds.map { profileName(it) }.joinToString(", ")
-                        Text("${actionLabel(action)} · ${pluralStringResource(R.plurals.history_app_count, count, count)} · $profiles",
+                        val profiles = if (action == "system") stringResource(R.string.device_wide)
+                            else userIds.map { profileName(it) }.joinToString(", ")
+                        val countLabel = if (action == "system") pluralStringResource(R.plurals.history_setting_count, count, count)
+                            else pluralStringResource(R.plurals.history_app_count, count, count)
+                        Text("${actionLabel(action)} · $countLabel · $profiles",
                             style = MaterialTheme.typography.titleMedium)
                         val failed = if (items.isNotEmpty()) items.count { it.status == "completed" && !it.success }
                             else group.records.count { it.completed && !it.success }
@@ -118,9 +121,16 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                         }
                         Text(historyCounts(succeeded, failed, skipped, awaiting), style = MaterialTheme.typography.bodySmall)
                         val changes = group.records.filter { it.undoOf.isEmpty() && (it.changed || !it.completed) }
-                        if (changes.isNotEmpty()) Text(stringResource(R.string.history_recovery_counts,
-                            changes.count { it.id in recovered || it.recoveryComplete },
-                            changes.count { it.id !in recovered && !it.recoveryComplete }), style = MaterialTheme.typography.bodySmall)
+                        if (changes.isNotEmpty()) {
+                            val restored = changes.count { it.id in recovered || it.recoveryComplete }
+                            val notRestored = changes.size - restored
+                            val parts = listOfNotNull(
+                                restored.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.history_restored_count, it, it) },
+                                notRestored.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.history_not_restored_count, it, it) },
+                            )
+                            Text(stringResource(R.string.history_recovery_label) + ": " + parts.joinToString(" · "),
+                                style = MaterialTheme.typography.bodySmall)
+                        }
                         if (plan?.interrupted == true) {
                             Text(stringResource(R.string.batch_interrupted_description))
                             if (!plan.reviewAcknowledged) TextButton(onClick = { scope.launch { services.batchStore.reviewed(plan.id) } }) {

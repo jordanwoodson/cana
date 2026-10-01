@@ -4,6 +4,7 @@ import io.github.samolego.canta.ui.menu.displayName
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -132,7 +137,7 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
             Column(Modifier.fillMaxSize()) {
                 Column(Modifier.fillMaxWidth().heightIn(max = controlsHeight).verticalScroll(rememberScrollState())) {
                     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(stringResource(R.string.comparison_description), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.comparison_short_description), style = MaterialTheme.typography.bodyMedium)
                         InfoDisclosure(stringResource(R.string.comparison_about)) {
                             Text(stringResource(R.string.comparison_privacy_description), style = MaterialTheme.typography.bodySmall)
                         }
@@ -175,7 +180,7 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
                     if (rows.isNotEmpty()) {
                         Text(stringResource(R.string.comparison_package_count, rows.size), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             style = MaterialTheme.typography.bodySmall)
-                        if (selectedProfiles.size > 1) Text(stringResource(R.string.comparison_scroll_hint), Modifier.padding(horizontal = 16.dp),
+                        if (selectedProfiles.size > 2) Text(stringResource(R.string.comparison_scroll_hint), Modifier.padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -224,7 +229,7 @@ private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: 
                     }
                     row.cells.forEach { cell ->
                         val openable = cell.status == ComparisonPackageStatus.INSTALLED || cell.status == ComparisonPackageStatus.REMOVED
-                        Column(Modifier.width(cellWidth).clickable(enabled = openable) { onOpenApp(row.packageName, cell.userId) }
+                        Column(Modifier.width(cellWidth).heightIn(min = 48.dp).clickable(enabled = openable) { onOpenApp(row.packageName, cell.userId) }
                             .semantics(mergeDescendants = true) {}.padding(8.dp),
                             verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             val statusText = when {
@@ -234,12 +239,21 @@ private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: 
                                 cell.status == ComparisonPackageStatus.ABSENT -> stringResource(R.string.comparison_absent_short)
                                 else -> stringResource(R.string.comparison_unavailable_short)
                             }
-                            Text(statusText, style = MaterialTheme.typography.labelMedium, maxLines = 1)
-                            if (cell.disabled) Text(stringResource(R.string.comparison_disabled), style = MaterialTheme.typography.labelSmall)
-                            if (cell.suspended) Text(stringResource(R.string.comparison_suspended), style = MaterialTheme.typography.labelSmall)
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                                Icon(when (cell.status) {
+                                    ComparisonPackageStatus.INSTALLED -> Icons.Default.CheckCircle
+                                    ComparisonPackageStatus.REMOVED -> Icons.Default.Block
+                                    ComparisonPackageStatus.ABSENT -> Icons.Default.RemoveCircleOutline
+                                    ComparisonPackageStatus.UNAVAILABLE -> Icons.Default.HelpOutline
+                                }, contentDescription = null, modifier = Modifier.size(14.dp))
+                                Text(statusText, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+                            }
+                            if (cell.disabled) ComparisonPill(stringResource(R.string.comparison_disabled))
+                            if (cell.suspended) ComparisonPill(stringResource(R.string.comparison_suspended))
                             cell.savedPrivacy?.let { privacy ->
-                                if (privacy.blockNetwork) Text(stringResource(R.string.comparison_network_short), style = MaterialTheme.typography.labelSmall)
-                                if (privacy.denyMetered) Text(stringResource(R.string.comparison_metered_short), style = MaterialTheme.typography.labelSmall)
+                                if (privacy.blockNetwork) ComparisonPill(stringResource(R.string.comparison_network_short))
+                                if (privacy.denyMetered) ComparisonPill(stringResource(R.string.comparison_metered_short))
                             }
                         }
                     }
@@ -247,5 +261,13 @@ private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: 
                 HorizontalDivider()
             }
         }
+    }
+}
+
+@Composable
+private fun ComparisonPill(label: String) {
+    Surface(shape = RoundedCornerShape(8.dp), color = MaterialTheme.colorScheme.surfaceVariant) {
+        Text(label, Modifier.padding(horizontal = 4.dp, vertical = 2.dp), style = MaterialTheme.typography.labelSmall,
+            maxLines = 1)
     }
 }

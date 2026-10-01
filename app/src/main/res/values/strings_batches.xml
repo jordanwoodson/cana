@@ -5,6 +5,19 @@
         <item quantity="one">%1$d app</item>
         <item quantity="other">%1$d apps</item>
     </plurals>
+    <plurals name="history_setting_count">
+        <item quantity="one">%1$d setting</item>
+        <item quantity="other">%1$d settings</item>
+    </plurals>
+    <string name="history_recovery_label">Recovery</string>
+    <plurals name="history_restored_count">
+        <item quantity="one">%1$d restored</item>
+        <item quantity="other">%1$d restored</item>
+    </plurals>
+    <plurals name="history_not_restored_count">
+        <item quantity="one">%1$d change not restored</item>
+        <item quantity="other">%1$d changes not restored</item>
+    </plurals>
     <string name="history_show_details">Details</string>
     <string name="history_hide_details">Hide details</string>
     <string name="history_empty_title">No changes yet</string>

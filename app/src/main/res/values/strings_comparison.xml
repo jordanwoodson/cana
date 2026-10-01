@@ -1,12 +1,13 @@
 <resources>
     <string name="comparison_title">Compare profiles</string>
     <string name="comparison_description">Compare app state across selected profiles. This screen is read-only.</string>
+    <string name="comparison_short_description">See where apps differ across profiles.</string>
     <string name="comparison_about">About this comparison</string>
     <string name="comparison_only_differences">Only differences</string>
-    <string name="comparison_installed_short">Installed ✓</string>
-    <string name="comparison_removed_short">Removed ⊘</string>
-    <string name="comparison_absent_short">Not present –</string>
-    <string name="comparison_unavailable_short">Unavailable ?</string>
+    <string name="comparison_installed_short">Installed</string>
+    <string name="comparison_removed_short">Removed</string>
+    <string name="comparison_absent_short">Not present</string>
+    <string name="comparison_unavailable_short">Unavailable</string>
     <string name="comparison_network_short">Net blocked</string>
     <string name="comparison_metered_short">Metered</string>
     <string name="comparison_privacy_description">Privacy shows saved network choices, not verified enforcement. Runtime permissions and background activity are not checked here.</string>

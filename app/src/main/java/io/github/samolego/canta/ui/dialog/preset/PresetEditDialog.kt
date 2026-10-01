@@ -57,13 +57,15 @@ private fun PresetDialog(
                 captureApps?.let { apps ->
                     Text(pluralStringResource(R.plurals.preset_capture_summary, apps.size, apps.size, captureProfile),
                         style = MaterialTheme.typography.bodyMedium)
-                    TextButton(onClick = { showCapturedApps = !showCapturedApps }) {
-                        Text(stringResource(if (showCapturedApps) R.string.preset_hide_captured else R.string.preset_show_captured))
-                    }
-                    if (showCapturedApps) apps.forEach { (name, pkg) ->
-                        Text(name, style = MaterialTheme.typography.bodySmall)
-                        if (name != pkg) Text(pkg, style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (apps.isNotEmpty()) {
+                        TextButton(onClick = { showCapturedApps = !showCapturedApps }) {
+                            Text(stringResource(if (showCapturedApps) R.string.preset_hide_captured else R.string.preset_show_captured))
+                        }
+                        if (showCapturedApps) apps.forEach { (name, pkg) ->
+                            Text(name, style = MaterialTheme.typography.bodySmall)
+                            if (name != pkg) Text(pkg, style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
 
