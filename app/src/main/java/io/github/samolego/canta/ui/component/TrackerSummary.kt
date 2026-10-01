@@ -2,6 +2,8 @@ package io.github.samolego.canta.ui.component
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -105,12 +107,10 @@ fun TrackerScanControls(model: AppListViewModel) {
 
 @Composable
 fun TrackerScanProgressRow(progress: TrackerScanProgress, modifier: Modifier = Modifier, onCancel: (() -> Unit)? = null) {
-    Column(modifier.fillMaxWidth()) {
-        LinearProgressIndicator(progress = { if (progress.total == 0) 0f else progress.done.toFloat() / progress.total }, modifier = Modifier.fillMaxWidth())
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.tracker_scan_progress, progress.done, progress.total), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-            if (onCancel != null) TextButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
-        }
+    CanaBanner(Icons.Default.TrackChanges, stringResource(R.string.tracker_scan_progress, progress.done, progress.total),
+        modifier = modifier,
+        details = { LinearProgressIndicator(progress = { if (progress.total == 0) 0f else progress.done.toFloat() / progress.total }, modifier = Modifier.fillMaxWidth()) }) {
+        if (onCancel != null) TextButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
     }
 }
 

@@ -4,6 +4,8 @@ import io.github.samolego.canta.ui.menu.profileName
 
 import android.Manifest
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -35,17 +37,19 @@ fun OtaBanner() {
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) scope.launch { services.ota.check() }
     }
-    if (state.pendingCount > 0) Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-        Column(Modifier.fillMaxWidth().padding(12.dp)) {
-            Text(stringResource(R.string.ota_summary, state.pendingCount))
+    if (state.pendingCount > 0) CanaBanner(
+        Icons.Default.SystemUpdate,
+        stringResource(R.string.ota_summary, state.pendingCount),
+        modifier = Modifier.padding(horizontal = 16.dp),
+        details = {
             Row {
                 TextButton(onClick = { review = state.pendingList.toList() }) { Text(stringResource(R.string.ota_review)) }
                 if (Build.VERSION.SDK_INT >= 33) TextButton(onClick = { notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }) {
                     Text(stringResource(R.string.ota_enable_notifications))
                 }
             }
-        }
-    }
+        },
+    )
     review?.let { OtaReviewDialog(it) { review = null } }
 }
 

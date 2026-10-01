@@ -1,7 +1,6 @@
 package io.github.samolego.canta.ui.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +25,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,9 +89,10 @@ fun AppList(
                 .fillMaxWidth()
                 .fillMaxHeight(),
     ) {
-        if (appListModel.isLoading) {
+        if (appListModel.isLoading && appListModel.allApps.isEmpty()) {
             LoadingAppsInfo()
         } else {
+            if (appListModel.isLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
             val trackerScans = io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans
             if (appType == AppsType.UNINSTALLED && appListModel.leftoverUpdates.isNotEmpty()) {
                 val updateBytes = io.github.samolego.canta.util.apps.knownApkTotal(appListModel.leftoverUpdates.map { it.updateSizeBytes })
@@ -191,7 +192,7 @@ fun AppList(
                             androidx.compose.material3.TextButton(onClick = { scope.launch { appListModel.loadInstalled(context.packageManager, context) } }) {
                                 Text(stringResource(R.string.inventory_retry))
                             }
-                        } else if (appListModel.activeFilterIds.isNotEmpty() || appListModel.searchQuery.isNotBlank() || appListModel.onlySystem || appListModel.collectionPackages.isNotEmpty()) {
+                        } else if (noMatches && (appListModel.activeFilterIds.isNotEmpty() || appListModel.searchQuery.isNotBlank() || appListModel.onlySystem || appListModel.collectionPackages.isNotEmpty())) {
                             androidx.compose.material3.TextButton(onClick = appListModel::clearFilters) { Text(stringResource(R.string.clear_filters)) }
                         }
                     }
@@ -204,19 +205,9 @@ fun AppList(
 @Preview(showBackground = true)
 @Composable
 fun LoadingBadgesIndicator() {
-    Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-    ) {
-        CircularProgressIndicator(
-                modifier = Modifier.size(32.dp),
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Text(stringResource(R.string.inventory_refreshing))
-    }
+    CanaBanner(Icons.Default.Info, stringResource(R.string.inventory_refreshing),
+        modifier = Modifier.padding(horizontal = 16.dp),
+        details = { LinearProgressIndicator(Modifier.fillMaxWidth()) })
 }
 
 @Composable

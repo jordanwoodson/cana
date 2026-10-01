@@ -95,6 +95,7 @@ fun CanaBanner(
     text: String,
     tone: StatusTone = StatusTone.NEUTRAL,
     modifier: Modifier = Modifier,
+    details: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     val scheme = MaterialTheme.colorScheme
@@ -104,11 +105,14 @@ fun CanaBanner(
         StatusTone.ERROR -> scheme.errorContainer to scheme.onErrorContainer
     }
     Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = container)) {
-        Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
-            Text(text, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = content)
-            actions()
+        Column {
+            Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
+                Text(text, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = content)
+                actions()
+            }
+            details?.let { Column(Modifier.fillMaxWidth().padding(start = 42.dp, end = 12.dp, bottom = 8.dp)) { it() } }
         }
     }
 }
