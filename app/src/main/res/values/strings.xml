@@ -9,7 +9,7 @@
     >Copy package name to clipboard</string>
     <string name="no_description_available">No description available</string>
     <string name="uninstall">Uninstall</string>
-    <string name="reinstall">ReInstall</string>
+    <string name="reinstall">Reinstall</string>
     <string name="only_system">Only system</string>
     <string name="switch_profile">Switch profile</string>
     <string name="profile_subtitle">%1$s (user %2$d)</string>
