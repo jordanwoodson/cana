@@ -98,7 +98,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         }
                     }
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        app.removalInfo?.let { RiskChip(it, Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true }) }
+                        app.shownRisk?.let { RiskChip(it, Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true }) }
                         val stateLabel = when {
                             app.isUninstalled -> R.string.tab_removed
                             app.isDisabled -> R.string.app_state_disabled
