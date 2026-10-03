@@ -19,11 +19,11 @@ class BloatListRepository(context: Context) {
     /** Atomic cache replacement makes this safe without waiting behind a network refresh. */
     suspend fun cached(): JSONObject = withContext(Dispatchers.IO) {
         val snapshot = SettingsStore.getInstance().bloatUpdateSettings()
-        val url = snapshot.bloatListUrl.ifBlank { DEFAULT_BLOAT_URL }
+        val url = BloatListSource.effectiveUrl(snapshot.bloatListUrl)
         val key = MessageDigest.getInstance("SHA-256").digest(url.toByteArray())
             .joinToString("") { "%02x".format(it) }
         BloatListCache(File(context.filesDir, "uad-$key.json")) {
-            context.assets.open("uad_lists.json").bufferedReader().use { it.readText() }
+            bundledList()
         }.load().data
     }
 
@@ -31,11 +31,11 @@ class BloatListRepository(context: Context) {
         refreshLock.withLock {
             val settings = SettingsStore.getInstance()
             val snapshot = settings.bloatUpdateSettings()
-            val url = snapshot.bloatListUrl.ifBlank { DEFAULT_BLOAT_URL }
+            val url = BloatListSource.effectiveUrl(snapshot.bloatListUrl)
             val key = MessageDigest.getInstance("SHA-256").digest(url.toByteArray())
                 .joinToString("") { "%02x".format(it) }
             val cache = BloatListCache(File(context.filesDir, "uad-$key.json")) {
-                context.assets.open("uad_lists.json").bufferedReader().use { it.readText() }
+                bundledList()
             }
             val current = cache.load()
             val sameUrl = snapshot.bloatCacheUrl == url
@@ -63,6 +63,10 @@ class BloatListRepository(context: Context) {
                 current.data
             }
         }
+    }
+
+    private fun bundledList(): String = context.assets.open("android-debloat-list.zip").use {
+        parseAndroidDebloatArchive(it.readBloatBytes()).toString()
     }
 
     companion object {

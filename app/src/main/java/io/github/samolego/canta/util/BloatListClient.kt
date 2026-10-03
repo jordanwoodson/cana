@@ -2,7 +2,6 @@ package io.github.samolego.canta.util
 
 import org.json.JSONObject
 import java.io.File
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -21,25 +20,16 @@ internal class BloatListClient(
             connection.connectTimeout = connectTimeoutMs
             connection.readTimeout = readTimeoutMs
             connection.useCaches = false
-            connection.setRequestProperty("Accept", "application/json")
+            connection.setRequestProperty("Accept", "application/zip, application/json")
             if (etag.isNotEmpty()) connection.setRequestProperty("If-None-Match", etag)
             val receivedEtag = connection.getHeaderField("ETag")
             return when (val code = connection.responseCode) {
                 HttpURLConnection.HTTP_NOT_MODIFIED -> Response(null, receivedEtag ?: etag)
                 HttpURLConnection.HTTP_OK -> {
-                    val bytes = ByteArrayOutputStream()
-                    connection.inputStream.use { stream ->
-                        val buffer = ByteArray(8192)
-                        while (true) {
-                            val size = stream.read(buffer)
-                            if (size == -1) break
-                            if (bytes.size() + size > 10 * 1024 * 1024) {
-                                throw IOException("Bloat list exceeds 10 MB")
-                            }
-                            bytes.write(buffer, 0, size)
-                        }
-                    }
-                    Response(parseBloatList(bytes.toString("UTF-8")), receivedEtag.orEmpty())
+                    val bytes = connection.inputStream.use { it.readBloatBytes() }
+                    val data = if (bytes.size >= 2 && bytes[0] == 0x50.toByte() && bytes[1] == 0x4b.toByte())
+                        parseAndroidDebloatArchive(bytes) else parseBloatList(bytes.toString(Charsets.UTF_8))
+                    Response(data, receivedEtag.orEmpty())
                 }
                 else -> throw IOException("Bloat list request failed: HTTP $code")
             }

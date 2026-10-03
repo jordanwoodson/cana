@@ -1,19 +1,14 @@
 <?php
-// Builds uad_lists.json in UAD-NG's format, the only format Canta/Cana read, from three sources:
-//   1. ADL's category files aosp/carrier/google/misc/oem.json under <adl root>. ADL wins on conflicts.
-//   2. Supplement files in ADL's schema (--supplement, here user_apps.json): third-party "user apps"
-//      that ADL doesn't cover, added to the Misc list. Duplicates of ADL entries are reported and skipped.
-//   3. UAD-NG's own uad_lists.json (--uadng), for packages none of the above lists. ADL's dataset has been
-//      frozen since 2026-05-14, so this picks up UAD-NG's newer OEM packages.
-// The removal mapping is the inverse of upstream's scripts/update_uad.php. Every entry gets a `source`,
-// which Canta ignores and Cana shows on the app's overview.
-// Reviewed UAD-schema overlays are applied last and deliberately override every earlier source.
+// Builds package-keyed JSON from MuntashirAkon's five Android Debloat List categories.
+// The default browser build uses only these upstream records and replacements.
+// Optional --supplement / --uadng / --overlay flags remain for historical audit tooling;
+// the Dockerfile does not use them. The removal mapping preserves Canta-compatible badges.
 // Usage: php uad_lists.php <adl root> <output file> [--uadng <file>] [--supplement <file>] [--overlay <file>]...
 declare(strict_types=1);
 
 const LISTS = ['aosp' => 'Aosp', 'carrier' => 'Carrier', 'google' => 'Google', 'misc' => 'Misc', 'oem' => 'Oem'];
 const REMOVALS = ['delete' => 'Recommended', 'replace' => 'Advanced', 'caution' => 'Expert', 'unsafe' => 'Unsafe'];
-const SOURCE_ADL = 'ADL (SysAdminDoc android-debloat-list)';
+const SOURCE_ADL = 'Android Debloat List (MuntashirAkon)';
 const SOURCE_UADNG = 'UAD-NG (Universal Debloater Alliance)';
 
 function fail(string $message): never { fwrite(STDERR, "uad_lists.php: $message\n"); exit(1); }
@@ -37,14 +32,14 @@ while ($args) {
     };
 }
 
-// Cana shows this as "UAD suggestions: …", so name the suggested apps rather than the list ID.
+// Legacy clients use display names; Cana also receives the complete replacement records.
 $suggestionNames = function (string $id) use ($root): string {
     $file = "$root/suggestions/$id.json";
     return is_file($file) ? implode(', ', array_column(read($file), 'label')) : '';
 };
 
 /** Converts one record in ADL's schema into UAD-NG's shape. */
-function convert(array $item, string $list, string $source, callable $suggestionNames, bool $appendWeb): array {
+function convert(array $item, string $list, string $source, callable $suggestionNames, bool $appendWeb, string $root): array {
     $description = trim($item['description']);
     if (!empty($item['warning'])) $description = trim("$description\n\nWarning: " . trim($item['warning']));
     if ($appendWeb && !empty($item['web'])) $description .= "\n\n" . implode("\n", $item['web']);
@@ -57,9 +52,14 @@ function convert(array $item, string $list, string $source, callable $suggestion
         'removal' => REMOVALS[$item['removal']] ?? throw new RuntimeException("Unknown removal for {$item['id']}"),
         'source' => $source,
     ];
+    foreach (['label', 'warning', 'web'] as $field) {
+        if (isset($item[$field])) $entry[$field] = $item[$field];
+    }
     if (!empty($item['suggestions'])) {
         $names = $suggestionNames($item['suggestions']);
         if ($names !== '') $entry['suggestions'] = $names;
+        $file = "$root/suggestions/{$item['suggestions']}.json";
+        if (is_file($file)) $entry['alternatives'] = read($file);
     }
     return $entry;
 }
@@ -68,7 +68,7 @@ $uad = [];
 $counts = [];
 foreach (LISTS as $file => $list) {
     foreach (read("$root/$file.json") as $item) {
-        $uad[$item['id']] = convert($item, $list, SOURCE_ADL, $suggestionNames, false);
+        $uad[$item['id']] = convert($item, $list, SOURCE_ADL, $suggestionNames, false, $root);
     }
 }
 $counts[SOURCE_ADL] = count($uad);
@@ -91,7 +91,7 @@ foreach ($supplements as $file) {
             fail("$file: $id refers to unknown suggestions '{$item['suggestions']}'");
         }
         if (isset($uad[$id])) { note("$id from $file is already in ADL; keeping ADL's entry"); continue; }
-        $uad[$id] = convert($item, 'Misc', $source, $suggestionNames, true);
+        $uad[$id] = convert($item, 'Misc', $source, $suggestionNames, true, $root);
         $added++;
     }
     $counts[$source] = $added;

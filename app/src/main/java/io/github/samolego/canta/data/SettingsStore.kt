@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import io.github.samolego.canta.data.proto.AppSettings
-import io.github.samolego.canta.util.DEFAULT_BLOAT_URL
+import io.github.samolego.canta.util.BloatListSource
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 
@@ -20,7 +20,7 @@ class SettingsStore private constructor(context: Context) {
     val confirmBeforeUninstallFlow = dataStore.data.map { it.confirmBeforeUninstall }
     val disableRiskDialogFlow = dataStore.data.map { it.disableRiskDialog }
     val bloatListUrlFlow = dataStore.data.map {
-        it.bloatListUrl.ifEmpty { DEFAULT_BLOAT_URL }
+        BloatListSource.effectiveUrl(it.bloatListUrl)
     }
     val bloatUnmeteredOnlyFlow = dataStore.data.map { it.bloatUnmeteredOnly }
     val allowUnsafeUninstallsFlow = dataStore.data.map { it.allowUnsafeUninstalls }
@@ -61,7 +61,7 @@ class SettingsStore private constructor(context: Context) {
 
     suspend fun setBloatCacheMetadata(url: String, etag: String, checkedMs: Long) {
         dataStore.updateData {
-            if (it.bloatListUrl.ifBlank { DEFAULT_BLOAT_URL } != url) it
+            if (BloatListSource.effectiveUrl(it.bloatListUrl) != url) it
             else it.toBuilder().setBloatCacheUrl(url).setBloatEtag(etag)
                 .setBloatLastCheckedMs(checkedMs).build()
         }

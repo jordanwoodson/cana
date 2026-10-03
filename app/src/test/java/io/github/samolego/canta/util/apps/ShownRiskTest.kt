@@ -1,24 +1,27 @@
 package io.github.samolego.canta.util.apps
 
 import io.github.samolego.canta.util.BloatData
-import io.github.samolego.canta.util.CanaVerdict
 import io.github.samolego.canta.util.RemovalRecommendation
 import io.github.samolego.canta.util.RemovalRecommendation.*
+import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
 
 class ShownRiskTest {
-    private fun app(risk: RemovalRecommendation?, verdict: CanaVerdict?) =
-        AppInfo("app", "app", "1", 1, true, false, false, BloatData(null, null, risk, verdict = verdict))
+    private fun app(risk: RemovalRecommendation?, oldAction: String?) =
+        AppInfo("app", "app", "1", 1, true, false, false, BloatData.fromJson(JSONObject().apply {
+            put("removal", risk?.name)
+            if (oldAction != null) put("verdict", JSONObject().put("action", oldAction))
+        }))
 
-    @Test fun recommendedTagOnlyShowsWhenClaudeRecommendsUninstalling() {
-        assertEquals(RECOMMENDED, app(RECOMMENDED, CanaVerdict(uninstall = true)).shownRisk)
-        assertNull(app(RECOMMENDED, CanaVerdict(uninstall = false)).shownRisk)
+    @Test fun upstreamRecommendationIsShownRegardlessOfLegacyClaudeVerdict() {
+        assertEquals(RECOMMENDED, app(RECOMMENDED, "Uninstall").shownRisk)
+        assertEquals(RECOMMENDED, app(RECOMMENDED, "Keep").shownRisk)
         assertEquals(RECOMMENDED, app(RECOMMENDED, null).shownRisk)
     }
 
-    @Test fun otherRatingsAndTheRealRatingAreUnchanged() {
-        for (risk in listOf(ADVANCED, EXPERT, UNSAFE)) assertEquals(risk, app(risk, CanaVerdict(uninstall = false)).shownRisk)
-        assertEquals(RECOMMENDED, app(RECOMMENDED, CanaVerdict(uninstall = false)).removalInfo)
+    @Test fun everyUpstreamRatingAndUnclassifiedStateArePreserved() {
+        for (risk in listOf(ADVANCED, EXPERT, UNSAFE)) assertEquals(risk, app(risk, "Keep").shownRisk)
+        assertNull(app(null, "Uninstall").shownRisk)
     }
 }

@@ -12,11 +12,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
 
-const val DEFAULT_BLOAT_URL =
-        "https://raw.githubusercontent.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/main/resources/assets/uad_lists.json"
-
 /**
- * App bloat information, parsed from the UAD json.
+ * App guidance from Android Debloat List or a custom package-keyed JSON list.
  */
 @Parcelize
 data class BloatData(
@@ -27,10 +24,12 @@ data class BloatData(
     val neededBy: List<String> = emptyList(),
     val labels: List<String> = emptyList(),
     val suggestions: String? = null,
-    /** Which list produced this entry, when the list says so (Cana's debloat server does). */
+    /** Which list produced this entry. */
     val source: String? = null,
-    /** Claude's keep-or-uninstall recommendation, from the verdict overlay on Cana's own lists. */
-    val verdict: CanaVerdict? = null,
+    val label: String? = null,
+    val warning: String? = null,
+    val web: List<String> = emptyList(),
+    val alternatives: List<SuggestedApp> = emptyList(),
 ) : Parcelable {
     companion object {
         fun fromJson(json: JSONObject): BloatData {
@@ -43,40 +42,37 @@ data class BloatData(
                 labels = json.stringList("labels"),
                 suggestions = (json.opt("suggestions") as? String)?.takeIf { it.isNotBlank() },
                 source = (json.opt("source") as? String)?.takeIf { it.isNotBlank() },
-                verdict = CanaVerdict.fromJson(json.optJSONObject("verdict")),
+                label = json.optionalText("label"),
+                warning = json.optionalText("warning"),
+                web = json.stringList("web"),
+                alternatives = json.optJSONArray("alternatives")?.let { array ->
+                    (0 until array.length()).mapNotNull { SuggestedApp.fromJson(array.optJSONObject(it)) }
+                }.orEmpty(),
             )
         }
     }
 }
 
-/**
- * Whether Claude recommends keeping or uninstalling a package when debloating for privacy and performance.
- * Separate from [RemovalRecommendation], which only says how risky removal is.
- */
+/** An upstream replacement, including any restrictions on the recommendation. */
 @Parcelize
-data class CanaVerdict(
-    val uninstall: Boolean,
-    /** What uninstalling gains: [PRIVACY] and/or [PERFORMANCE]. */
-    val benefits: List<String> = emptyList(),
+data class SuggestedApp(
+    val id: String,
+    val label: String,
+    val repo: String,
     val reason: String? = null,
+    val source: String? = null,
 ) : Parcelable {
     companion object {
-        const val PRIVACY = "privacy"
-        const val PERFORMANCE = "performance"
-
-        fun fromJson(json: JSONObject?): CanaVerdict? {
-            val action = json?.opt("action") as? String ?: return null
-            val uninstall = when {
-                action.equals("Uninstall", true) -> true
-                action.equals("Keep", true) -> false
-                else -> return null
-            }
-            return CanaVerdict(uninstall,
-                json.stringList("benefits").map { it.lowercase() }.filter { it == PRIVACY || it == PERFORMANCE }.distinct(),
-                (json.opt("reason") as? String)?.takeIf { it.isNotBlank() })
+        fun fromJson(json: JSONObject?): SuggestedApp? {
+            json ?: return null
+            return SuggestedApp(json.optionalText("id") ?: return null,
+                json.optionalText("label") ?: return null, json.optionalText("repo") ?: return null,
+                json.optionalText("reason"), json.optionalText("source"))
         }
     }
 }
+
+private fun JSONObject.optionalText(key: String): String? = (opt(key) as? String)?.takeIf { it.isNotBlank() }
 
 private fun JSONObject.stringList(key: String): List<String> {
     val array = optJSONArray(key) ?: return emptyList()
@@ -86,7 +82,7 @@ private fun JSONObject.stringList(key: String): List<String> {
 }
 
 /**
- * Enum class to represent the removal recommendation, from the UAD list.
+ * Cana's badges for Android Debloat List's delete / replace / caution / unsafe guidance.
  */
 enum class RemovalRecommendation(
     val icon: ImageVector,
@@ -96,22 +92,22 @@ enum class RemovalRecommendation(
     RECOMMENDED(
         Icons.Default.Check,
         Color.Green,
-        "Pointless or outright negative packages, and/or apps available through Google Play."
+        "The selected debloat list recommends removing this app. Read its description and warnings."
     ),
     ADVANCED(
         Icons.Default.Settings,
         Color.Yellow,
-        "Breaks obscure or minor parts of functionality, or apps that aren't easily enabled/installed through Settings/Google Play. This category is also used for apps that are useful (default keyboard/gallery/launcher/music app.) but that can easily be replaced by a better alternative."
+        "Replacement or additional review is needed. Removing this app may affect features; read its description and warnings."
     ),
     EXPERT(
         Icons.Default.Warning,
         Color.Red,
-        "Breaks widespread and/or important functionality, but nothing important to the basic operation of the operating system. Removing an 'Expert' package should not bootloop the device (unless mentioned in the description) but we can't guarantee it 100%."
+        "The selected debloat list advises caution: removing this app may be unsafe. Read its description and warnings."
     ),
     UNSAFE(
         Icons.Default.Close,
         Color.Magenta,
-        "Can break vital parts of the operating system. Removing an 'Unsafe' package have an extremely high risk of bootlooping your device."
+        "The selected debloat list says removing this app is unsafe. Read the warning about the functionality that would break."
     ),
     SYSTEM(
         Icons.Default.Android,
@@ -127,7 +123,7 @@ enum class RemovalRecommendation(
 }
 
 /**
- * Represents the install data from the UAD list.
+ * Represents the five Android Debloat List categories.
  */
 enum class InstallData {
     OEM,

@@ -105,7 +105,6 @@ fun AppTile(
                     Row(Modifier.fillMaxWidth().height(26.dp), verticalAlignment = Alignment.CenterVertically) {
                         Row(Modifier.weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.CenterVertically) {
-                            appInfo.bloatData?.verdict?.let { VerdictBadge(it) }
                             appInfo.shownRisk?.let { RiskChip(it) }
                             if (appInfo.isDisabled) DisabledBadge()
                             if (appInfo.isSuspended) SuspendedBadge()

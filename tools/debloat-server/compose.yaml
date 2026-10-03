@@ -1,10 +1,9 @@
-# debloat: the SysAdminDoc android-debloat-list reference browser (static site, no state), built
+# debloat: MuntashirAkon's Android Debloat List reference browser (static site, no state), built
 # from GitHub by the Dockerfile. The port is published on 127.0.0.1 only and reaches the tailnet
 # solely through `sudo tailscale serve --bg --https=3090 http://127.0.0.1:3090`
 # → https://ubuntu-server.taila70e29.ts.net:3090
 # Pull the latest upstream: `sudo docker compose build --pull && sudo docker compose up -d`.
-# Pin a tag or commit instead: set REF below (e.g. v0.1.0). UADNG_REF picks the UAD-NG branch whose
-# uad_lists.json fills in packages ADL lacks; user_apps.json in this directory adds third-party user apps.
+# Pin an upstream commit by setting REF below. No local recommendation overrides are applied.
 name: debloat
 
 services:
@@ -13,7 +12,6 @@ services:
       context: .
       args:
         REF: master
-        UADNG_REF: main
     image: debloat:local
     container_name: debloat
     ports:

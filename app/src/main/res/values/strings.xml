@@ -192,7 +192,7 @@
     <string name="safety_role">Current %1$s role holder. Choose a replacement before removal.</string>
     <string name="safety_keyboard">Current or enabled keyboard: %1$s. Keep another working keyboard.</string>
     <string name="safety_admin">Active device administrator: %1$s. Device management may stop working.</string>
-    <string name="safety_dependent">Installed app %1$s depends on this package according to UAD.</string>
+    <string name="safety_dependent">Installed app %1$s depends on this package according to the debloat list.</string>
     <string name="safety_acknowledge">I understand these warnings and want to continue.</string>
     <string name="restore_export">Export recovery script</string>
     <string name="restore_export_saved">Recovery script saved. Review its manual steps before running it over adb.</string>
@@ -292,7 +292,10 @@
     <string name="settings_appearance">Appearance</string>
     <string name="last_used_no_record">No use recorded in Android’s retained usage history</string>
     <string name="last_used_date">Last recorded use: %1$s</string>
-    <string name="app_suggestions">UAD suggestions: %1$s</string>
+    <string name="app_suggestions">Suggested replacements: %1$s</string>
+    <string name="app_replacements">Suggested replacements</string>
+    <string name="app_list_warning">Removal warning</string>
+    <string name="app_references">References</string>
     <string name="system_controls">System</string>
     <string name="device_settings">Device settings</string>
     <string name="system_quad9" translatable="false">Quad9</string>
@@ -359,14 +362,6 @@
     <string name="tracker_scan_summary">Tracker scan finished: %1$d of %2$d successfully scanned apps contain tracker signatures; %3$d failed</string>
     <string name="filter_trackers">With trackers</string>
     <string name="filter_privacy">Privacy</string>
-    <string name="filter_verdict">Removal recommendation</string>
-    <string name="filter_verdict_uninstall">Uninstall</string>
-    <string name="filter_verdict_keep">Keep</string>
-    <string name="verdict_uninstall_title">Removal recommended</string>
-    <string name="verdict_keep_title">Keep recommended</string>
-    <string name="verdict_gains">Gains: %1$s</string>
-    <string name="verdict_privacy">privacy</string>
-    <string name="verdict_performance">performance</string>
     <string name="sort_trackers">Sort by trackers</string>
     <string name="shizuku_connect_service">Start Shizuku, then return here to authorize Cana. This screen updates automatically.</string>
     <string name="shizuku_update_required">This Shizuku version is too old. Update Shizuku and start its service again.</string>

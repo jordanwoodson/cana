@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,6 +43,7 @@ import io.github.samolego.canta.ops.ActionChoices
 import io.github.samolego.canta.ui.component.*
 import io.github.samolego.canta.ui.viewmodel.PackageAction
 import io.github.samolego.canta.util.LogUtils
+import io.github.samolego.canta.util.openWebLink
 import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import kotlinx.coroutines.CancellationException
@@ -143,7 +145,10 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     }
                     HorizontalDivider()
                     Text(stringResource(R.string.about_this_app), style = MaterialTheme.typography.titleMedium)
-                    app.bloatData?.verdict?.let { VerdictCard(it) }
+                    app.bloatData?.warning?.let { warning ->
+                        CanaBanner(Icons.Default.Warning, stringResource(R.string.app_list_warning), StatusTone.WARNING,
+                            details = { Text(warning, style = MaterialTheme.typography.bodyMedium) })
+                    }
                     val description = app.description
                     if (description != null) {
                         val color = MaterialTheme.colorScheme.onSurface.toArgb()
@@ -153,7 +158,26 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                             modifier = Modifier.fillMaxWidth())
                     } else Text(stringResource(R.string.no_description_available), style = MaterialTheme.typography.bodyLarge)
                     app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }
-                    app.bloatData?.suggestions?.takeIf { it.isNotBlank() }?.let { Text(stringResource(R.string.app_suggestions, it)) }
+                    val alternatives = app.bloatData?.alternatives.orEmpty()
+                    if (alternatives.isNotEmpty()) {
+                        Text(stringResource(R.string.app_replacements), style = MaterialTheme.typography.titleSmall)
+                        alternatives.forEach { suggested ->
+                            val canOpen = Uri.parse(suggested.repo).scheme in setOf("https", "http")
+                            ListItem(
+                                headlineContent = { Text(suggested.label) },
+                                supportingContent = { Column {
+                                    Text(suggested.id, style = MaterialTheme.typography.bodySmall)
+                                    suggested.reason?.let { Text(it) }
+                                } },
+                                trailingContent = { if (canOpen) Icon(Icons.AutoMirrored.Filled.OpenInNew, null) },
+                                modifier = Modifier.clickable(enabled = canOpen) { context.openWebLink(suggested.repo) },
+                            )
+                        }
+                    } else app.bloatData?.suggestions?.takeIf { it.isNotBlank() }?.let { Text(stringResource(R.string.app_suggestions, it)) }
+                    app.bloatData?.web?.filter { Uri.parse(it).scheme in setOf("https", "http") }?.takeIf { it.isNotEmpty() }?.let { links ->
+                        Text(stringResource(R.string.app_references), style = MaterialTheme.typography.titleSmall)
+                        links.forEach { url -> TextButton(onClick = { context.openWebLink(url) }) { Text(url) } }
+                    }
                     app.bloatData?.neededBy?.takeIf { it.isNotEmpty() }?.let {
                         Text(stringResource(R.string.app_needed_by, it.joinToString()), style = MaterialTheme.typography.bodySmall)
                     }

@@ -25,12 +25,13 @@ class OverlayMergeTest(unittest.TestCase):
         (self.root / 'supplement.json').write_text(json.dumps([{'id': 'com.example.supplement', 'description': 'Supplement entry.', 'removal': 'delete'}]))
         (self.root / 'result.json').write_text('previous validated output')
 
-    def run_merge(self, overlay=None, second=None):
+    def run_merge(self, overlay=None, second=None, legacy_sources=True):
         command = ['sudo', '-n', 'docker', 'run', '--rm', '--network=none', '--user', f'{os.getuid()}:{os.getgid()}',
                    '--mount', f'type=bind,source={self.root},target=/work',
                    '--mount', f'type=bind,source={SOURCE / "uad_lists.php"},target=/tool/uad_lists.php,readonly',
-                   'php:8.4-cli-alpine', 'php', '/tool/uad_lists.php', '/work/fixture', '/work/result.json',
-                   '--uadng', '/work/fallback.json', '--supplement', '/work/supplement.json']
+                   'php:8.4-cli-alpine', 'php', '/tool/uad_lists.php', '/work/fixture', '/work/result.json']
+        if legacy_sources:
+            command += ['--uadng', '/work/fallback.json', '--supplement', '/work/supplement.json']
         if overlay is not None:
             (self.root / 'overlay.json').write_text(json.dumps(overlay))
             command += ['--overlay', '/work/overlay.json']
@@ -38,6 +39,56 @@ class OverlayMergeTest(unittest.TestCase):
             (self.root / 'second.json').write_text(json.dumps(second))
             command += ['--overlay', '/work/second.json']
         return subprocess.run(command, capture_output=True, text=True)
+
+    def test_default_list_uses_only_muntashirakon_guidance(self):
+        result = self.run_merge(legacy_sources=False)
+        self.assertEqual(0, result.returncode, result.stderr)
+        data = json.loads((self.root / 'result.json').read_text())
+        self.assertEqual({'android'}, set(data))
+        self.assertEqual('Android Debloat List (MuntashirAkon)', data['android']['source'])
+        self.assertNotIn('verdict', data['android'])
+
+    def test_default_list_keeps_warning_references_and_replacement_notes(self):
+        fixture = self.root / 'fixture'
+        (fixture / 'google.json').write_text(json.dumps([{
+            'id': 'com.example.browser', 'label': 'Stock Browser', 'description': 'Browser.',
+            'removal': 'replace', 'warning': 'Replace it first.', 'web': ['https://example.com/report'],
+            'suggestions': 'browsers', 'required_by': ['com.example.client']}]))
+        (fixture / 'suggestions').mkdir()
+        alternatives = [{'id': 'org.example.browser', 'label': 'Open Browser',
+                         'repo': 'https://example.com/browser', 'reason': 'Device restrictions.'}]
+        (fixture / 'suggestions/browsers.json').write_text(json.dumps(alternatives))
+        result = self.run_merge(legacy_sources=False)
+        self.assertEqual(0, result.returncode, result.stderr)
+        data = json.loads((self.root / 'result.json').read_text())['com.example.browser']
+        self.assertEqual('Stock Browser', data['label'])
+        self.assertEqual('Replace it first.', data['warning'])
+        self.assertEqual(['https://example.com/report'], data['web'])
+        self.assertEqual(['com.example.client'], data['neededBy'])
+        self.assertEqual(alternatives, data['alternatives'])
+
+    def test_upstream_browser_shows_replacements_and_their_restrictions(self):
+        fixture = self.root / 'fixture'
+        (fixture / 'google.json').write_text(json.dumps([{'id': 'com.example.browser', 'suggestions': 'browsers'}]))
+        (fixture / 'suggestions').mkdir()
+        (fixture / 'suggestions/browsers.json').write_text(json.dumps([{
+            'id': 'org.example.browser', 'label': 'Open Browser', 'repo': 'https://example.com/browser',
+            'reason': 'Only works on selected devices.'}]))
+        pages = fixture / 'browser/src/bloatware'
+        pages.mkdir(parents=True)
+        page = pages / 'com.example.browser.md'
+        page.write_text('# Stock Browser\n\nOriginal upstream description.\n')
+        command = ['sudo', '-n', 'docker', 'run', '--rm', '--network=none', '--user', f'{os.getuid()}:{os.getgid()}',
+                   '--mount', f'type=bind,source={fixture},target=/work',
+                   '--mount', f'type=bind,source={SOURCE},target=/tool,readonly',
+                   'php:8.4-cli-alpine', 'php', '/tool/browser_suggestions.php', '/work']
+        result = subprocess.run(command, capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stderr)
+        text = page.read_text()
+        self.assertIn('Original upstream description.', text)
+        self.assertIn('Open Browser', text)
+        self.assertIn('https://example.com/browser', text)
+        self.assertIn('Only works on selected devices.', text)
 
     def test_existing_merge_without_overlay_preserves_all_sources(self):
         result = self.run_merge()

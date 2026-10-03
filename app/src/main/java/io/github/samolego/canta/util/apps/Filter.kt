@@ -22,7 +22,6 @@ class Filter(
         removalRecommendation != null -> FilterGroup.RISK
         id.startsWith("privacy_") -> FilterGroup.PRIVACY
         id.startsWith("category_") -> FilterGroup.CATEGORY
-        id.startsWith("verdict_") -> FilterGroup.VERDICT
         else -> FilterGroup.STATE
     }
     companion object {
@@ -37,11 +36,6 @@ class Filter(
         /** Apps whose APK code matched at least one tracker signature in a Cana scan. */
         val trackers = Filter("With trackers", { app -> (io.github.samolego.canta.ops.CanaServices.getInstance().trackerScans.count(app) ?: 0) > 0 },
             nameRes = R.string.filter_trackers, id = "privacy_trackers")
-        /** Claude's keep-or-uninstall recommendation for privacy and performance debloating. */
-        val verdictUninstall = Filter("Claude: uninstall", { it.bloatData?.verdict?.uninstall == true },
-            nameRes = R.string.filter_verdict_uninstall, id = "verdict_uninstall")
-        val verdictKeep = Filter("Claude: keep", { it.bloatData?.verdict?.uninstall == false },
-            nameRes = R.string.filter_verdict_keep, id = "verdict_keep")
         val unused = Filter("Unused for 90 days", { !it.isUninstalled && io.github.samolego.canta.ops.ManagementPolicy.unused90Days(it.lastUsed, it.firstInstallTime, System.currentTimeMillis()) }, nameRes = R.string.unused_90_days)
 
         /**
@@ -100,13 +94,10 @@ class Filter(
                 ))
             }
 
-            removalFilters.add(verdictUninstall)
-            removalFilters.add(verdictKeep)
-
             availableFilters = removalFilters
         }
         fun fromId(id: String): Filter? = availableFilters.find { it.id == id }
     }
 }
 
-enum class FilterGroup { SCOPE, STATE, RISK, VERDICT, CATEGORY, PRIVACY }
+enum class FilterGroup { SCOPE, STATE, RISK, CATEGORY, PRIVACY }

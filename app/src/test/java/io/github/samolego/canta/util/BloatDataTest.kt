@@ -42,21 +42,6 @@ class BloatDataTest {
         assertNull(BloatData.fromJson(JSONObject("""{"source":7}""")).source)
     }
 
-    @Test fun parsesCanaVerdictOverlay() {
-        val uninstall = BloatData.fromJson(JSONObject("""{"list":"Carrier","removal":"Recommended",
-            "verdict":{"action":"Uninstall","benefits":["Privacy","performance","speed","privacy"],"reason":"Sends diagnostics."}}""")).verdict
-        assertEquals(CanaVerdict(true, listOf(CanaVerdict.PRIVACY, CanaVerdict.PERFORMANCE), "Sends diagnostics."), uninstall)
-        val keep = BloatData.fromJson(JSONObject("""{"verdict":{"action":"keep","benefits":[],"reason":""}}""")).verdict
-        assertEquals(CanaVerdict(false), keep)
-    }
-
-    @Test fun missingOrUnknownVerdictIsAbsent() {
-        assertNull(BloatData.fromJson(JSONObject("""{"removal":"Recommended"}""")).verdict)
-        assertNull(BloatData.fromJson(JSONObject("""{"verdict":{"action":"Disable"}}""")).verdict)
-        assertNull(BloatData.fromJson(JSONObject("""{"verdict":"Uninstall"}""")).verdict)
-        assertNull(BloatData.fromJson(JSONObject("""{"verdict":{"action":7}}""")).verdict)
-    }
-
     @Test fun nullAndMalformedOptionalValuesDoNotBecomeFakePackageNames() {
         val parsed = BloatData.fromJson(JSONObject("""{
             "list":null, "description":null, "removal":null,

@@ -1,0 +1,16 @@
+Android Debloat List
+Copyright (C) 2022 Muntashir Al-Islam and contributors.
+
+Source: https://github.com/MuntashirAkon/android-debloat-list
+Bundled upstream revision: 10c82498154523d29ba0f268e4ab8316ab19c16b
+Downloaded: 2026-10-03
+
+android-debloat-list.zip is the unmodified upstream repository archive.
+Cana reads aosp.json, carrier.json, google.json, misc.json, oem.json and
+suggestions/*.json. The app maps delete/replace/caution/unsafe to its
+Recommended/Advanced/Expert/Unsafe badges, preserving upstream warnings,
+dependencies, references and replacement notes. No local audit or verdict
+overrides are applied.
+
+The list is distributed under GNU Affero General Public License version 3
+or later; see ADL-LICENSE.txt and COPYING inside the archive.

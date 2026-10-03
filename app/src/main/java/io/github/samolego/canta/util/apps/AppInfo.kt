@@ -37,9 +37,9 @@ data class AppInfo(
         get() = appName ?: packageName.substringAfterLast('.')
     val removalInfo: RemovalRecommendation?
         get() = bloatData?.removal
-    /** The rating badge to show: a Recommended rating is hidden when Claude recommends keeping the app. */
+    /** Display the list's own recommendation. */
     val shownRisk: RemovalRecommendation?
-        get() = removalInfo?.takeUnless { it == RemovalRecommendation.RECOMMENDED && bloatData?.verdict?.uninstall == false }
+        get() = removalInfo
     val description: String?
         get() = bloatData?.description
 

@@ -96,7 +96,6 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
                     FilterGroup.SCOPE -> R.string.filter_scope
                     FilterGroup.STATE -> R.string.filter_state
                     FilterGroup.RISK -> R.string.filter_risk
-                    FilterGroup.VERDICT -> R.string.filter_verdict
                     FilterGroup.CATEGORY -> R.string.filter_category
                     FilterGroup.PRIVACY -> R.string.filter_privacy
                 }), style = MaterialTheme.typography.titleSmall)

@@ -89,12 +89,49 @@ class BloatListClientTest {
         }
     }
 
+    @Test fun downloadsTheUpstreamArchiveAndCachesTheConvertedList() {
+        MockWebServer().use { server ->
+            server.enqueue(MockResponse().setBody(okio.Buffer().write(AndroidDebloatListTest().fixture()))
+                .setHeader("Content-Type", "application/zip").setHeader("ETag", "\"adl-v1\""))
+            server.enqueue(MockResponse().setResponseCode(304))
+            val dir = Files.createTempDirectory("adl-test").toFile()
+            try {
+                val file = dir.resolve("list.json")
+                val cache = BloatListCache(file) { bundled }
+                val url = server.url("/master.zip").toString()
+                val first = cache.refresh(BloatListClient(), url, "")
+                val data = BloatData.fromJson(first.data.getJSONObject("com.example.browser"))
+                assertEquals("Open Browser", data.alternatives.single().label)
+                assertEquals(first.data.toString(), parseBloatList(file.readText()).toString())
+                val second = cache.refresh(BloatListClient(), url, first.etag)
+                assertEquals(first.data.toString(), second.data.toString())
+                server.takeRequest(1, TimeUnit.SECONDS)
+                assertEquals("\"adl-v1\"", server.takeRequest(1, TimeUnit.SECONDS)!!.getHeader("If-None-Match"))
+            } finally { dir.deleteRecursively() }
+        }
+    }
+
+    @Test fun incompleteUpstreamArchiveCannotReplaceTheCache() {
+        MockWebServer().use { server ->
+            server.enqueue(MockResponse().setBody(okio.Buffer().write(
+                AndroidDebloatListTest().archive(mapOf("google.json" to "[]")))))
+            val dir = Files.createTempDirectory("adl-test").toFile()
+            try {
+                val file = dir.resolve("list.json").apply { writeText(downloaded) }
+                assertThrows(Exception::class.java) {
+                    BloatListCache(file) { bundled }.refresh(BloatListClient(), server.url("/master.zip").toString(), "")
+                }
+                assertEquals(downloaded, file.readText())
+            } finally { dir.deleteRecursively() }
+        }
+    }
+
     @Test fun bundledListParsesWithAllSupportedMetadata() {
-        val json = parseBloatList(java.io.File("src/main/assets/uad_lists.json").readText())
+        val json = parseAndroidDebloatArchive(java.io.File("src/main/assets/android-debloat-list.zip").readBytes())
         val entries = json.keys().asSequence().map { BloatData.fromJson(json.getJSONObject(it)) }.toList()
         assertTrue(entries.isNotEmpty())
         assertTrue(entries.all { it.installData != null })
-        assertTrue(entries.any { it.suggestions == "cameras" })
+        assertTrue(entries.any { it.alternatives.any { app -> app.label == "Open Camera" } })
         assertTrue(entries.any { it.neededBy.isNotEmpty() })
     }
 }

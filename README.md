@@ -23,7 +23,7 @@ Cana is a fork of [Canta](https://github.com/samolego/Canta) by [samolego](https
 The name turns **(cant)a** into **(can)a**: a fork built to do more. Cana lets you
 **pick which user profile to work on**, so system apps inside a work profile can
 be debloated too. It uses Shizuku and recommendations from the
-[Universal Debloat List](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/).
+[Android Debloat List](https://github.com/MuntashirAkon/android-debloat-list).
 
 - ✅ No root required
 - ✅ Personal, work, clone and private space profiles, and secondary users
@@ -55,7 +55,7 @@ that profile's apps, and uninstall / reinstall then act on that profile only
 * Durable history, Undo last batch, and a PC restore script exported from History or Logs.
 * Per-profile runtime permissions, background restrictions, metered data restrictions and
   Android 14+ network blocks, with current state and revert controls.
-* Offline UAD recommendations, all list categories, tracker component inspection, privacy presets,
+* Offline Android Debloat List recommendations, removal warnings, replacement apps, all list categories, tracker component inspection, privacy presets,
   OTA change review, APK-size sorting, and last-used sorting in Cana's own profile.
 * A separate System screen for Private DNS, captive checks, scanning, mobile data and Data Saver.
 * Exact preflight plans, persistent batch progress and stop controls, hidden-selection review,
@@ -133,10 +133,14 @@ The Open C artwork and export instructions live in [assets/branding](assets/bran
 * [samolego](https://github.com/samolego) and the contributors of
   [Canta](https://github.com/samolego/Canta), which Cana is built on. If you like Cana,
   consider [supporting Canta](https://www.paypal.com/donate/?hosted_button_id=FD4R46ZZ5EWME).
-* [Universal-Debloater-Alliance](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/)
-  for the debloat list
+* [Muntashir Al-Islam and contributors](https://github.com/MuntashirAkon/android-debloat-list)
+  for Android Debloat List and its replacement suggestions
 * @RikkaApps for Shizuku
 
 ## License
 
 [LGPL-3.0](LICENSE), same as Canta.
+
+The bundled Android Debloat List data is licensed under
+[AGPL-3.0-or-later](app/src/main/assets/ADL-LICENSE.txt); its source revision and
+attribution are in [ADL-NOTICE.txt](app/src/main/assets/ADL-NOTICE.txt).

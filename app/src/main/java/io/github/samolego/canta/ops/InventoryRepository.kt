@@ -83,6 +83,6 @@ class InventoryRepository(
         for (key in json.keys()) json.optJSONObject(key)?.let { put(key, BloatData.fromJson(it)) }
         put(io.github.samolego.canta.packageName, BloatData(null,
             io.github.samolego.canta.util.optionalTextArgument(context.getString(io.github.samolego.canta.R.string.canta_description),
-                "Universal Debloater Alliance (https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation)"), null))
+                "Muntashir Al-Islam and Android Debloat List contributors (https://github.com/MuntashirAkon/android-debloat-list)"), null))
     }
 }
