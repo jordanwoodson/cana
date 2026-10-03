@@ -4,12 +4,12 @@ title: Cana - Do more. Because you can.
 description: More control over your Android apps. Debloat personal, work, and other user profiles without root, powered by Shizuku.
 
 hero:
-  name: '<span class="cana-wordmark">(<strong>can</strong>)a</span>'
+  name: '<span class="cana-wordmark"><span>(</span><strong>can</strong><span>)</span>a</span>'
   text: "Do more. Because you can."
   tagline: "More control over your Android apps. Personal, work, and other profiles — powered by Shizuku."
   image:
     src: /branding/cana-icon.svg
-    alt: Cana Open C icon
+    alt: Cana Open C icon in Dracula purple and pink
   actions:
     - theme: brand
       text: Get Cana
@@ -39,9 +39,9 @@ features:
     details: Create, import, and share reusable lists of apps to remove.
     link: /presets
 
-  - icon: 📱
-    title: Android 9 and up
-    details: A Material Design interface with light, dark, and wallpaper-based colors.
+  - icon: 🦇
+    title: Dracula, everywhere
+    details: The classic terminal palette across every screen. Dark surfaces, purple and pink accents, and readable status colors on Android 9 and up.
     link: /settings
 
   - icon: ↗

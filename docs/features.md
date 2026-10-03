@@ -34,7 +34,7 @@ Presets can include package removals and privacy settings. Import review shows n
 
 ## Recommendations and accessibility
 
-Removal recommendations are guidance, not guarantees. Readable badges identify Recommended, Advanced, Expert, Unsafe, and System apps. The UI uses Material 3, localized resources, visible labels, and Android font scaling.
+Removal recommendations are guidance, not guarantees. Readable badges identify Recommended, Advanced, Expert, Unsafe, and System apps. The UI pairs Material 3 with the Dracula terminal palette, monospace headings, localized resources, visible labels, and Android font scaling.
 
 Recommendation and tracker data can be cached for offline use. Downloads contact the configured sources and expose normal network request metadata. Tracker scans read APK files locally and keep their results on the device. Cana has no analytics SDK. See the [privacy policy](https://github.com/jordanwoodson/cana/blob/master/privacy_policy.md) for local storage, backup, download, and export details.
 

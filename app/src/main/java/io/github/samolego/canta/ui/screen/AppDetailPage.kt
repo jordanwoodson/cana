@@ -152,9 +152,16 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     val description = app.description
                     if (description != null) {
                         val color = MaterialTheme.colorScheme.onSurface.toArgb()
+                        val linkColor = MaterialTheme.colorScheme.tertiary.toArgb()
+                        val selectionColor = MaterialTheme.colorScheme.surfaceVariant.toArgb()
                         AndroidView(factory = { TextView(it).apply { setTextIsSelectable(true); movementMethod = LinkMovementMethod.getInstance(); textSize = 16f } },
                             // List descriptions are plain text with \n between lines, which HTML would collapse
-                            update = { it.text = Html.fromHtml(description.replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT); it.setTextColor(color) },
+                            update = {
+                                it.text = Html.fromHtml(description.replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT)
+                                it.setTextColor(color)
+                                it.setLinkTextColor(linkColor)
+                                it.highlightColor = selectionColor
+                            },
                             modifier = Modifier.fillMaxWidth())
                     } else Text(stringResource(R.string.no_description_available), style = MaterialTheme.typography.bodyLarge)
                     app.bloatData?.source?.let { Text(stringResource(R.string.app_list_source, it), style = MaterialTheme.typography.labelMedium) }

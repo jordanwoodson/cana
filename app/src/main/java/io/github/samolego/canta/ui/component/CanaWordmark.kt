@@ -1,6 +1,7 @@
 package io.github.samolego.canta.ui.component
 
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +12,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import io.github.samolego.canta.R
 
@@ -19,12 +21,14 @@ fun CanaWordmark(modifier: Modifier = Modifier, style: TextStyle = LocalTextStyl
     val appName = stringResource(R.string.app_name)
     Text(
         text = buildAnnotatedString {
-            append("(")
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { append("can") }
-            append(")a")
+            withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary)) { append("(") }
+            withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) { append("can") }
+            withStyle(SpanStyle(color = MaterialTheme.colorScheme.secondary)) { append(")") }
+            withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurface)) { append("a") }
         },
         modifier = modifier.clearAndSetSemantics { contentDescription = appName },
         style = style,
+        fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight.Normal,
         maxLines = 1,
     )

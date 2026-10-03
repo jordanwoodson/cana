@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -78,9 +77,9 @@ fun AppTile(
     }
     val sizeLabel = if (sizeBytes > 0) Formatter.formatShortFileSize(context, sizeBytes)
         else stringResource(R.string.app_size_unavailable)
-    Box(modifier.fillMaxWidth().height(88.dp)) {
+    Box(modifier.fillMaxWidth().heightIn(min = 88.dp)) {
         ListItem(
-            modifier = Modifier.fillMaxSize().combinedClickable(
+            modifier = Modifier.fillMaxWidth().combinedClickable(
                 enabled = enabled,
                 onClick = onShowDialog,
                 onLongClick = {
@@ -102,7 +101,7 @@ fun AppTile(
                 Column(Modifier.alpha(contentAlpha)) {
                     Text(appInfo.packageName, style = MaterialTheme.typography.bodySmall,
                         color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Row(Modifier.fillMaxWidth().height(26.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 26.dp), verticalAlignment = Alignment.CenterVertically) {
                         Row(Modifier.weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             appInfo.shownRisk?.let { RiskChip(it) }
@@ -166,17 +165,10 @@ fun AppIconImage(appIconImage: Drawable, contentDescription: String?, size: Dp =
     )
 }
 
-@Preview(name = "Compact app row light", showBackground = true)
+@Preview(name = "Compact app row Dracula", showBackground = true, backgroundColor = 0xFF282A36)
 @Composable
-private fun CompactAppRowLightPreview() = CompactAppRowPreview(false)
-
-@Preview(name = "Compact app row dark", showBackground = true)
-@Composable
-private fun CompactAppRowDarkPreview() = CompactAppRowPreview(true)
-
-@Composable
-private fun CompactAppRowPreview(dark: Boolean) {
-    CantaTheme(darkTheme = dark) {
+private fun CompactAppRowPreview() {
+    CantaTheme {
         AppTile(
             appInfo = AppInfo("Android Keyboard (AOSP)", "com.android.inputmethod.latin", "1", 1,
                 isSystemApp = true, isUninstalled = false, isDisabled = false,

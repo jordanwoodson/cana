@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/branding/cana-icon.svg" alt="Cana Open C icon" width="128" />
+<img src="assets/branding/cana-icon.svg" alt="Cana Open C icon in Dracula purple and pink" width="128" />
 
 # (can)a
 
@@ -29,6 +29,7 @@ be debloated too. It uses Shizuku and recommendations from the
 - ✅ Personal, work, clone and private space profiles, and secondary users
 - ✅ Detects previously uninstalled apps, per profile
 - ✅ Works on Android **9.0+ (SDK 28+)**
+- 🦇 [Dracula](https://draculatheme.com/contribute) throughout: dark surfaces, purple and pink branding, terminal-style headings, and readable status colors
 - ⚠️ No *permanent* bricking (If you uninstall **critical apps**, you can experience bootloop and have to **factory reset**!)
 
 \* Some apps (e.g. some oplus apps) don't allow uninstallation, and a work profile's admin can

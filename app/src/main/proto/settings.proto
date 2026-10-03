@@ -18,5 +18,6 @@ message AppSettings {
   bool bloat_unmetered_only = 12;
   string bloat_cache_url = 13;
   string tracker_list_url = 14;
-  bool use_dynamic_color = 15;
+  // Legacy preference retained for data compatibility; Cana now always uses Dracula.
+  bool use_dynamic_color = 15 [deprecated = true];
 }

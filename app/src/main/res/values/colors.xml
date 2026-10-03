@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="cana_charcoal">#152421</color>
-    <color name="cana_mint">#70EFAD</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="cana_charcoal">#282A36</color>
+    <color name="dracula_selection">#44475A</color>
+    <color name="dracula_foreground">#F8F8F2</color>
+    <color name="dracula_purple">#BD93F9</color>
+    <color name="dracula_cyan">#8BE9FD</color>
 </resources>

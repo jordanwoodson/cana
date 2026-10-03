@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
@@ -86,32 +85,26 @@ private fun JSONObject.stringList(key: String): List<String> {
  */
 enum class RemovalRecommendation(
     val icon: ImageVector,
-    val badgeColor: Color,
     val description: String
 ) {
     RECOMMENDED(
         Icons.Default.Check,
-        Color.Green,
         "The selected debloat list recommends removing this app. Read its description and warnings."
     ),
     ADVANCED(
         Icons.Default.Settings,
-        Color.Yellow,
         "Replacement or additional review is needed. Removing this app may affect features; read its description and warnings."
     ),
     EXPERT(
         Icons.Default.Warning,
-        Color.Red,
         "The selected debloat list advises caution: removing this app may be unsafe. Read its description and warnings."
     ),
     UNSAFE(
         Icons.Default.Close,
-        Color.Magenta,
         "The selected debloat list says removing this app is unsafe. Read the warning about the functionality that would break."
     ),
     SYSTEM(
         Icons.Default.Android,
-        Color.DarkGray,
         "System apps are apps that come pre-installed with your device."
     );
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -79,7 +78,7 @@ fun StatusChip(label: String, icon: ImageVector, tone: StatusTone = StatusTone.N
 private fun CompactChip(label: String, icon: ImageVector, colors: RiskColors, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.semantics(mergeDescendants = true) {}
-            .padding(2.dp).height(24.dp)
+            .padding(2.dp).heightIn(min = 24.dp)
             .background(colors.container, RoundedCornerShape(12.dp))
             .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -182,17 +181,10 @@ fun <T> ChoiceRow(
     }
 }
 
-@Preview(name = "Shared components light", showBackground = true)
+@Preview(name = "Shared components Dracula", showBackground = true, backgroundColor = 0xFF282A36)
 @Composable
-private fun ComponentsLightPreview() = ComponentsPreview(dark = false)
-
-@Preview(name = "Shared components dark", showBackground = true)
-@Composable
-private fun ComponentsDarkPreview() = ComponentsPreview(dark = true)
-
-@Composable
-private fun ComponentsPreview(dark: Boolean) {
-    CantaTheme(darkTheme = dark) {
+private fun ComponentsPreview() {
+    CantaTheme {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             RiskChip(RemovalRecommendation.RECOMMENDED)
             StatusChip("Needs review", Icons.Default.Warning, StatusTone.WARNING)

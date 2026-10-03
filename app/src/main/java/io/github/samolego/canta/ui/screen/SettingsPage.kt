@@ -1,7 +1,6 @@
 package io.github.samolego.canta.ui.screen
 
 import android.content.Intent
-import android.os.Build
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -78,7 +77,6 @@ fun SettingsScreen(
 
     val allowUnsafe by settingsViewModel.allowUnsafeUninstall.collectAsStateWithLifecycle()
     val authEnabled by settingsViewModel.authEnabled.collectAsStateWithLifecycle()
-    val useDynamicColor by settingsViewModel.useDynamicColor.collectAsStateWithLifecycle()
 
     Scaffold(
         snackbarHost = { androidx.compose.material3.SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
@@ -140,14 +138,11 @@ fun SettingsScreen(
                 onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SectionHeader(stringResource(R.string.settings_appearance))
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) SettingsItem(
-                title = stringResource(R.string.use_wallpaper_colors),
-                description = stringResource(R.string.use_wallpaper_colors_description),
+            SectionHeader(stringResource(R.string.settings_appearance))
+            SettingsItem(
+                title = stringResource(R.string.dracula_theme),
+                description = stringResource(R.string.dracula_theme_description),
                 icon = Icons.Default.Palette,
-                isSwitch = true,
-                checked = useDynamicColor,
-                onCheckedChange = settingsViewModel::saveUseDynamicColor,
             )
 
             SectionHeader(stringResource(R.string.settings_permissions))

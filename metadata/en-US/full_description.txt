@@ -16,6 +16,7 @@ Please read the guide on how <a href="https://github.com/Universal-Debloater-All
     <li>Uninstall apps and restore existing packages in the selected profile</li>
     <li>Search, community recommendations, and reusable presets</li>
     <li>Real Android results and error logs</li>
+    <li>Dracula dark theme with purple and pink accents and terminal-style headings</li>
     <li>No root required</li>
 </ul>
 

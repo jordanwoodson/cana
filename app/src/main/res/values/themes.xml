@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Canta" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Canta.Base" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/cana_charcoal</item>
+        <item name="android:colorBackground">@color/cana_charcoal</item>
+        <item name="android:colorAccent">@color/dracula_purple</item>
+        <item name="android:textColorPrimary">@color/dracula_foreground</item>
+        <item name="android:textColorSecondary">@color/dracula_foreground</item>
+        <item name="android:textColorLink">@color/dracula_cyan</item>
+        <item name="android:colorControlHighlight">@color/dracula_selection</item>
+        <item name="android:statusBarColor">@color/cana_charcoal</item>
+        <item name="android:navigationBarColor">@color/cana_charcoal</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+    <style name="Theme.Canta" parent="Theme.Canta.Base" />
 </resources>

@@ -16,7 +16,7 @@ BRAND = ROOT / "assets/branding"
 RES = ROOT / "app/src/main/res"
 WEB = ROOT / "docs/public/branding"
 SVG = "{http://www.w3.org/2000/svg}"
-BACKGROUND = "#152421"
+BACKGROUND = "#282A36"
 
 
 def save(path, content):
@@ -37,16 +37,16 @@ def main():
         r"translate\(([\d.]+) ([\d.]+)\) scale\(([\d.]+)\)",
         group.attrib["transform"],
     ).groups()
-    paths = [path.attrib["d"] for path in group.findall(f"{SVG}path")]
-    mint = group.attrib["fill"]
+    paths = group.findall(f"{SVG}path")
     art = re.search(r"  <g[\s\S]*</g>", source).group()
 
     # Android clips the full 108 dp layers to a 72 dp viewport. The mark fits
     # inside the central safe circle, including the outward arrow's tip.
-    for name, color in (("foreground", mint), ("monochrome", "#FFFFFF")):
+    for name in ("foreground", "monochrome"):
         android_paths = "\n".join(
-            f'        <path android:fillColor="{color}" android:pathData="{p}" />'
-            for p in paths
+            f'        <path android:fillColor="{color}" android:pathData="{path.attrib["d"]}" />'
+            for path in paths
+            for color in ["#FFFFFF" if name == "monochrome" else path.attrib["fill"]]
         )
         save(RES / f"drawable/ic_launcher_{name}.xml", f'''<?xml version="1.0" encoding="utf-8"?>
 <!-- Generated from assets/branding/cana-mark.svg. -->
@@ -70,7 +70,10 @@ def main():
     rounded = icon(f'<rect x="18" y="18" width="72" height="72" rx="17" fill="{BACKGROUND}"/>')
     circle = icon(f'<circle cx="54" cy="54" r="36" fill="{BACKGROUND}"/>')
     background = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108"><path fill="{BACKGROUND}" d="M0 0H108V108H0Z"/></svg>'
-    mono = source.replace(mint, "#FFFFFF")
+    # Preserve the same silhouette as a solid mask for Android themed icons.
+    mono = source
+    for color in {path.attrib["fill"] for path in paths}:
+        mono = mono.replace(color, "#FFFFFF")
 
     save(BRAND / "cana-icon.svg", rounded)
     save(BRAND / "cana-icon-round.svg", circle)

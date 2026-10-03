@@ -51,14 +51,8 @@ fun ScreenTopBar(
     )
 }
 
-@Preview(name = "Screen top bar light", showBackground = true)
+@Preview(name = "Screen top bar Dracula", showBackground = true, backgroundColor = 0xFF282A36)
 @Composable
-private fun ScreenTopBarLightPreview() {
-    CantaTheme(darkTheme = false) { ScreenTopBar({}, { androidx.compose.material3.Text("App details") }, subtitle = "Work profile") }
-}
-
-@Preview(name = "Screen top bar dark", showBackground = true)
-@Composable
-private fun ScreenTopBarDarkPreview() {
-    CantaTheme(darkTheme = true) { ScreenTopBar({}, { androidx.compose.material3.Text("App details") }, subtitle = "Work profile") }
+private fun ScreenTopBarPreview() {
+    CantaTheme { ScreenTopBar({}, { androidx.compose.material3.Text("App details") }, subtitle = "Work profile") }
 }

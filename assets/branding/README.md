@@ -6,18 +6,27 @@ The Open C mark pairs an open letter C with an outward arrow: more room to do
 more. The wordmark is **(can)a**, with **can** emphasized. Use **Cana** for app
 labels, prose, search, and accessibility names.
 
-- Mint: `#70EFAD` on charcoal `#152421`.
-- On light backgrounds, use forest `#006C45` for readable brand text.
+- The Dracula palette uses purple `#BD93F9` for the C and pink `#FF79C6`
+  for its outward arrow, on background `#282A36`.
+- The terminal-style monospace wordmark uses purple **can**, pink parentheses,
+  and foreground `#F8F8F2` for **a**. Place the wordmark on a dark surface.
+- Surfaces use selection `#44475A`; secondary accents use cyan `#8BE9FD`,
+  green `#50FA7B`, orange `#FFB86C`, and yellow `#F1FA8C`.
+- Comment `#6272A4` is a decorative accent, not small body text on the dark
+  background. Use foreground `#F8F8F2` for readable text.
 - Keep the mark flat and preserve its open space. Do not put the wordmark inside
   the launcher icon.
-- Android keeps wallpaper-based dynamic colors. Its fallback palette uses the
-  Cana greens, with red reserved for errors and destructive actions.
+- The default Android palette and documentation share the Dracula colors.
+  Red `#FF5555` is reserved for errors and destructive actions.
 - Credit the original project as **Canta by samolego**.
 
-`cana-mark.svg` is the source for Android foreground and monochrome vectors,
+`cana-mark.svg` is the source for the two-color Android foreground and solid
+monochrome vectors,
 legacy launcher sizes, metadata, and documentation icons. Its 108-unit canvas
 includes the padding required for adaptive icons; don't trim the source.
 `cana-icon.svg` and `cana-icon-round.svg` show the normal masked appearance.
+The Android adaptive icon's background is also defined in
+`app/src/main/res/values/colors.xml`; keep it at `#282A36` to match the exports.
 
 Regenerate exports from the repository root:
 

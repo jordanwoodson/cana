@@ -39,6 +39,8 @@ import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.EmptyState
+import io.github.samolego.canta.ui.theme.LocalCanaColors
+import io.github.samolego.canta.ui.theme.RiskColors
 import io.github.samolego.canta.util.LogUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +85,13 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
     val clipboardManager = LocalClipboardManager.current
     val copiedText = stringResource(R.string.log_copied)
     val uiMessages = remember { CanaServices.getInstance().uiMessages }
+    val scheme = MaterialTheme.colorScheme
+    val colors = when (logEntry.level) {
+        LogUtils.LogLevel.DEBUG -> RiskColors(scheme.surfaceVariant, scheme.onSurfaceVariant)
+        LogUtils.LogLevel.INFO -> RiskColors(scheme.primaryContainer, scheme.onPrimaryContainer)
+        LogUtils.LogLevel.WARNING -> LocalCanaColors.current.advanced
+        LogUtils.LogLevel.ERROR -> RiskColors(scheme.errorContainer, scheme.onErrorContainer)
+    }
 
     Surface(
         modifier = Modifier
@@ -97,12 +106,8 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
                     uiMessages.post(copiedText)
                 }
             ),
-        color = when (logEntry.level) {
-            LogUtils.LogLevel.DEBUG -> MaterialTheme.colorScheme.surfaceVariant
-            LogUtils.LogLevel.INFO -> MaterialTheme.colorScheme.primaryContainer
-            LogUtils.LogLevel.WARNING -> MaterialTheme.colorScheme.tertiaryContainer
-            LogUtils.LogLevel.ERROR -> MaterialTheme.colorScheme.errorContainer
-        },
+        color = colors.container,
+        contentColor = colors.onContainer,
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {

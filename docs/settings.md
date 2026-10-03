@@ -37,5 +37,7 @@ the current view; the selection bar also counts selected apps hidden by filters.
 Use **Clear selection** to remove all selected targets. No version-tapping shortcut
 is needed.
 
-Theme and dynamic colors follow the appearance options in Settings. Android's
-font-size setting applies to labels and controls.
+Cana uses the [Dracula palette](https://draculatheme.com/contribute): a dark
+background, purple and pink accents, and cyan highlights. The appearance stays
+consistent with any system theme or wallpaper. **Appearance** in Settings shows
+the active Dracula theme. Android's font-size setting applies to labels and controls.

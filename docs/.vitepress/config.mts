@@ -5,6 +5,7 @@ export default defineConfig({
   base: "/cana/",
   description: "Do more. Because you can.",
   head: [
+    ["meta", { name: "theme-color", content: "#282a36" }],
     ["meta", { name: "author", content: "Cana contributors; based on Canta by samolego" }],
     [
       "meta",
@@ -104,6 +105,9 @@ export default defineConfig({
   },
 
   // CSS customization
-  appearance: "dark",
+  appearance: "force-dark",
+  markdown: {
+    theme: "dracula",
+  },
 
 });

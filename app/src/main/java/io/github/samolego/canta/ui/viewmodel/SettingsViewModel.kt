@@ -42,9 +42,6 @@ class SettingsViewModel(
     val allowUnsafeUninstall = _allowUnsafeUninstalls.asStateFlow()
 
 
-    private val _useDynamicColor = MutableStateFlow(false)
-    val useDynamicColor = _useDynamicColor.asStateFlow()
-
     private val _authEnabled = MutableStateFlow(false)
     val authEnabled = _authEnabled.asStateFlow()
 
@@ -60,7 +57,6 @@ class SettingsViewModel(
         observeBloatListUrl()
         settingsStore.bloatUnmeteredOnlyFlow.onEach { _bloatUnmeteredOnly.value = it }.launchIn(viewModelScope)
         observeAllowUnsafeUninstalls()
-        settingsStore.useDynamicColorFlow.onEach { _useDynamicColor.value = it }.launchIn(viewModelScope)
         observeAuthEnabled()
     }
 
@@ -132,10 +128,6 @@ class SettingsViewModel(
 
     fun saveAllowUnsafeUninstalls(allow: Boolean) {
         viewModelScope.launch { settingsStore.setAllowUnsafeUninstalls(allow) }
-    }
-
-    fun saveUseDynamicColor(enabled: Boolean) {
-        viewModelScope.launch { settingsStore.setUseDynamicColor(enabled) }
     }
 
     fun saveAuthEnabled(authEnabled: Boolean) {
