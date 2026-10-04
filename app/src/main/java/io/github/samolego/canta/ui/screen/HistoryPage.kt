@@ -30,6 +30,7 @@ import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.ScreenTopBar
+import io.github.samolego.canta.ui.component.CheckboxRow
 import io.github.samolego.canta.ui.component.RestoreExportButton
 import io.github.samolego.canta.ui.component.EmptyState
 import io.github.samolego.canta.ui.component.StatusChip
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun HistoryPage(onNavigateBack: () -> Unit) {
     val services = CanaServices.getInstance()
@@ -105,7 +106,7 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                             failed > 0 -> R.string.history_status_failed
                             else -> R.string.history_status_succeeded
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(group.timestamp)),
                                 style = MaterialTheme.typography.bodySmall)
                             StatusChip(stringResource(status), when (status) {
@@ -275,7 +276,7 @@ internal fun UndoBatchDialog(records: List<OperationRecord>, onDismiss: () -> Un
     val warnings = assessments?.values.orEmpty().flatMap { it.values }.flatMap { it.warnings }
     val blocked = assessments?.values.orEmpty().flatMap { it.values }.any { it.protected || it.error != null }
     val needsAcknowledgment = warnings.isNotEmpty() || sharedPeers.isNotEmpty()
-    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(stringResource(R.string.undo_last_batch)) },
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(stringResource(R.string.history_undo_changes)) },
         text = { Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.undo_batch_description))
             records.forEach { record ->
@@ -290,8 +291,8 @@ internal fun UndoBatchDialog(records: List<OperationRecord>, onDismiss: () -> Un
                 report.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             } }
             if (sharedPeers.isNotEmpty()) Text(stringResource(R.string.privacy_shared_uid, sharedPeers.joinToString()))
-            if (needsAcknowledgment) Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(accepted, { accepted = it }); Text(stringResource(R.string.safety_acknowledge))
+            if (needsAcknowledgment) CheckboxRow(accepted, { accepted = it }, enabled = !busy) {
+                Text(stringResource(R.string.safety_acknowledge))
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (busy || assessments == null && error == null) LinearProgressIndicator()

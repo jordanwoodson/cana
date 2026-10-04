@@ -7,6 +7,8 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,10 +41,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -263,7 +272,7 @@ private fun MainContent(
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.imePadding().nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(LocalCanaSnackbar.current) },
         topBar = {
             CantaTopBar(
@@ -306,28 +315,50 @@ private fun MainContent(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             io.github.samolego.canta.ui.component.OtaBanner()
-            PrimaryTabRow(
-                selectedTabIndex = selectedAppsType.ordinal,
-                contentColor = headerContentColor,
-                containerColor = headerColor,
-            ) {
-                AppsType.entries.forEach { currentTab ->
-                    Tab(
-                        selected = selectedAppsType == currentTab,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(currentTab.ordinal)
-                                                }
-                            selectedAppsType = currentTab
-                        },
-                        text = {
-                            val count = if (currentTab == AppsType.INSTALLED) installedCount else removedCount
-                            Text(pluralStringResource(
-                                if (currentTab == AppsType.INSTALLED) R.plurals.tab_installed_count else R.plurals.tab_removed_count,
-                                count, count,
-                            ), maxLines = 1)
-                        },
-                    )
+            val countedTabLabels = listOf(
+                pluralStringResource(R.plurals.tab_installed_count, installedCount, installedCount),
+                pluralStringResource(R.plurals.tab_removed_count, removedCount, removedCount),
+            )
+            val tabLabelStyle = MaterialTheme.typography.titleSmall
+            val tabTextMeasurer = rememberTextMeasurer()
+            val density = LocalDensity.current
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val labelWidthDp = maxWidth / AppsType.entries.size - 32.dp
+                val labelWidth = with(density) { labelWidthDp.roundToPx() }
+                val stackedTabLabels = countedTabLabels.any {
+                    tabTextMeasurer.measure(it, tabLabelStyle, softWrap = false).size.width > labelWidth
+                }
+                PrimaryTabRow(
+                    selectedTabIndex = selectedAppsType.ordinal,
+                    contentColor = headerContentColor,
+                    containerColor = headerColor,
+                ) {
+                    AppsType.entries.forEach { currentTab ->
+                        Tab(
+                            selected = selectedAppsType == currentTab,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(currentTab.ordinal)
+                                }
+                                selectedAppsType = currentTab
+                            },
+                            text = {
+                                val count = if (currentTab == AppsType.INSTALLED) installedCount else removedCount
+                                val countedLabel = countedTabLabels[currentTab.ordinal]
+                                if (stackedTabLabels) Column(
+                                    modifier = Modifier.clearAndSetSemantics {
+                                        this[SemanticsProperties.Text] = listOf(AnnotatedString(countedLabel))
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Text(stringResource(if (currentTab == AppsType.INSTALLED) R.string.tab_installed else R.string.tab_removed),
+                                        style = tabLabelStyle, textAlign = TextAlign.Center)
+                                    Text(java.text.NumberFormat.getIntegerInstance().format(count),
+                                        style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
+                                } else Text(countedLabel, style = tabLabelStyle, textAlign = TextAlign.Center)
+                            },
+                        )
+                    }
                 }
             }
             io.github.samolego.canta.ui.component.ActiveFilterChips(appListViewModel)

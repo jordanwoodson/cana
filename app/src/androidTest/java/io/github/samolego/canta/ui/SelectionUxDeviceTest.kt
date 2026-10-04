@@ -116,4 +116,16 @@ class SelectionUxDeviceTest {
             assertTrue(model.pendingAction!!.apps.isEmpty())
         }
     }
+
+    @Test fun reviewCanDeselectOneHiddenAppWithoutClearingTheOthers() {
+        val model = AppListViewModel()
+        model.selectedApps.add("example.first")
+        model.selectedApps.add("example.second")
+        compose.setContent { CantaTheme { SelectionActionBar(model, AppsType.INSTALLED) } }
+        compose.onNodeWithText("2 selected · 2 hidden").performClick()
+        compose.onNodeWithContentDescription("Deselect example.first").performClick()
+        compose.onNodeWithText("example.first").assertDoesNotExist()
+        compose.onNodeWithText("example.second").assertIsDisplayed()
+        compose.runOnIdle { assertEquals(setOf("example.second"), model.selectedApps.keys.toSet()) }
+    }
 }

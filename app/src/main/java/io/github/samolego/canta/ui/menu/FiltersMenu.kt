@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Add
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
@@ -50,27 +52,6 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(R.string.filters_title), style = MaterialTheme.typography.titleLarge)
-            Text(stringResource(R.string.saved_views), style = MaterialTheme.typography.titleSmall)
-            val available = viewsState.views.filter { it.appliesTo(model.selectedUserId) }
-            if (viewsState.loading) LinearProgressIndicator()
-            else if (viewsState.unavailable) {
-                Text(stringResource(R.string.saved_views_unavailable), color = MaterialTheme.colorScheme.error)
-                TextButton(onClick = { readRevision++ }) { Text(stringResource(R.string.inventory_retry)) }
-            } else {
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    AssistChip(enabled = !viewsState.unavailable, onClick = { save = true },
-                        label = { Text(stringResource(R.string.save_current_view)) },
-                        leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) })
-                    available.forEach { view ->
-                        FilterChip(selected = false, onClick = { model.applySavedView(view); onDismiss() }, label = { Text(view.name) })
-                        IconButton(onClick = { deleteTarget = view }, modifier = Modifier.size(48.dp)) {
-                            Icon(Icons.Default.Delete, stringResource(R.string.saved_view_delete, view.name))
-                        }
-                    }
-                }
-                if (available.isEmpty()) Text(stringResource(R.string.saved_views_empty), style = MaterialTheme.typography.bodySmall)
-            }
             Text(stringResource(R.string.filter_scope), style = MaterialTheme.typography.titleSmall)
             ChoiceRow(
                 options = listOf(
@@ -100,12 +81,36 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
                     FilterGroup.PRIVACY -> R.string.filter_privacy
                 }), style = MaterialTheme.typography.titleSmall)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Filter.availableFilters.filter { it != Filter.any && it.group == group && (it != Filter.unused || model.usageAvailable) }.forEach { filter ->
+                    Filter.availableFilters.filter { it != Filter.any && it.group == group &&
+                        (it != Filter.unused || model.usageAvailable) &&
+                        (it != Filter.leftoverUpdates || appType == AppsType.UNINSTALLED || it.id in model.activeFilterIds) }.forEach { filter ->
                         FilterChip(selected = filter.id in model.activeFilterIds, onClick = { model.toggleFilter(filter) },
                             label = { Text(filter.nameRes?.let { stringResource(it) } ?: filter.name) })
                     }
                 }
                 if (group == FilterGroup.PRIVACY) io.github.samolego.canta.ui.component.TrackerScanControls(model)
+            }
+            HorizontalDivider()
+            Text(stringResource(R.string.saved_views), style = MaterialTheme.typography.titleSmall)
+            val available = viewsState.views.filter { it.appliesTo(model.selectedUserId) }
+            if (viewsState.loading) LinearProgressIndicator()
+            else if (viewsState.unavailable) {
+                Text(stringResource(R.string.saved_views_unavailable), color = MaterialTheme.colorScheme.error)
+                TextButton(onClick = { readRevision++ }) { Text(stringResource(R.string.inventory_retry)) }
+            } else {
+                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    AssistChip(enabled = !viewsState.unavailable, onClick = { save = true },
+                        label = { Text(stringResource(R.string.save_current_view)) },
+                        leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) })
+                    available.forEach { view ->
+                        FilterChip(selected = false, onClick = { model.applySavedView(view); onDismiss() }, label = { Text(view.name) })
+                        IconButton(onClick = { deleteTarget = view }, modifier = Modifier.size(48.dp)) {
+                            Icon(Icons.Default.Delete, stringResource(R.string.saved_view_delete, view.name))
+                        }
+                    }
+                }
+                if (available.isEmpty()) Text(stringResource(R.string.saved_views_empty), style = MaterialTheme.typography.bodySmall)
             }
             TextButton(onClick = { explainBadges = true }) { Text(stringResource(R.string.risk_levels_explain)) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -139,10 +144,18 @@ fun FiltersMenu(showMenu: Boolean, onDismiss: () -> Unit, appListViewModel: AppL
         var busy by remember { mutableStateOf(false) }
         AlertDialog(onDismissRequest = { if (!busy) save = false }, title = { Text(stringResource(R.string.save_view)) }, text = {
             Column {
-                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.saved_view_name)) }, singleLine = true)
-                Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(scoped, { scoped = it }); Text(stringResource(R.string.saved_view_profile)) }
-                if (model.selectedApps.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(collection, { collection = it }); Text(stringResource(R.string.saved_view_collection))
+                OutlinedTextField(name, { name = it }, enabled = !busy,
+                    label = { Text(stringResource(R.string.saved_view_name)) }, singleLine = true)
+                Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(scoped, enabled = !busy,
+                    role = Role.Checkbox, onValueChange = { scoped = it }), verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(scoped, onCheckedChange = null, enabled = !busy)
+                    Text(stringResource(R.string.saved_view_profile), Modifier.padding(start = 8.dp))
+                }
+                if (model.selectedApps.isNotEmpty()) Row(Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                    .toggleable(collection, enabled = !busy, role = Role.Checkbox, onValueChange = { collection = it }),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(collection, onCheckedChange = null, enabled = !busy)
+                    Text(stringResource(R.string.saved_view_collection), Modifier.padding(start = 8.dp))
                 }
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }

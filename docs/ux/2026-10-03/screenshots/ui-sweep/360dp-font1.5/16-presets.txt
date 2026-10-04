@@ -1,0 +1,53 @@
+Native configuration: 360 x 800dp; fontScale=1.5
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #2105 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+       |-Node #2106 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #2132 at (l=280.0, t=449.0, r=440.0, b=609.0)px
+          | IsContainer = 'true'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 20.0.dp), topEnd = CornerSize(size = 20.0.dp), bottomEnd = CornerSize(size = 20.0.dp), bottomStart = CornerSize(size = 20.0.dp))'
+          |  |-Node #2134 at (l=320.0, t=489.0, r=400.0, b=569.0)px
+          |    ContentDescription = '[Presets]'
+          |    Role = 'Image'
+          |-Node #2136 at (l=190.0, t=657.0, r=530.0, b=732.0)px
+          | Text = '[No presets]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2137 at (l=64.0, t=748.0, r=656.0, b=1000.0)px
+          | Text = '[Create or import presets to manage app uninstall lists across devices]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2140 at (l=64.0, t=1065.0, r=656.0, b=1160.0)px
+          | ContentDescription = '[Create preset]'
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Create preset]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #2145 at (l=64.0, t=1185.0, r=656.0, b=1280.0)px
+          | ContentDescription = '[Import preset]'
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Import preset]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #2110 at (l=0.0, t=0.0, r=720.0, b=176.0)px
+            IsTraversalGroup = 'true'
+             |-Node #2111 at (l=0.0, t=48.0, r=720.0, b=176.0)px
+               Shape = 'RectangleShape'
+                |-Node #2113 at (l=8.0, t=64.0, r=104.0, b=160.0)px
+                | ContentDescription = '[Back]'
+                | Focused = 'false'
+                | Role = 'Button'
+                | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                | Actions = [OnClick, RequestFocus]
+                | MergeDescendants = 'true'
+                |-Node #2115 at (l=112.0, t=76.0, r=336.0, b=147.0)px
+                   |-Node #2116 at (l=112.0, t=76.0, r=336.0, b=147.0)px
+                     Text = '[Presets]'
+                     Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

@@ -22,9 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -53,13 +55,24 @@ fun CantaTopBar(
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
+    val currentProfileName = profileName(appListViewModel.selectedUserId)
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val profileTextWidth = textMeasurer.measure(currentProfileName, MaterialTheme.typography.labelLarge, softWrap = false).size.width
+    val wordmarkWidth = textMeasurer.measure("(can)a", MaterialTheme.typography.titleMedium, softWrap = false).size.width
+    val fullTitleWidth = with(density) { (profileTextWidth + wordmarkWidth).toDp() } + 64.dp
+    val searchVisible = searchActive || appListViewModel.searchQuery.isNotEmpty()
     val closeSearch = { searchActive = false; appListViewModel.searchQuery = ""; keyboard?.hide(); Unit }
-    BackHandler(searchActive, closeSearch)
+    BackHandler(searchVisible, closeSearch)
     Column(Modifier.background(containerColor)) {
         TopAppBar(title = {
-            Row(Modifier.widthIn(max = 232.dp), verticalAlignment = Alignment.CenterVertically) {
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val showWordmark = fullTitleWidth <= maxWidth
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                if (showWordmark) {
                 CanaWordmark(style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.width(8.dp))
+                }
                 Box(Modifier.weight(1f)) {
                     Surface(
                         onClick = onProfilesClick,
@@ -72,7 +85,7 @@ fun CantaTopBar(
                             horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Icon(appListViewModel.selectedProfile?.icon() ?: Icons.Default.Person,
                                 contentDescription = null, modifier = Modifier.size(16.dp))
-                            Text(profileName(appListViewModel.selectedUserId),
+                            Text(currentProfileName,
                                 modifier = Modifier.weight(1f), maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 style = MaterialTheme.typography.labelLarge)
@@ -82,17 +95,20 @@ fun CantaTopBar(
                     ProfilesMenu(showProfilesMenu, appListViewModel.users, appListViewModel.selectedUserId, onProfileSelected, onDismissProfilesMenu)
                 }
             }
+            }
         }, colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
             scrollBehavior = scrollBehavior,
             actions = {
-                IconClickButton(onClick = { searchActive = !searchActive }, icon = Icons.Default.Search, contentDescription = stringResource(R.string.search_action))
+                IconClickButton(onClick = { if (searchVisible) closeSearch() else searchActive = true },
+                    icon = if (searchVisible) Icons.Default.Clear else Icons.Default.Search,
+                    contentDescription = stringResource(if (searchVisible) R.string.close_search else R.string.search_action))
                 IconClickButton(onClick = { filters = true }, icon = Icons.Default.FilterAlt, contentDescription = stringResource(R.string.filters_action))
                 Box {
                     IconClickButton(onClick = { more = true }, icon = Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options_action))
                     MoreOptionsMenu(more, navigateToPage, { startTrackerScan(context, appListViewModel) }) { more = false }
                 }
             })
-        if (searchActive || appListViewModel.searchQuery.isNotEmpty()) {
+        if (searchVisible) {
             OutlinedTextField(value = appListViewModel.searchQuery, onValueChange = { appListViewModel.searchQuery = it },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp).padding(bottom = 8.dp).focusRequester(focus),
                 label = { Text(stringResource(R.string.search_apps)) }, singleLine = true,

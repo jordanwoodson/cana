@@ -207,11 +207,10 @@ internal fun PackageActionConfirmation(
                         Row(Modifier.fillMaxWidth().toggleable(pkg in included, enabled = eligible, role = Role.Checkbox,
                             onValueChange = { included = if (it) included + pkg else included - pkg }), verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(pkg in included, enabled = eligible, onCheckedChange = null)
-                            Column(Modifier.weight(1f)) {
-                                Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall,
-                                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Column(Modifier.weight(1f).padding(start = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium)
+                                if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall)
+                                app?.removalInfo?.let { RiskChip(it) }
                                 val reason = when {
                                     app == null -> stringResource(R.string.plan_unavailable)
                                     assessment?.protected == true -> stringResource(R.string.safety_protected, pkg)
@@ -224,7 +223,6 @@ internal fun PackageActionConfirmation(
                                 reason?.let { Text(it, style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant) }
                             }
-                            app?.removalInfo?.let { RiskChip(it) }
                         }
                     }
                     if (included.isEmpty()) Text(stringResource(R.string.plan_empty))
@@ -256,8 +254,7 @@ internal fun PackageActionConfirmation(
                                     formatFileSize(context, it)
                                 } ?: stringResource(R.string.app_size_unavailable)))
                                 if (!cleanup) {
-                                    Row(Modifier.fillMaxWidth().clickable { reset = !reset }, verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(checked = reset, onCheckedChange = { reset = it })
+                                    io.github.samolego.canta.ui.component.CheckboxRow(reset, { reset = it }) {
                                         Text(stringResource(R.string.reset_to_factory_version))
                                     }
                                 }
@@ -272,8 +269,7 @@ internal fun PackageActionConfirmation(
                             })
                     } else if (cleanup && checked.orEmpty().none { it.error != null }) Text(stringResource(R.string.no_leftover_updates))
                     if (needsConsent) {
-                        Row(Modifier.fillMaxWidth().clickable { warningsAccepted = !warningsAccepted }, verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(warningsAccepted, { warningsAccepted = it })
+                        io.github.samolego.canta.ui.component.CheckboxRow(warningsAccepted, { warningsAccepted = it }) {
                             Text(stringResource(R.string.safety_acknowledge))
                         }
                     }

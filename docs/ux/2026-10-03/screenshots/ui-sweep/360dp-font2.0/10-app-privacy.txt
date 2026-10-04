@@ -1,0 +1,159 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #655 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+       |-Node #656 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #681 at (l=0.0, t=280.0, r=720.0, b=423.0)px
+          | IsContainer = 'true'
+          | Shape = 'RectangleShape'
+          |  |-Node #684 at (l=0.0, t=280.0, r=720.0, b=423.0)px
+          |    HorizontalScrollAxisRange = 'ScrollAxisRange(value=239.0, maxValue=542.0, reverseScrolling=false)'
+          |    IsTraversalGroup = 'true'
+          |    Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@f493787'
+          |    [SelectableGroup]
+          |    Actions = [ScrollBy, ScrollByOffset]
+          |     |-Node #686 at (l=-239.0, t=280.0, r=77.0, b=423.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'false'
+          |     | Text = '[Overview]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #690 at (l=77.0, t=280.0, r=644.0, b=423.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'true'
+          |     | Text = '[Privacy and data]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #694 at (l=644.0, t=280.0, r=1023.0, b=423.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'false'
+          |     | Text = '[Components]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #699 at (l=109.0, t=417.0, r=612.0, b=423.0)px
+          |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 3.0.dp), topEnd = CornerSize(size = 3.0.dp), bottomEnd = CornerSize(size = 3.0.dp), bottomStart = CornerSize(size = 3.0.dp))'
+          |-Node #775 at (l=32.0, t=455.0, r=688.0, b=1520.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@5b912dd'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=4901.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #777 at (l=32.0, t=461.0, r=592.0, b=545.0)px
+          |  | Text = '[Privacy controls]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #778 at (l=600.0, t=463.0, r=680.0, b=543.0)px
+          |  | ContentDescription = '[Refresh privacy controls]'
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #780 at (l=32.0, t=575.0, r=688.0, b=1775.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |-Node #783 at (l=56.0, t=599.0, r=664.0, b=749.0)px
+          |  |  | Text = '[Connect to verify privacy settings]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #784 at (l=56.0, t=765.0, r=664.0, b=1521.0)px
+          |  |  | Text = '[Live state is unavailable while Shizuku is disconnected. Saved restrictions remain visible and can be forgotten.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #787 at (l=56.0, t=1537.0, r=576.0, b=1644.0)px
+          |  |  | Focused = 'false'
+          |  |  | Role = 'Button'
+          |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |  | Text = '[Connect Shizuku]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #790 at (l=56.0, t=1644.0, r=262.0, b=1751.0)px
+          |  |    Focused = 'false'
+          |  |    Role = 'Button'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    Text = '[Retry]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #795 at (l=32.0, t=1825.0, r=630.0, b=1900.0)px
+          |  | Text = '[Runtime permissions]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #796 at (l=32.0, t=1924.0, r=688.0, b=2092.0)px
+          |  | Text = '[Live state unavailable]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #799 at (l=32.0, t=2116.0, r=332.0, b=2223.0)px
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Revoke 0]'
+          |  | [Disabled]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #803 at (l=32.0, t=2273.0, r=688.0, b=2639.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RectangleShape'
+          |  | Text = '[Background activity, Live state unavailable]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |  |-Node #814 at (l=552.0, t=2313.0, r=656.0, b=2377.0)px, Tag: 'privacy-switch-background'
+          |  |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |    ContentDescription = '[Background activity]'
+          |  |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@a72cba8'
+          |  |    Role = 'Switch'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    ToggleableState = 'Off'
+          |  |    [Disabled]
+          |  |    Actions = [OnClick, OnFillData]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #817 at (l=32.0, t=2689.0, r=688.0, b=4272.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RectangleShape'
+          |  | Text = '[Metered background data, Android can clear this rule during boot. Cana saves your choice and reapplies it when Shizuku returns, then checks again after startup settles. Revert cancels Cana’s saved restriction., Live state unavailable]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |  |-Node #829 at (l=552.0, t=2729.0, r=656.0, b=2793.0)px, Tag: 'privacy-switch-metered'
+          |  |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |    ContentDescription = '[Metered background data]'
+          |  |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@8de16c1'
+          |  |    Role = 'Switch'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    ToggleableState = 'Off'
+          |  |    [Disabled]
+          |  |    Actions = [OnClick, OnFillData]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #832 at (l=32.0, t=4322.0, r=688.0, b=6421.0)px
+          |    IsContainer = 'true'
+          |    Shape = 'RectangleShape'
+          |    Text = '[All network access, Blocks Wi-Fi and mobile data for this profile. This enables a device-wide firewall chain and can activate existing rules from other software. Shizuku must start again after a reboot to reapply the block. Revert restores this app’s rule and keeps the shared chain enabled for other apps., Live state unavailable]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |     |-Node #844 at (l=552.0, t=4362.0, r=656.0, b=4426.0)px, Tag: 'privacy-switch-network'
+          |       ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |       ContentDescription = '[All network access]'
+          |       FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@bc4ae66'
+          |       Role = 'Switch'
+          |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |       ToggleableState = 'Off'
+          |       [Disabled]
+          |       Actions = [OnClick, OnFillData]
+          |       MergeDescendants = 'true'
+          |-Node #660 at (l=0.0, t=0.0, r=720.0, b=280.0)px
+            IsTraversalGroup = 'true'
+             |-Node #661 at (l=0.0, t=48.0, r=720.0, b=280.0)px
+               Shape = 'RectangleShape'
+                |-Node #663 at (l=8.0, t=116.0, r=104.0, b=212.0)px
+                | ContentDescription = '[Back]'
+                | Focused = 'false'
+                | Role = 'Button'
+                | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                | Actions = [OnClick, RequestFocus]
+                | MergeDescendants = 'true'
+                |-Node #665 at (l=112.0, t=48.0, r=704.0, b=280.0)px
+                   |-Node #667 at (l=112.0, t=48.0, r=704.0, b=216.0)px
+                   | Text = '[Android System Intelligence]'
+                   | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                   |-Node #668 at (l=112.0, t=216.0, r=359.0, b=280.0)px
+                     Text = '[Personal]'
+                     Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

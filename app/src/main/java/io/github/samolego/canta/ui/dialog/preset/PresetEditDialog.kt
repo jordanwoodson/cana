@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
+import io.github.samolego.canta.ui.component.CheckboxRow
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.util.CantaPresetData
@@ -50,7 +51,7 @@ private fun PresetDialog(
         text = {
             Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    text = stringResource(R.string.create_preset_description),
+                    text = stringResource(if (captureApps == null) R.string.preset_edit_description else R.string.create_preset_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -95,12 +96,10 @@ private fun PresetDialog(
                     maxLines = 3
                 )
                 if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-                if (profileKind != null) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(includeProfile, { includeProfile = it })
+                if (profileKind != null) CheckboxRow(includeProfile, { includeProfile = it }, enabled = !busy) {
                     Text(stringResource(R.string.preset_remember_profile, profileKind))
                 }
-                if (capturePrivacy) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(includePrivacy, { includePrivacy = it })
+                if (capturePrivacy) CheckboxRow(includePrivacy, { includePrivacy = it }, enabled = !busy) {
                     Text(stringResource(R.string.preset_capture_privacy))
                 }
             }

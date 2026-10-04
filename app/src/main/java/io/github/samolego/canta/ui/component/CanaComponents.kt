@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -22,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -36,8 +40,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -85,7 +93,7 @@ private fun CompactChip(label: String, icon: ImageVector, colors: RiskColors, mo
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, contentDescription = null, tint = colors.onContainer, modifier = Modifier.size(14.dp))
-        Text(label, style = MaterialTheme.typography.labelMedium, color = colors.onContainer, maxLines = 1)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = colors.onContainer)
     }
 }
 
@@ -167,16 +175,43 @@ fun <T> ChoiceRow(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
-        options.forEachIndexed { index, option ->
-            SegmentedButton(
-                selected = selected == option.value,
-                onClick = { onSelect(option.value) },
-                enabled = enabled,
-                shape = SegmentedButtonDefaults.itemShape(index, options.size),
-                modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(option.testTag),
-                label = { Text(option.label, maxLines = 1) },
-            )
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.labelLarge
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        // Measure the actual translated labels at the user's text size. Each segment also
+        // needs space for its selected icon, gap and horizontal padding.
+        val widestLabel = options.maxOfOrNull { measurer.measure(AnnotatedString(it.label), style).size.width } ?: 0
+        val segmentWidth = with(density) { widestLabel.toDp() } + 52.dp
+        if (segmentWidth * options.size <= maxWidth) {
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                options.forEachIndexed { index, option ->
+                    SegmentedButton(
+                        selected = selected == option.value,
+                        onClick = { onSelect(option.value) },
+                        enabled = enabled,
+                        shape = SegmentedButtonDefaults.itemShape(index, options.size),
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag(option.testTag),
+                        label = { Text(option.label) },
+                    )
+                }
+            }
+        } else {
+            Column(Modifier.fillMaxWidth().selectableGroup()) {
+                options.forEach { option ->
+                    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp)
+                        .selectable(selected == option.value, enabled = enabled, role = Role.RadioButton,
+                            onClick = { onSelect(option.value) })
+                        .testTag(option.testTag).padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        RadioButton(selected = selected == option.value, onClick = null, enabled = enabled)
+                        Text(option.label, style = style,
+                            color = if (enabled) MaterialTheme.colorScheme.onSurface
+                                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
+                    }
+                }
+            }
         }
     }
 }

@@ -1,0 +1,60 @@
+Native configuration: 360 x 800dp; fontScale=1.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #3489 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #3509 at (l=40.0, t=216.0, r=649.0, b=280.0)px
+       | Text = '[Manage apps with care]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #3510 at (l=40.0, t=312.0, r=680.0, b=1384.0)px
+       | IsTraversalGroup = 'true'
+       | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@43947f9'
+       | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=250.0, reverseScrolling=false)'
+       | Actions = [ScrollBy, ScrollByOffset]
+       |  |-Node #3511 at (l=40.0, t=312.0, r=680.0, b=408.0)px
+       |  | Text = '[• See installed and removed apps in each profile.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3512 at (l=40.0, t=432.0, r=680.0, b=528.0)px
+       |  | Text = '[• Remove, disable or restore apps with a record in History.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3513 at (l=40.0, t=552.0, r=680.0, b=648.0)px
+       |  | Text = '[• Review privacy controls before applying them.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3515 at (l=40.0, t=698.0, r=680.0, b=1514.0)px
+       |  | Text = '[This app provides app removal recommendations based on third-party information. These recommendations are informational in nature and do not guarantee safety or compatibility with your specific device. Uninstalling system apps can cause unexpected issues, including but not limited to: loss of functionality, system instability, device bootloops, data loss, etc. The developer of this app is not responsible for any damage done to your device resulting from following the recommendations provided.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3516 at (l=40.0, t=1538.0, r=680.0, b=1634.0)px
+       |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+       |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@72ca4c3'
+       |    Focused = 'false'
+       |    Role = 'Checkbox'
+       |    Text = '[I understand removing system apps can break my device]'
+       |    ToggleableState = 'Off'
+       |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       |    MergeDescendants = 'true'
+       |-Node #3521 at (l=311.0, t=1424.0, r=429.0, b=1504.0)px
+       | Focused = 'false'
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Exit]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #3524 at (l=445.0, t=1424.0, r=680.0, b=1504.0)px
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Continue]'
+       | [Disabled]
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #3493 at (l=0.0, t=0.0, r=720.0, b=176.0)px
+         IsTraversalGroup = 'true'
+          |-Node #3494 at (l=0.0, t=48.0, r=720.0, b=176.0)px
+            Shape = 'RectangleShape'
+             |-Node #3496 at (l=32.0, t=83.0, r=422.0, b=141.0)px
+                |-Node #3497 at (l=32.0, t=83.0, r=422.0, b=141.0)px
+                  Text = '[Welcome to Cana]'
+                  Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

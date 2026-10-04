@@ -4,6 +4,7 @@ import io.github.samolego.canta.ui.menu.displayName
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,14 +23,20 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.InfoDisclosure
+import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
+import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.apps.UserProfile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -37,7 +44,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.combine
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -> Unit = { _, _ -> }) {
     val services = remember { CanaServices.getInstance() }
@@ -125,6 +132,7 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
     val unavailable = !loading && inputs.any { it.packages == null }
     val errors = listOfNotNull(profileError, privacyError) + snapshots.values.mapNotNull { it.error }
     var showDetails by rememberSaveable { mutableStateOf(false) }
+    var connect by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) },
         topBar = { ScreenTopBar(onNavigateBack, { Text(stringResource(R.string.comparison_title)) }, actions = {
@@ -145,7 +153,10 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
                         if (privacyError != null) Text(stringResource(R.string.comparison_privacy_unavailable), color = MaterialTheme.colorScheme.error)
                         if (unavailable) Text(stringResource(R.string.comparison_inventory_unavailable), color = MaterialTheme.colorScheme.error)
                         if (errors.isNotEmpty() || unavailable) {
-                            Row {
+                            FlowRow {
+                                if (!ShizukuPermission.isCantaAuthorized()) TextButton(onClick = { connect = true }) {
+                                    Text(stringResource(R.string.privacy_connect))
+                                }
                                 TextButton(onClick = { refresh++ }, enabled = !loading) { Text(stringResource(R.string.comparison_retry)) }
                                 if (errors.isNotEmpty()) TextButton(onClick = { showDetails = !showDetails }) { Text(stringResource(R.string.comparison_details)) }
                             }
@@ -164,11 +175,12 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
                         trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) {
                             Icon(Icons.Default.Close, contentDescription = stringResource(R.string.comparison_clear_search))
                         } }, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
-                    Row(Modifier.fillMaxWidth().clickable(enabled = selectedProfiles.size > 1) { onlyDifferences = !onlyDifferences }
+                    Row(Modifier.fillMaxWidth().toggleable(onlyDifferences && selectedProfiles.size > 1,
+                        enabled = selectedProfiles.size > 1, role = Role.Switch, onValueChange = { onlyDifferences = it })
                         .padding(horizontal = 16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                         Text(stringResource(R.string.comparison_only_differences), Modifier.weight(1f))
                         Switch(checked = onlyDifferences && selectedProfiles.size > 1,
-                            onCheckedChange = { onlyDifferences = it }, enabled = selectedProfiles.size > 1)
+                            onCheckedChange = null, enabled = selectedProfiles.size > 1)
                     }
                     if (loading) {
                         LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 8.dp))
@@ -179,8 +191,6 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
                         Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.bodySmall)
                     if (rows.isNotEmpty()) {
                         Text(stringResource(R.string.comparison_package_count, rows.size), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            style = MaterialTheme.typography.bodySmall)
-                        if (selectedProfiles.size > 2) Text(stringResource(R.string.comparison_scroll_hint), Modifier.padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -202,63 +212,102 @@ fun ProfileComparisonPage(onNavigateBack: () -> Unit, onOpenApp: (String, Int) -
             }
         }
     }
+    if (connect) ShizukuRequirementDialog { connect = false; refresh++ }
 }
 
 @Composable
 private fun ProfileComparisonMatrix(rows: List<ProfileComparisonRow>, profiles: List<UserProfile>, loading: Boolean,
     onOpenApp: (String, Int) -> Unit, modifier: Modifier = Modifier) {
-    val appWidth = 150.dp
-    val cellWidth = 108.dp
-    val matrixWidth = appWidth + cellWidth * profiles.size
+    val textMeasurer = rememberTextMeasurer(cacheSize = 32)
+    val density = LocalDensity.current
+    val headerStyle = MaterialTheme.typography.titleSmall
+    val cellStyle = MaterialTheme.typography.labelSmall
+    val appLabel = stringResource(R.string.comparison_app)
     val labels = profiles.associate { it.id to it.displayName() }
-    Column(modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
-        Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-            Row(Modifier.width(matrixWidth)) {
-                Text(stringResource(R.string.comparison_app), Modifier.width(appWidth).padding(8.dp), style = MaterialTheme.typography.titleSmall)
-                profiles.forEach { Text(labels.getValue(it.id), Modifier.width(cellWidth).padding(8.dp), style = MaterialTheme.typography.titleSmall) }
-            }
-        }
-        HorizontalDivider(Modifier.width(matrixWidth))
-        LazyColumn(Modifier.width(matrixWidth).weight(1f)) {
-            items(rows, key = { it.packageName }) { row ->
-                Row {
-                    Column(Modifier.width(appWidth).padding(8.dp)) {
-                        Text(row.name, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
-                        Text(row.packageName, style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
-                    }
-                    row.cells.forEach { cell ->
-                        val openable = cell.status == ComparisonPackageStatus.INSTALLED || cell.status == ComparisonPackageStatus.REMOVED
-                        Column(Modifier.width(cellWidth).heightIn(min = 48.dp).clickable(enabled = openable) { onOpenApp(row.packageName, cell.userId) }
-                            .semantics(mergeDescendants = true) {}.padding(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            val statusText = when {
-                                loading && cell.status == ComparisonPackageStatus.UNAVAILABLE -> stringResource(R.string.comparison_loading)
-                                cell.status == ComparisonPackageStatus.INSTALLED -> stringResource(R.string.comparison_installed_short)
-                                cell.status == ComparisonPackageStatus.REMOVED -> stringResource(R.string.comparison_removed_short)
-                                cell.status == ComparisonPackageStatus.ABSENT -> stringResource(R.string.comparison_absent_short)
-                                else -> stringResource(R.string.comparison_unavailable_short)
-                            }
-                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Icon(when (cell.status) {
-                                    ComparisonPackageStatus.INSTALLED -> Icons.Default.CheckCircle
-                                    ComparisonPackageStatus.REMOVED -> Icons.Default.Block
-                                    ComparisonPackageStatus.ABSENT -> Icons.Default.RemoveCircleOutline
-                                    ComparisonPackageStatus.UNAVAILABLE -> Icons.Default.HelpOutline
-                                }, contentDescription = null, modifier = Modifier.size(14.dp))
-                                Text(statusText, style = MaterialTheme.typography.labelSmall, maxLines = 1)
-                            }
-                            if (cell.disabled) ComparisonPill(stringResource(R.string.comparison_disabled))
-                            if (cell.suspended) ComparisonPill(stringResource(R.string.comparison_suspended))
-                            cell.savedPrivacy?.let { privacy ->
-                                if (privacy.blockNetwork) ComparisonPill(stringResource(R.string.comparison_network_short))
-                                if (privacy.denyMetered) ComparisonPill(stringResource(R.string.comparison_metered_short))
-                            }
-                        }
+    val statusLabels = mapOf(
+        ComparisonPackageStatus.INSTALLED to stringResource(R.string.comparison_installed_short),
+        ComparisonPackageStatus.REMOVED to stringResource(R.string.comparison_removed_short),
+        ComparisonPackageStatus.ABSENT to stringResource(R.string.comparison_absent_short),
+        ComparisonPackageStatus.UNAVAILABLE to stringResource(R.string.comparison_unavailable_short),
+    )
+    val loadingLabel = stringResource(R.string.comparison_loading)
+    val disabledLabel = stringResource(R.string.comparison_disabled)
+    val suspendedLabel = stringResource(R.string.comparison_suspended)
+    val networkLabel = stringResource(R.string.comparison_network_short)
+    val meteredLabel = stringResource(R.string.comparison_metered_short)
+    fun textWidth(text: String, style: TextStyle) = with(density) {
+        textMeasurer.measure(text, style, softWrap = false).size.width.toDp()
+    }
+
+    // Keep whole status labels and badges readable at the current font scale and locale.
+    // The table scrolls horizontally, so wider content does not need to be clipped to fit.
+    val measuredStatusLabels = statusLabels.values +
+        if (loading && rows.any { row -> row.cells.any { it.status == ComparisonPackageStatus.UNAVAILABLE } }) {
+            listOf(loadingLabel)
+        } else emptyList()
+    val statusWidth = measuredStatusLabels.maxOf { textWidth(it, cellStyle) } + 14.dp + 3.dp
+    val pillWidth = listOf(disabledLabel, suspendedLabel, networkLabel, meteredLabel)
+        .maxOf { textWidth(it, cellStyle) } + 8.dp
+    val contentWidth = maxOf(statusWidth, pillWidth) + 16.dp
+    val appWidth = maxOf(150.dp, textWidth(appLabel, headerStyle) + 16.dp)
+    val cellWidths = labels.mapValues { (_, label) ->
+        maxOf(108.dp, textWidth(label, headerStyle) + 16.dp, contentWidth)
+    }
+    val matrixWidth = profiles.fold(appWidth) { width, profile -> width + cellWidths.getValue(profile.id) }
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val needsHorizontalScroll = matrixWidth > maxWidth
+        Column(Modifier.fillMaxSize()) {
+            if (needsHorizontalScroll) Text(
+                stringResource(R.string.comparison_scroll_hint),
+                Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Column(Modifier.fillMaxWidth().weight(1f).horizontalScroll(rememberScrollState())) {
+                Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+                    Row(Modifier.width(matrixWidth)) {
+                        Text(appLabel, Modifier.width(appWidth).padding(8.dp), style = headerStyle)
+                        profiles.forEach { Text(labels.getValue(it.id), Modifier.width(cellWidths.getValue(it.id)).padding(8.dp), style = headerStyle) }
                     }
                 }
-                HorizontalDivider()
+                HorizontalDivider(Modifier.width(matrixWidth))
+                LazyColumn(Modifier.width(matrixWidth).weight(1f)) {
+                    items(rows, key = { it.packageName }) { row ->
+                        Row {
+                            Column(Modifier.width(appWidth).padding(8.dp)) {
+                                Text(row.name, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
+                                Text(row.packageName, style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+                            }
+                            row.cells.forEach { cell ->
+                                val openable = cell.status == ComparisonPackageStatus.INSTALLED || cell.status == ComparisonPackageStatus.REMOVED
+                                Column(Modifier.width(cellWidths.getValue(cell.userId)).heightIn(min = 48.dp).clickable(enabled = openable) { onOpenApp(row.packageName, cell.userId) }
+                                    .semantics(mergeDescendants = true) {}.padding(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    val statusText = if (loading && cell.status == ComparisonPackageStatus.UNAVAILABLE) {
+                                        loadingLabel
+                                    } else statusLabels.getValue(cell.status)
+                                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                                        Icon(when (cell.status) {
+                                            ComparisonPackageStatus.INSTALLED -> Icons.Default.CheckCircle
+                                            ComparisonPackageStatus.REMOVED -> Icons.Default.Block
+                                            ComparisonPackageStatus.ABSENT -> Icons.Default.RemoveCircleOutline
+                                            ComparisonPackageStatus.UNAVAILABLE -> Icons.Default.HelpOutline
+                                        }, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Text(statusText, style = cellStyle, maxLines = 1)
+                                    }
+                                    if (cell.disabled) ComparisonPill(disabledLabel)
+                                    if (cell.suspended) ComparisonPill(suspendedLabel)
+                                    cell.savedPrivacy?.let { privacy ->
+                                        if (privacy.blockNetwork) ComparisonPill(networkLabel)
+                                        if (privacy.denyMetered) ComparisonPill(meteredLabel)
+                                    }
+                                }
+                            }
+                        }
+                        HorizontalDivider()
+                    }
+                }
             }
         }
     }

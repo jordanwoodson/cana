@@ -1,6 +1,8 @@
 package io.github.samolego.canta.ui
 
 import android.os.Build
+import android.content.ComponentName
+import android.provider.Settings
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.test.platform.app.InstrumentationRegistry
@@ -25,8 +27,10 @@ class SafetyUiDeviceTest {
     @Test fun keyboardWarningCannotBeBypassedByOrdinaryUninstallConfirmation() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         withTimeout(30_000) { while (!Shizuku.pingBinder()) delay(100) }
-        val name = "com.android.inputmethod.latin"
         val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val name = requireNotNull(ComponentName.unflattenFromString(
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD),
+        )).packageName
         val app = AppInfo.fromPackageInfo(CanaServices.getInstance().packageOps.getPackageInfo(name, 0)!!, context.packageManager, false)
         val request = PackageActionRequest(PackageAction.UNINSTALL, 0, listOf(app))
         val model = AppListViewModel()

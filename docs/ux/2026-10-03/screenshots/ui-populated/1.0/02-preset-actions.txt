@@ -1,0 +1,114 @@
+Native configuration: 360 x 800dp; fontScale=1.0
+Printing with useUnmergedTree = 'false'
+Node #3599 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #3600 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #3601 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #3626 at (l=0.0, t=176.0, r=720.0, b=1552.0)px
+       | CollectionInfo = 'CollectionInfo(rowCount=2, columnCount=1)'
+       | IsTraversalGroup = 'true'
+       | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@43947f9'
+       | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+       | Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+       |  |-Node #3630 at (l=32.0, t=216.0, r=417.0, b=296.0)px
+       |  | Focused = 'false'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | Text = '[Create preset]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3635 at (l=32.0, t=328.0, r=417.0, b=408.0)px
+       |  | Focused = 'false'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | Text = '[Import preset]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3641 at (l=32.0, t=440.0, r=688.0, b=928.0)px
+       |    IsContainer = 'true'
+       |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+       |     |-Node #3646 at (l=64.0, t=472.0, r=453.0, b=520.0)px
+       |     | Text = '[Work profile cleanup]'
+       |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |     |-Node #3647 at (l=64.0, t=528.0, r=560.0, b=608.0)px
+       |     | Text = '[Optional apps saved for review before applying.]'
+       |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |     |-Node #3648 at (l=64.0, t=624.0, r=200.0, b=680.0)px
+       |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+       |     | Text = '[Work]'
+       |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |     | MergeDescendants = 'true'
+       |     |-Node #3655 at (l=100.0, t=696.0, r=323.0, b=728.0)px
+       |     | Text = '[2 apps selected]'
+       |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |     |-Node #3658 at (l=100.0, t=736.0, r=367.0, b=768.0)px
+       |     | Text = '[Sep 21, 2026 09:13]'
+       |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |     |-Node #3660 at (l=568.0, t=480.0, r=648.0, b=560.0)px
+       |     | ContentDescription = '[More options]'
+       |     | Focused = 'false'
+       |     | Role = 'Button'
+       |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |     | Actions = [OnClick, RequestFocus]
+       |     | MergeDescendants = 'true'
+       |     |-Node #3663 at (l=64.0, t=808.0, r=656.0, b=888.0)px
+       |       ContentDescription = '[Apply Preset]'
+       |       Focused = 'false'
+       |       Role = 'Button'
+       |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |       Text = '[Apply Preset]'
+       |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       |       MergeDescendants = 'true'
+       |-Node #3605 at (l=0.0, t=0.0, r=720.0, b=176.0)px
+         IsTraversalGroup = 'true'
+          |-Node #3606 at (l=0.0, t=48.0, r=720.0, b=176.0)px
+            Shape = 'RectangleShape'
+             |-Node #3608 at (l=8.0, t=64.0, r=104.0, b=160.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #3610 at (l=112.0, t=83.0, r=294.0, b=141.0)px
+                |-Node #3611 at (l=112.0, t=83.0, r=294.0, b=141.0)px
+                  Text = '[Presets]'
+                  Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Printing with useUnmergedTree = 'false'
+Node #3669 at (l=0.0, t=0.0, r=310.0, b=418.0)px
+ |-Node #3670 at (l=0.0, t=0.0, r=310.0, b=418.0)px
+   [IsPopup]
+    |-Node #3671 at (l=0.0, t=0.0, r=310.0, b=418.0)px
+      IsContainer = 'true'
+      Shape = 'RoundedCornerShape(topStart = CornerSize(size = 4.0.dp), topEnd = CornerSize(size = 4.0.dp), bottomEnd = CornerSize(size = 4.0.dp), bottomStart = CornerSize(size = 4.0.dp))'
+       |-Node #3672 at (l=0.0, t=16.0, r=310.0, b=402.0)px
+         IsTraversalGroup = 'true'
+         Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@43947f9'
+         VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+         Actions = [ScrollBy, ScrollByOffset]
+          |-Node #3673 at (l=0.0, t=16.0, r=310.0, b=112.0)px
+          | ContentDescription = '[Edit]'
+          | Focused = 'false'
+          | Text = '[Edit]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #3678 at (l=0.0, t=112.0, r=310.0, b=208.0)px
+          | ContentDescription = '[Add apps]'
+          | Focused = 'false'
+          | Text = '[Add apps]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #3683 at (l=0.0, t=208.0, r=310.0, b=304.0)px
+          | Focused = 'false'
+          | Text = '[Copy preset]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #3689 at (l=0.0, t=306.0, r=310.0, b=402.0)px
+            ContentDescription = '[Delete]'
+            Focused = 'false'
+            Text = '[Delete]'
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

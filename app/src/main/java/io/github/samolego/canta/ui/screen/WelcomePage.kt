@@ -2,11 +2,14 @@ package io.github.samolego.canta.ui.screen
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,7 +36,7 @@ import io.github.samolego.canta.util.shizuku.AuthorizationState
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun WelcomePage(appListViewModel: AppListViewModel, onExit: () -> Unit, onFinished: suspend () -> Unit) {
     val context = LocalContext.current
@@ -83,14 +86,33 @@ fun WelcomePage(appListViewModel: AppListViewModel, onExit: () -> Unit, onFinish
         }
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.welcome_title)) }) }) { padding ->
+    fun previousStep() {
+        if (!busy && step > 1) {
+            step--
+            error = null
+        }
+    }
+    BackHandler(enabled = step > 1 || busy) { previousStep() }
+    val stepScroll = rememberScrollState()
+    LaunchedEffect(step) { stepScroll.scrollTo(0) }
+
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text(stringResource(R.string.welcome_title)) },
+            navigationIcon = {
+                if (step > 1) IconButton(onClick = ::previousStep, enabled = !busy) {
+                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                }
+            },
+        )
+    }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(stringResource(when (step) {
                 1 -> R.string.welcome_step_one
                 2 -> R.string.welcome_step_two
                 else -> R.string.welcome_step_three
             }), style = MaterialTheme.typography.headlineSmall)
-            Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+            Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(stepScroll),
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 when (step) {
                     1 -> {
@@ -130,7 +152,9 @@ fun WelcomePage(appListViewModel: AppListViewModel, onExit: () -> Unit, onFinish
                     }
                 }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = if (step == 3) Arrangement.End else Arrangement.SpaceBetween) {
+            FlowRow(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (step) {
                     1 -> {
                         TextButton(onClick = onExit) { Text(stringResource(R.string.welcome_exit)) }

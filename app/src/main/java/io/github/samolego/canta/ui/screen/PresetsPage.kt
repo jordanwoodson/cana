@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,6 +38,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,7 +60,6 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.component.ScreenTopBar
 import io.github.samolego.canta.ui.component.StatusChip
-import io.github.samolego.canta.ui.component.fab.ExpandableFAB
 import io.github.samolego.canta.ui.dialog.preset.ImportPresetDialog
 import io.github.samolego.canta.ui.dialog.preset.PresetCreateDialog
 import io.github.samolego.canta.ui.dialog.preset.PresetImportReviewDialog
@@ -65,7 +68,7 @@ import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.ui.viewmodel.PresetsViewModel
 import io.github.samolego.canta.util.CantaPresetData
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun PresetsPage(
     presetViewModel: PresetsViewModel,
@@ -77,6 +80,9 @@ fun PresetsPage(
     val uiMessages = remember { CanaServices.getInstance().uiMessages }
 
     var currentDialog by remember { mutableStateOf<(@Composable () -> Unit)?>(null) }
+    var presetToDelete by remember { mutableStateOf<CantaPresetData?>(null) }
+    val presetDeletedText = stringResource(R.string.preset_deleted)
+    val presetDeleteErrorText = stringResource(R.string.preset_delete_error)
 
     val createConfigDialog =
             @Composable
@@ -96,23 +102,6 @@ fun PresetsPage(
                         onNavigateBack = { onNavigateBack(null) },
                         title = { Text(stringResource(R.string.presets)) },
                 )
-            },
-            floatingActionButton = {
-                if (presetViewModel.presets.isNotEmpty()) {
-                    ExpandableFAB(
-                            onBottomClick = { currentDialog = { createConfigDialog() } },
-                            onTopClick = {
-                                currentDialog = {
-                                    ImportDialog(
-                                            presetViewModel = presetViewModel,
-                                            appListViewModel = appListViewModel,
-                                            hideDialog = { currentDialog = null },
-                                            context = context,
-                                    )
-                                }
-                            }
-                    )
-                }
             }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding)) {
@@ -137,14 +126,31 @@ fun PresetsPage(
                         }
                 )
             } else {
-                val presetDeletedText = stringResource(R.string.preset_deleted)
-                val presetDeleteErrorText = stringResource(R.string.preset_delete_error)
                 val presetCopiedText = stringResource(R.string.preset_copied)
                 LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    item {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = { currentDialog = { createConfigDialog() } }) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.create_preset))
+                            }
+                            OutlinedButton(onClick = {
+                                currentDialog = {
+                                    ImportDialog(presetViewModel = presetViewModel, appListViewModel = appListViewModel,
+                                        hideDialog = { currentDialog = null }, context = context)
+                                }
+                            }) {
+                                Icon(Icons.Default.Download, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.import_preset))
+                            }
+                        }
+                    }
                     items(presetViewModel.presets) { preset ->
                         PresetCard(
                                 preset = preset,
@@ -171,17 +177,7 @@ fun PresetsPage(
                                         }
                                     }
                                 },
-                                onDelete = {
-                                    presetViewModel.deletePreset(
-                                            preset = preset,
-                                            onSuccess = {
-                                                uiMessages.post(presetDeletedText)
-                                            },
-                                            onError = {
-                                                uiMessages.post(presetDeleteErrorText)
-                                            },
-                                    )
-                                },
+                                onDelete = { presetToDelete = preset },
                                 onExport = {
                                     presetViewModel.exportToClipboard(
                                             context = context,
@@ -197,6 +193,22 @@ fun PresetsPage(
     }
 
     currentDialog?.let { it() }
+    presetToDelete?.let { preset ->
+        AlertDialog(
+            onDismissRequest = { presetToDelete = null },
+            title = { Text(stringResource(R.string.preset_delete_title)) },
+            text = { Text(stringResource(R.string.preset_delete_description, preset.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    presetToDelete = null
+                    presetViewModel.deletePreset(preset,
+                        onSuccess = { uiMessages.post(presetDeletedText) },
+                        onError = { uiMessages.post(presetDeleteErrorText) })
+                }) { Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = { TextButton(onClick = { presetToDelete = null }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
     presetViewModel.importReview?.let { review ->
         val importedText = stringResource(R.string.preset_import_saved)
         PresetImportReviewDialog(review, presetViewModel.checkingImport, presetViewModel.isLoading,
@@ -289,6 +301,7 @@ private fun EmptyPresetsState(onCreateClick: () -> Unit, onImportClick: () -> Un
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PresetCard(
     preset: CantaPresetData,
@@ -333,35 +346,37 @@ private fun PresetCard(
                             modifier = Modifier.padding(top = 8.dp))
                     }
 
-                    Row(
-                            modifier = Modifier.padding(top = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    FlowRow(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Icon(
-                                Icons.Default.Apps,
-                                contentDescription = stringResource(R.string.selected_apps),
-                                modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                                text = pluralStringResource(R.plurals.num_selected_apps, preset.apps.size + preset.lockdown.size, preset.apps.size + preset.lockdown.size),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Icon(
-                                Icons.Default.Schedule,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                                text = formatDate(preset.createdDate),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Icon(
+                                    Icons.Default.Apps,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                    text = pluralStringResource(R.plurals.num_selected_apps, preset.apps.size + preset.lockdown.size, preset.apps.size + preset.lockdown.size),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Icon(
+                                    Icons.Default.Schedule,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                    text = formatDate(preset.createdDate),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
 
@@ -395,13 +410,13 @@ private fun PresetCard(
                                 leadingIcon = { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_apps)) }
                         )
                         DropdownMenuItem(
-                                text = { Text(stringResource(R.string.share)) },
+                                text = { Text(stringResource(R.string.preset_copy_action)) },
                                 onClick = {
                                     showMenu = false
                                     onExport()
                                 },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share))
+                                    Icon(Icons.Default.ContentCopy, contentDescription = null)
                                 }
                         )
                         HorizontalDivider()

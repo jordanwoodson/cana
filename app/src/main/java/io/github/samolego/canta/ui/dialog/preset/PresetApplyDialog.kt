@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.util.withPackageAuthentication
 import io.github.samolego.canta.ops.*
+import io.github.samolego.canta.ui.component.CheckboxRow
 import io.github.samolego.canta.util.CantaPresetData
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.apps.UserProfile
@@ -88,9 +89,9 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
     AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(stringResource(R.string.apply_preset)) },
         text = { Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(preset.name)
-            Text(stringResource(R.string.preset_target_users, targets.joinToString()))
-            if (result == null && profiles.size > 1) Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(allProfiles, { allProfiles = it }, enabled = !busy)
+            val targetNames = targets.map { profileName(it) }.joinToString()
+            Text(stringResource(R.string.preset_apply_profiles, targetNames))
+            if (result == null && profiles.size > 1) CheckboxRow(allProfiles, { allProfiles = it }, enabled = !busy) {
                 Text(stringResource(R.string.preset_all_profiles))
             }
             PresetActionsContent(preset)
@@ -100,15 +101,20 @@ fun PresetApplyDialog(preset: CantaPresetData, userId: Int, onDismiss: () -> Uni
             if (preset.lockdown.any { it.blockNetwork }) Text(stringResource(R.string.privacy_network_description))
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (busy || warnings == null && error == null) LinearProgressIndicator()
-            warnings?.forEach { (user, reports) -> reports.forEach { (name, assessment) ->
-                Text(profileName(user))
-                if (assessment.protected) Text(stringResource(R.string.safety_protected, name))
-                assessment.error?.let { Text(it) }
-                assessment.warnings.forEach { Text("$name: ${it.kind} · ${it.detail}") }
-            } }
+            warnings?.forEach { (user, reports) ->
+                val actionable = reports.filterValues { it.protected || it.error != null || it.warnings.isNotEmpty() }
+                if (actionable.isNotEmpty()) {
+                    Text(profileName(user), style = MaterialTheme.typography.titleSmall)
+                    actionable.forEach { (name, assessment) ->
+                        if (assessment.protected) Text(stringResource(R.string.safety_protected, name))
+                        assessment.error?.let { Text(it) }
+                        assessment.warnings.forEach { Text("$name: ${it.kind} · ${it.detail}") }
+                    }
+                }
+            }
             if (shared) Text(stringResource(R.string.privacy_shared_uid, warnings.orEmpty().values.flatMap { it.keys }.distinct().joinToString()))
-            if (needsConsent && result == null) Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(accepted, { accepted = it }); Text(stringResource(R.string.safety_acknowledge))
+            if (needsConsent && result == null) CheckboxRow(accepted, { accepted = it }, enabled = !busy) {
+                Text(stringResource(R.string.safety_acknowledge))
             }
             result?.let { batch ->
                 Text(stringResource(R.string.batch_outcome_counts, batch.successCount, batch.failureCount, batch.skippedCount, batch.unknownCount))

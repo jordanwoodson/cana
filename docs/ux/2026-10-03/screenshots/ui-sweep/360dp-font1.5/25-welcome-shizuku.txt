@@ -1,0 +1,81 @@
+Native configuration: 360 x 800dp; fontScale=1.5
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #3383 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #3403 at (l=40.0, t=216.0, r=550.0, b=291.0)px
+       | Text = '[Connect Shizuku]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #3404 at (l=40.0, t=323.0, r=680.0, b=1272.0)px
+       | IsTraversalGroup = 'true'
+       | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@20bc19a'
+       | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=748.0, reverseScrolling=false)'
+       | Actions = [ScrollBy, ScrollByOffset]
+       |  |-Node #3424 at (l=40.0, t=323.0, r=680.0, b=806.0)px
+       |  | Text = '[Cana uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3427 at (l=100.0, t=830.0, r=680.0, b=893.0)px
+       |  | Text = '[Install Shizuku app]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3430 at (l=100.0, t=917.0, r=560.0, b=1043.0)px
+       |  | Text = '[Start Shizuku service]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3431 at (l=584.0, t=932.0, r=680.0, b=1028.0)px
+       |  | ContentDescription = '[Start Shizuku service]'
+       |  | Focused = 'false'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | Actions = [OnClick, RequestFocus]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3435 at (l=100.0, t=1067.0, r=560.0, b=1256.0)px
+       |  | Text = '[Grant permission to Cana in Shizuku]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3436 at (l=584.0, t=1114.0, r=680.0, b=1210.0)px
+       |  | ContentDescription = '[Grant permission to Cana in Shizuku]'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | [Disabled]
+       |  | Actions = [OnClick]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3438 at (l=40.0, t=1280.0, r=680.0, b=1532.0)px
+       |  | Text = '[Start Shizuku, then return here to authorize Cana. This screen updates automatically.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3440 at (l=40.0, t=1582.0, r=680.0, b=1870.0)px
+       |  | Text = '[Optional recovery preparation: USB debugging lets you connect a computer if you need help restoring apps. It is not required for authorization.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3443 at (l=100.0, t=1894.0, r=680.0, b=2020.0)px
+       |    Text = '[(Optional) Enable USB debugging]'
+       |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #3444 at (l=315.0, t=1305.0, r=680.0, b=1400.0)px
+       | Focused = 'false'
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Skip for now]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #3447 at (l=372.0, t=1417.0, r=680.0, b=1512.0)px
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Continue]'
+       | [Disabled]
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #3387 at (l=0.0, t=0.0, r=720.0, b=176.0)px
+         IsTraversalGroup = 'true'
+          |-Node #3388 at (l=0.0, t=48.0, r=720.0, b=176.0)px
+            Shape = 'RectangleShape'
+             |-Node #3421 at (l=16.0, t=72.0, r=96.0, b=152.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #3390 at (l=112.0, t=76.0, r=592.0, b=147.0)px
+                |-Node #3391 at (l=112.0, t=76.0, r=592.0, b=147.0)px
+                  Text = '[Welcome to Cana]'
+                  Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

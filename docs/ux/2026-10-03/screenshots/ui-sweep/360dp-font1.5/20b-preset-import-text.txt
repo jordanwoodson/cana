@@ -1,0 +1,68 @@
+Native configuration: 360 x 800dp; fontScale=1.5
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+Printing with useUnmergedTree = 'false'
+Node #3270 at (l=0.0, t=0.0, r=640.0, b=1131.0)px
+ |-Node #3271 at (l=0.0, t=0.0, r=640.0, b=1131.0)px
+   [IsDialog]
+    |-Node #3272 at (l=0.0, t=0.0, r=640.0, b=1131.0)px
+      PaneTitle = 'Dialog'
+       |-Node #3273 at (l=0.0, t=0.0, r=640.0, b=1131.0)px
+         IsContainer = 'true'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 28.0.dp), topEnd = CornerSize(size = 28.0.dp), bottomEnd = CornerSize(size = 28.0.dp), bottomStart = CornerSize(size = 28.0.dp))'
+          |-Node #3276 at (l=48.0, t=48.0, r=490.0, b=123.0)px
+          | Text = '[Import preset]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #3278 at (l=48.0, t=155.0, r=592.0, b=939.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@20bc19a'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #3279 at (l=48.0, t=155.0, r=592.0, b=344.0)px
+          |  | Text = '[Import a preset from clipboard or paste JSON text directly.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #3292 at (l=48.0, t=376.0, r=592.0, b=568.0)px
+          |  | [SelectableGroup]
+          |  |  |-Node #3293 at (l=48.0, t=376.0, r=592.0, b=472.0)px, Tag: 'preset-import-clipboard'
+          |  |  | Focused = 'false'
+          |  |  | Role = 'RadioButton'
+          |  |  | Selected = 'false'
+          |  |  | Text = '[Clipboard]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #3296 at (l=48.0, t=472.0, r=592.0, b=568.0)px, Tag: 'preset-import-text'
+          |  |    Focused = 'false'
+          |  |    Role = 'RadioButton'
+          |  |    Selected = 'true'
+          |  |    Text = '[Text]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #3300 at (l=48.0, t=600.0, r=592.0, b=939.0)px
+          |    ContentDataType = 'AndroidContentDataType(androidAutofillType=1)'
+          |    EditableText = ''
+          |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@a894ef0'
+          |    Focused = 'false'
+          |    ImeAction = 'Default'
+          |    InputText = ''
+          |    IsEditable = 'true'
+          |    Text = '[Paste preset JSON]'
+          |    TextSelectionRange = 'TextRange(0, 0)'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, InsertTextAtCursor, OnClick, OnFillData, OnLongClick, PasteText, PerformImeAction, RequestFocus, SetSelection, SetText, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |-Node #3285 at (l=114.0, t=988.0, r=321.0, b=1083.0)px
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Cancel]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #3310 at (l=337.0, t=988.0, r=592.0, b=1083.0)px
+            Role = 'Button'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+            Text = '[Review]'
+            [Disabled]
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

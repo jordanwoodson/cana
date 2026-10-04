@@ -1,0 +1,155 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #2683 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+       |-Node #2684 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #2711 at (l=0.0, t=230.0, r=720.0, b=957.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@5b912dd'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=1508.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #2713 at (l=32.0, t=230.0, r=688.0, b=455.0)px
+          |  | Text = '[See where apps differ across profiles.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2715 at (l=32.0, t=471.0, r=688.0, b=653.0)px
+          |  | ContentDescription = '[Expand]'
+          |  | Focused = 'false'
+          |  | Text = '[About this comparison]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2738 at (l=32.0, t=669.0, r=688.0, b=1173.0)px
+          |  | Text = '[The profile list could not be refreshed. Check Shizuku and profile access, then retry.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2742 at (l=32.0, t=1189.0, r=552.0, b=1296.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Connect Shizuku]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2745 at (l=32.0, t=1296.0, r=238.0, b=1403.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Retry]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2748 at (l=32.0, t=1403.0, r=615.0, b=1510.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Technical details]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2719 at (l=32.0, t=1526.0, r=630.0, b=1601.0)px
+          |  | Text = '[Profiles to compare]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2720 at (l=0.0, t=1601.0, r=720.0, b=1697.0)px
+          |  | HorizontalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          |  | IsTraversalGroup = 'true'
+          |  | Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@f493787'
+          |  | Actions = [ScrollBy, ScrollByOffset]
+          |  |  |-Node #2751 at (l=32.0, t=1612.0, r=348.0, b=1687.0)px
+          |  |    Focused = 'false'
+          |  |    Role = 'Checkbox'
+          |  |    Selected = 'true'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  |    Text = '[Personal]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #2721 at (l=32.0, t=1697.0, r=688.0, b=2041.0)px
+          |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=1)'
+          |  | EditableText = ''
+          |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@7d2a51a'
+          |  | Focused = 'false'
+          |  | ImeAction = 'Default'
+          |  | InputText = ''
+          |  | IsEditable = 'true'
+          |  | Text = '[Search app name or package]'
+          |  | TextSelectionRange = 'TextRange(0, 0)'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, InsertTextAtCursor, OnClick, OnFillData, OnLongClick, PasteText, PerformImeAction, RequestFocus, SetSelection, SetText, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2732 at (l=0.0, t=2041.0, r=720.0, b=2209.0)px
+          |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@f1a684b'
+          |  | Role = 'Switch'
+          |  | Text = '[Only differences]'
+          |  | ToggleableState = 'Off'
+          |  | [Disabled]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #2755 at (l=32.0, t=2225.0, r=688.0, b=2353.0)px
+          |  | Text = '[Only one profile is currently available.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2760 at (l=32.0, t=2385.0, r=460.0, b=2449.0)px
+          |    Text = '[245 apps shown]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2764 at (l=0.0, t=957.0, r=720.0, b=1552.0)px
+          | HorizontalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@f493787'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #2765 at (l=0.0, t=957.0, r=673.0, b=1064.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RectangleShape'
+          |  |  |-Node #2767 at (l=16.0, t=973.0, r=284.0, b=1048.0)px
+          |  |  | Text = '[App]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #2768 at (l=316.0, t=973.0, r=657.0, b=1048.0)px
+          |  |    Text = '[Personal]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2770 at (l=0.0, t=1066.0, r=673.0, b=1552.0)px
+          |    CollectionInfo = 'CollectionInfo(rowCount=245, columnCount=1)'
+          |    IsTraversalGroup = 'true'
+          |    Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@5b912dd'
+          |    VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=100.0, reverseScrolling=false)'
+          |    Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+          |     |-Node #2774 at (l=16.0, t=1082.0, r=284.0, b=1232.0)px
+          |     | Text = '[2 Button Navigation Bar]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #2775 at (l=16.0, t=1232.0, r=284.0, b=1360.0)px
+          |     | Text = '[com.android.internal.systemui.navbar.twobutton]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #2776 at (l=300.0, t=1066.0, r=673.0, b=1162.0)px
+          |     | Focused = 'false'
+          |     | Text = '[Installed]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #2784 at (l=16.0, t=1394.0, r=284.0, b=1544.0)px
+          |     | Text = '[3 Button Navigation Bar]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #2785 at (l=16.0, t=1544.0, r=284.0, b=1672.0)px
+          |     | Text = '[com.android.internal.systemui.navbar.threebutton]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #2786 at (l=300.0, t=1378.0, r=673.0, b=1474.0)px
+          |       Focused = 'false'
+          |       Text = '[Installed]'
+          |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |       MergeDescendants = 'true'
+          |-Node #2688 at (l=0.0, t=0.0, r=720.0, b=230.0)px
+            IsTraversalGroup = 'true'
+             |-Node #2689 at (l=0.0, t=48.0, r=720.0, b=230.0)px
+               Shape = 'RectangleShape'
+                |-Node #2691 at (l=8.0, t=91.0, r=104.0, b=187.0)px
+                | ContentDescription = '[Back]'
+                | Focused = 'false'
+                | Role = 'Button'
+                | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                | Actions = [OnClick, RequestFocus]
+                | MergeDescendants = 'true'
+                |-Node #2693 at (l=112.0, t=48.0, r=608.0, b=230.0)px
+                |  |-Node #2694 at (l=112.0, t=48.0, r=608.0, b=230.0)px
+                |    Text = '[Compare profiles]'
+                |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+                |-Node #2697 at (l=624.0, t=99.0, r=704.0, b=179.0)px
+                  ContentDescription = '[Refresh comparison]'
+                  Focused = 'false'
+                  Role = 'Button'
+                  Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                  Actions = [OnClick, RequestFocus]
+                  MergeDescendants = 'true'

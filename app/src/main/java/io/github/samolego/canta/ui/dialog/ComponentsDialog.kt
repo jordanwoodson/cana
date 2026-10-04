@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Extension
@@ -17,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.util.openWebLink
+import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.data.SettingsStore
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
@@ -48,31 +51,53 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
     }
     var catalog by remember { mutableStateOf<ComponentCatalog?>(null) }
     var message by remember { mutableStateOf<String?>(null) }
+    var loadError by remember { mutableStateOf<String?>(null) }
+    var loading by remember { mutableStateOf(true) }
+    val loadFailed = stringResource(R.string.components_load_failed)
     var revision by remember { mutableIntStateOf(0) }
     var busy by remember { mutableStateOf(false) }
     var undoReview by remember { mutableStateOf<OperationRecord?>(null) }
     var pending by remember { mutableStateOf<AppComponent?>(null) }
     var sourceDialog by remember { mutableStateOf(false) }
     LaunchedEffect(packageName, userId, revision) {
+        loading = true
+        loadError = null
         try { catalog = services.components.load(packageName, userId) }
         catch (e: CancellationException) { throw e }
-        catch (e: Exception) { message = e.message }
+        catch (e: Exception) {
+            LogUtils.e("Components", "Cannot load components for $packageName", e)
+            loadError = loadFailed
+        }
+        finally { loading = false }
     }
     val content: @Composable () -> Unit = {
-            Column(Modifier.heightIn(max = 560.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyColumn(if (embedded) Modifier.fillMaxSize() else Modifier.heightIn(max = 560.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (!embedded) {
-                    Text(packageName, style = MaterialTheme.typography.labelMedium)
-                    Text(profileName(userId))
+                    item {
+                        Column {
+                            Text(packageName, style = MaterialTheme.typography.labelMedium)
+                            Text(profileName(userId))
+                        }
+                    }
                 }
-                if (busy || catalog == null) LinearProgressIndicator(Modifier.fillMaxWidth())
-                message?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                if (busy || loading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
+                message?.let { item { Text(it, style = MaterialTheme.typography.bodySmall) } }
+                loadError?.let { error -> item {
+                    Column {
+                        Text(error, color = MaterialTheme.colorScheme.error)
+                        TextButton(onClick = { revision++ }) { Text(stringResource(R.string.retry)) }
+                    }
+                } }
                 val state = catalog
                 if (state != null) {
-                    if (!state.editable) Text(stringResource(R.string.component_requires_root), style = MaterialTheme.typography.bodySmall)
-                    state.trackers.error?.let { Text(stringResource(R.string.tracker_fallback, it), style = MaterialTheme.typography.bodySmall) }
-                    LazyColumn(Modifier.heightIn(max = 320.dp)) {
+                    if (!state.editable) item { Text(stringResource(R.string.component_requires_root), style = MaterialTheme.typography.bodySmall) }
+                    state.trackers.error?.let { error -> item { Text(stringResource(R.string.tracker_fallback, error), style = MaterialTheme.typography.bodySmall) } }
                         items(state.components, key = { it.name.flattenToString() }) { component ->
-                            ListItem(headlineContent = { Text(component.name.className, style = MaterialTheme.typography.bodyMedium) },
+                            val editable = !busy && !loading && loadError == null && state.editable && packageName !in services.safety.alwaysProtected
+                            ListItem(modifier = Modifier.toggleable(component.enabled, enabled = editable,
+                                    role = Role.Switch, onValueChange = { pending = component }),
+                                headlineContent = { Text(component.name.className, style = MaterialTheme.typography.bodyMedium) },
                                 supportingContent = {
                                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     StatusChip(stringResource(when (component.kind) {
@@ -85,10 +110,10 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                                         color = MaterialTheme.colorScheme.tertiary, style = MaterialTheme.typography.labelSmall)
                                     }
                                 }, trailingContent = {
-                                    Switch(component.enabled, { pending = component }, enabled = !busy && state.editable && packageName !in services.safety.alwaysProtected)
+                                    Switch(component.enabled, onCheckedChange = null, enabled = editable)
                                 })
                         }
-                    }
+                    item {
                     InfoDisclosure(stringResource(R.string.about_tracker_scanning)) {
                         Text(stringResource(R.string.tracker_match_description), style = MaterialTheme.typography.bodySmall)
                         Text(stringResource(R.string.tracker_active_source, state.trackers.source), style = MaterialTheme.typography.labelSmall)
@@ -98,7 +123,8 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                             TextButton(onClick = { context.openWebLink("https://opendatacommons.org/licenses/odbl/1-0/") }) { Text("ODbL 1.0") }
                         }
                     }
-                    TextButton(onClick = { sourceDialog = true }) { Text(stringResource(R.string.tracker_source)) }
+                    }
+                    item { TextButton(onClick = { sourceDialog = true }) { Text(stringResource(R.string.tracker_source)) } }
                 }
             }
     }
@@ -120,7 +146,7 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
         val report = assessment
         AlertDialog(onDismissRequest = { pending = null }, title = { Text(stringResource(if (component.enabled) R.string.disable_app else R.string.enable_app)) },
             text = {
-                Column {
+                Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState())) {
                     Text(packageName)
                     Text(profileName(userId))
                     Text(component.name.className)
@@ -130,9 +156,10 @@ fun ComponentsDialog(packageName: String, userId: Int, embedded: Boolean, onDism
                         report.error?.let { Text(it) }
                         if (component.enabled && report.warnings.isNotEmpty()) {
                             report.warnings.forEach { Text("${it.kind}: ${it.detail}") }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(accepted, { accepted = it })
-                                Text(stringResource(R.string.safety_acknowledge))
+                            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(accepted,
+                                role = Role.Checkbox, onValueChange = { accepted = it }), verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(accepted, onCheckedChange = null)
+                                Text(stringResource(R.string.safety_acknowledge), Modifier.padding(start = 8.dp))
                             }
                         }
                     }

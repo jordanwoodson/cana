@@ -31,9 +31,10 @@ class PrivacyUiDeviceTest {
     }
     @Test fun actualPermissionAndBackgroundValuesAndWorkProfileAreVisible() = runBlocking {
         ready()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         compose.setContent { CantaTheme { PrivacyDialog(pkg, 10, {}) } }
         compose.waitUntil(90_000) { compose.onAllNodesWithTag("privacy-permission-android.permission.CAMERA").fetchSemanticsNodes().isNotEmpty() }
-        compose.onAllNodesWithText("Work profile").onFirst().assertIsDisplayed()
+        compose.onNodeWithText(context.getString(R.string.profile_work)).performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("privacy-permission-android.permission.CAMERA").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("Background activity").performScrollTo().assertIsDisplayed()
         compose.onNodeWithText("All network access").performScrollTo().assertIsDisplayed()
@@ -55,8 +56,9 @@ class PrivacyUiDeviceTest {
     }
     @Test fun lockdownPresetRoundtripAndApplyOnlyAffectCapturedWorkProfile() = runBlocking {
         ready()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val services = CanaServices.getInstance()
-        val store = PresetStore(InstrumentationRegistry.getInstrumentation().targetContext)
+        val store = PresetStore(context)
         val original = CantaPresetData("Privacy test", "Work only", 1, emptySet(), uuid = java.util.UUID.randomUUID().toString(),
             lockdown = listOf(LockdownSettings(pkg, denyMetered = true)))
         assertTrue(store.savePreset(original))
@@ -68,10 +70,12 @@ class PrivacyUiDeviceTest {
         compose.setContent { CantaTheme { PresetApplyDialog(preset, 10, {}) } }
         compose.waitUntil(60_000) { compose.onAllNodesWithText("Apply Preset").fetchSemanticsNodes().size == 2 &&
             compose.onAllNodesWithText("Apply Preset")[1].fetchSemanticsNode().config.contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled).not() }
-        compose.onAllNodesWithText("Work profile").onFirst().assertIsDisplayed()
+        val expectedProfile = context.getString(R.string.preset_apply_profiles, context.getString(R.string.profile_work))
+        compose.onNodeWithText(expectedProfile).performScrollTo().assertIsDisplayed()
         compose.onAllNodesWithText("Apply Preset")[1].performClick()
-        val expected = InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.batch_outcome_counts, 1, 0, 0, 0)
+        val expected = context.getString(R.string.batch_outcome_counts, 1, 0, 0, 0)
         compose.waitUntil(60_000) { compose.onAllNodesWithText(expected).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText(expected).performScrollTo().assertIsDisplayed()
         assertEquals(beforePeer.toString(), services.privacy.snapshot(pkg, 0, PrivacyAction.METERED).toString())
         } finally {
             services.history.records.first().filter { it.id !in previousIds && it.packageName == pkg &&

@@ -22,9 +22,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.ActionChoices
@@ -41,7 +42,6 @@ fun profileLabel(model: AppListViewModel): String = profileName(model.selectedUs
 @Composable
 fun SelectionActionBar(model: AppListViewModel, appType: AppsType) {
     if (model.selectedApps.isEmpty()) return
-    var actions by remember { mutableStateOf(false) }
     var review by remember { mutableStateOf(false) }
     val visible = model.appList.filter { it.isUninstalled == (appType == AppsType.UNINSTALLED) }.map { it.packageName }.toSet()
     val summary = SelectionSummary.of(model.selectedApps.keys.toSet(), visible)
@@ -50,45 +50,29 @@ fun SelectionActionBar(model: AppListViewModel, appType: AppsType) {
     val choices = ActionChoices.forSelection(selected, removedTab)
     val selectionLabel = if (summary.hidden > 0) stringResource(R.string.selection_hidden_short, summary.total, summary.hidden)
         else pluralStringResource(R.plurals.selection_selected_count, summary.total, summary.total)
-    val destructivePrimary = choices.primary in setOf(PackageAction.UNINSTALL, PackageAction.REMOVE_UPDATES, PackageAction.UNINSTALL_KEEP_DATA)
-    val actionColor = if (destructivePrimary) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-    val onActionColor = if (destructivePrimary) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val selectionWidth = textMeasurer.measure(selectionLabel, MaterialTheme.typography.labelLarge, softWrap = false).size.width
+    val actionWidth = textMeasurer.measure(stringResource(choices.primary.label), MaterialTheme.typography.labelLarge, softWrap = false).size.width
+    // Include the clear/menu targets and both buttons' horizontal content padding.
+    val compactWidth = with(density) { (selectionWidth + actionWidth).toDp() } + 170.dp
+    val selectionControls: @Composable RowScope.() -> Unit = {
+        IconButton(enabled = !model.isOperating, onClick = { model.selectedApps.clear() }) {
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_selection))
+        }
+        TextButton(modifier = Modifier.weight(1f), onClick = { review = true }) { Text(selectionLabel) }
+    }
     Surface(tonalElevation = 4.dp) {
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().height(64.dp).padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            IconButton(enabled = !model.isOperating, onClick = { model.selectedApps.clear() }) {
-                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear_selection))
-            }
-            TextButton(modifier = Modifier.weight(1f), onClick = { review = true }) {
-                Text(selectionLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-            Box {
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Button(enabled = !model.isOperating, onClick = { model.requestAction(choices.primary) },
-                        modifier = Modifier.height(48.dp),
-                        shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, topEnd = 4.dp, bottomEnd = 4.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = actionColor, contentColor = onActionColor)) {
-                        Text(stringResource(choices.primary.label), maxLines = 1)
-                    }
-                    IconButton(enabled = !model.isOperating && (choices.reversible.isNotEmpty() || choices.removing.isNotEmpty()),
-                        onClick = { actions = true },
-                        modifier = Modifier.size(48.dp).clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 24.dp, bottomEnd = 24.dp)).background(actionColor),
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = onActionColor)) {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.selection_more_actions))
-                    }
+        BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 8.dp)) {
+            if (compactWidth <= maxWidth) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    selectionControls()
+                    SelectionActionButtons(model, choices)
                 }
-                DropdownMenu(actions, { actions = false }) {
-                    if (choices.reversible.isNotEmpty()) {
-                        Text(stringResource(R.string.selection_reversible), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                        choices.reversible.forEach { action -> ActionMenuItem(action) { actions = false; model.requestAction(action) } }
-                    }
-                    if (choices.removing.isNotEmpty()) {
-                        if (choices.reversible.isNotEmpty()) HorizontalDivider()
-                        Text(stringResource(R.string.selection_removes_app), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                        choices.removing.forEach { action -> ActionMenuItem(action) { actions = false; model.requestAction(action) } }
-                    }
+            } else {
+                Column {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, content = selectionControls)
+                    SelectionActionButtons(model, choices, expand = true)
                 }
             }
         }
@@ -104,12 +88,50 @@ fun SelectionActionBar(model: AppListViewModel, appType: AppsType) {
                             Text(app?.packageName ?: stringResource(R.string.selected_unavailable), style = MaterialTheme.typography.bodySmall)
                         }
                         IconButton(enabled = !model.isOperating, onClick = { model.selectedApps.remove(name) }) {
-                            Icon(Icons.Default.Close, stringResource(R.string.clear_selection))
+                            Icon(Icons.Default.Close, stringResource(R.string.app_deselect_description, app?.name ?: name))
                         }
                     }
                 }
             }
         }, confirmButton = { TextButton(onClick = { review = false }) { Text(stringResource(R.string.close)) } })
+}
+
+@Composable
+private fun SelectionActionButtons(model: AppListViewModel, choices: ActionChoices, expand: Boolean = false) {
+    var actions by remember { mutableStateOf(false) }
+    val destructive = choices.primary in setOf(PackageAction.UNINSTALL, PackageAction.REMOVE_UPDATES, PackageAction.UNINSTALL_KEEP_DATA)
+    val actionColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+    val onActionColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
+    Box {
+        Row(if (expand) Modifier.fillMaxWidth() else Modifier,
+            horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+            Button(enabled = !model.isOperating, onClick = { model.requestAction(choices.primary) },
+                modifier = (if (expand) Modifier.weight(1f) else Modifier).heightIn(min = 48.dp),
+                shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, topEnd = 4.dp, bottomEnd = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = actionColor, contentColor = onActionColor)) {
+                Text(stringResource(choices.primary.label))
+            }
+            IconButton(enabled = !model.isOperating && (choices.reversible.isNotEmpty() || choices.removing.isNotEmpty()),
+                onClick = { actions = true },
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 24.dp, bottomEnd = 24.dp)).background(actionColor),
+                colors = IconButtonDefaults.iconButtonColors(contentColor = onActionColor)) {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.selection_more_actions))
+            }
+        }
+        DropdownMenu(actions, { actions = false }) {
+            if (choices.reversible.isNotEmpty()) {
+                Text(stringResource(R.string.selection_reversible), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                choices.reversible.forEach { action -> ActionMenuItem(action) { actions = false; model.requestAction(action) } }
+            }
+            if (choices.removing.isNotEmpty()) {
+                if (choices.reversible.isNotEmpty()) HorizontalDivider()
+                Text(stringResource(R.string.selection_removes_app), modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                choices.removing.forEach { action -> ActionMenuItem(action) { actions = false; model.requestAction(action) } }
+            }
+        }
+    }
 }
 
 @Composable

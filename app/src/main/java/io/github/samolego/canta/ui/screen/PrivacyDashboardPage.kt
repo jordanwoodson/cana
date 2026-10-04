@@ -106,36 +106,43 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
             if (unavailable) Text(stringResource(R.string.privacy_store_unavailable), color = MaterialTheme.colorScheme.error)
             else if (!loading && entries.isEmpty()) EmptyState(Icons.Default.Security,
                 stringResource(R.string.privacy_dashboard), stringResource(R.string.privacy_dashboard_empty))
-            for ((block, action) in entries.sortedWith(compareBy({ it.first.userId }, { it.first.packageName }, { it.second.key }))) {
+            val grouped = entries.groupBy { it.first.userId to it.first.packageName }
+                .toSortedMap(compareBy({ it.first }, { it.second }))
+            for ((target, restrictions) in grouped) {
                 ElevatedCard(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(appNames[block.userId to block.packageName] ?: block.packageName, style = MaterialTheme.typography.titleMedium)
-                        Text(profileName(block.userId), style = MaterialTheme.typography.bodySmall,
+                        Text(appNames[target] ?: target.second, style = MaterialTheme.typography.titleMedium)
+                        Text(profileName(target.first), style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        val status = if (!connected && block.status != "needs_review") "disconnected" else block.status
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                            StatusChip(stringResource(action.title), Icons.Default.WifiOff)
-                            StatusChip(stringResource(privacyDashboardStatus(status)), when (status) {
-                                "verified" -> Icons.Default.CheckCircle
-                                "failed" -> Icons.Default.Error
-                                else -> Icons.Default.Warning
-                            }, when (status) {
-                                "failed" -> StatusTone.ERROR
-                                "verified" -> StatusTone.NEUTRAL
-                                else -> StatusTone.WARNING
-                            })
+                        for ((block, action) in restrictions.sortedBy { it.second.key }) {
+                            HorizontalDivider()
+                            val status = if (!connected && block.status != "needs_review") "disconnected" else block.status
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                StatusChip(stringResource(action.title), Icons.Default.WifiOff)
+                                StatusChip(stringResource(privacyDashboardStatus(status)), when (status) {
+                                    "verified" -> Icons.Default.CheckCircle
+                                    "failed" -> Icons.Default.Error
+                                    else -> Icons.Default.Warning
+                                }, when (status) {
+                                    "failed" -> StatusTone.ERROR
+                                    "verified" -> StatusTone.NEUTRAL
+                                    else -> StatusTone.WARNING
+                                })
+                            }
+                            val verified = if (connected) live[Triple(block.packageName, block.userId, action)] else null
+                            Text(stringResource(when (verified) {
+                                null -> R.string.privacy_live_unavailable
+                                true -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_blocked else R.string.privacy_live_restricted
+                                false -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_allowed else R.string.privacy_live_unrestricted
+                            }), style = MaterialTheme.typography.bodySmall)
+                            if (block.status == "needs_review") Text(stringResource(R.string.privacy_review_required), style = MaterialTheme.typography.bodySmall)
+                            if (diagnostics && block.statusMessage.isNotBlank()) Text(block.statusMessage, style = MaterialTheme.typography.bodySmall)
+                            TextButton(onClick = { forget = block to action }) {
+                                Text(stringResource(R.string.privacy_forget_restriction, stringResource(action.title)))
+                            }
                         }
-                        val verified = if (connected) live[Triple(block.packageName, block.userId, action)] else null
-                        Text(stringResource(when (verified) {
-                            null -> R.string.privacy_live_unavailable
-                            true -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_blocked else R.string.privacy_live_restricted
-                            false -> if (action == PrivacyAction.NETWORK) R.string.privacy_live_allowed else R.string.privacy_live_unrestricted
-                        }), style = MaterialTheme.typography.bodySmall)
-                        if (block.status == "needs_review") Text(stringResource(R.string.privacy_review_required), style = MaterialTheme.typography.bodySmall)
-                        if (diagnostics && block.statusMessage.isNotBlank()) Text(block.statusMessage, style = MaterialTheme.typography.bodySmall)
-                        FlowRow {
-                            TextButton(onClick = { reviewUser = block.userId; reviewPackage = block.packageName }) { Text(stringResource(R.string.privacy_review)) }
-                            TextButton(onClick = { forget = block to action }) { Text(stringResource(R.string.privacy_forget)) }
+                        TextButton(onClick = { reviewUser = target.first; reviewPackage = target.second }) {
+                            Text(stringResource(R.string.privacy_review))
                         }
                     }
                 }
@@ -149,7 +156,11 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
     reviewPackage?.let { pkg -> PrivacyDialog(pkg, reviewUser) { reviewPackage = null; revision++ } }
     forget?.let { (block, action) ->
         AlertDialog(onDismissRequest = { forget = null }, title = { Text(stringResource(R.string.privacy_forget)) },
-            text = { Column { Text(block.packageName); Text(profileName(block.userId)); Text(stringResource(R.string.privacy_forget_explanation)) } },
+            text = { Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(block.packageName); Text(profileName(block.userId)); Text(stringResource(action.title))
+                Text(stringResource(R.string.privacy_forget_explanation))
+            } },
             confirmButton = { TextButton(onClick = {
                 forget = null
                 scope.launch { withPackageAuthentication(context) {

@@ -8,6 +8,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -29,14 +31,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,7 +59,7 @@ import io.github.samolego.canta.util.apps.AppInfo
 import io.github.samolego.canta.util.apps.UserProfile
 
 /** Compact row. A long press selects without opening details; all package actions remain elsewhere. */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun AppTile(
     modifier: Modifier = Modifier,
@@ -77,6 +82,26 @@ fun AppTile(
     }
     val sizeLabel = if (sizeBytes > 0) Formatter.formatShortFileSize(context, sizeBytes)
         else stringResource(R.string.app_size_unavailable)
+    val badgeLabels = listOfNotNull(
+        appInfo.shownRisk?.let { risk -> stringResource(when (risk) {
+            RemovalRecommendation.RECOMMENDED -> R.string.risk_recommended
+            RemovalRecommendation.ADVANCED -> R.string.risk_advanced
+            RemovalRecommendation.EXPERT -> R.string.risk_expert
+            RemovalRecommendation.UNSAFE -> R.string.risk_unsafe
+            RemovalRecommendation.SYSTEM -> R.string.risk_system
+        }) },
+        if (appInfo.isDisabled) stringResource(R.string.filter_disabled) else null,
+        if (appInfo.isSuspended) stringResource(R.string.suspended_badge) else null,
+        if (appInfo.isUninstalled && appInfo.isUpdatedSystemApp) stringResource(R.string.leftover_update_chip) else null,
+        trackerCount?.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.tracker_badge, it, it) },
+        if (appInfo.packageName == packageName) stringResource(R.string.app_name) else null,
+    )
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    // Chip padding (20dp), icon (14dp), and the icon/text gap (4dp).
+    val widestBadge = badgeLabels.maxOfOrNull {
+        textMeasurer.measure(it, MaterialTheme.typography.labelMedium, softWrap = false).size.width
+    }?.plus(with(density) { 38.dp.roundToPx() }) ?: 0
     Box(modifier.fillMaxWidth().heightIn(min = 88.dp)) {
         ListItem(
             modifier = Modifier.fillMaxWidth().combinedClickable(
@@ -101,9 +126,9 @@ fun AppTile(
                 Column(Modifier.alpha(contentAlpha)) {
                     Text(appInfo.packageName, style = MaterialTheme.typography.bodySmall,
                         color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Row(Modifier.fillMaxWidth().heightIn(min = 26.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Row(Modifier.weight(1f).clipToBounds(), horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.CenterVertically) {
+                    Layout(modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp), content = {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             appInfo.shownRisk?.let { RiskChip(it) }
                             if (appInfo.isDisabled) DisabledBadge()
                             if (appInfo.isSuspended) SuspendedBadge()
@@ -112,9 +137,25 @@ fun AppTile(
                             if (trackerCount != null && trackerCount > 0) TrackerBadge(trackerCount)
                             if (appInfo.packageName == packageName) CantaBadge()
                         }
-                        Text(sizeLabel, modifier = Modifier.padding(start = 4.dp),
-                            style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant,
+                        Text(sizeLabel, style = MaterialTheme.typography.labelSmall, color = scheme.onSurfaceVariant,
                             maxLines = 1)
+                    }) { measurables, constraints ->
+                        val gap = 4.dp.roundToPx()
+                        val size = measurables[1].measure(constraints.copy(minWidth = 0, minHeight = 0))
+                        val stacked = widestBadge + size.width + gap > constraints.maxWidth
+                        val badges = measurables[0].measure(constraints.copy(minWidth = 0, minHeight = 0,
+                            maxWidth = if (stacked) constraints.maxWidth else (constraints.maxWidth - size.width - gap).coerceAtLeast(0)))
+                        val contentHeight = if (stacked) badges.height + gap + size.height else maxOf(badges.height, size.height)
+                        val height = contentHeight.coerceIn(constraints.minHeight, constraints.maxHeight)
+                        layout(constraints.maxWidth, height) {
+                            if (stacked) {
+                                badges.placeRelative(0, 0)
+                                size.placeRelative(0, badges.height + gap)
+                            } else {
+                                badges.placeRelative(0, (height - badges.height) / 2)
+                                size.placeRelative(constraints.maxWidth - size.width, (height - size.height) / 2)
+                            }
+                        }
                     }
                 }
             },

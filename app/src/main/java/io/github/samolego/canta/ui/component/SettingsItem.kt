@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -17,6 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
@@ -31,18 +35,36 @@ fun SettingsItem(
     onClick: (() -> Unit)? = null,
     onCheckedChange: ((Boolean) -> Unit)? = null
 ) {
+    val action = if (isSwitch) Modifier.toggleable(
+        value = checked,
+        enabled = enabled && onCheckedChange != null,
+        role = Role.Switch,
+        onValueChange = { value ->
+            onClick?.invoke()
+            onCheckedChange?.invoke(value)
+        },
+    ) else if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
+    else Modifier
+    if (LocalDensity.current.fontScale >= 1.3f) {
+        Column(Modifier.fillMaxWidth().heightIn(min = 48.dp).then(action).padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(title, Modifier.weight(1f).padding(end = if (isSwitch) 12.dp else 0.dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
+                if (isSwitch) Switch(checked = checked, enabled = enabled, onCheckedChange = null)
+            }
+            description?.let {
+                Text(it, Modifier.padding(top = 4.dp), style = MaterialTheme.typography.bodyMedium,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
+            }
+        }
+        return
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(
-                enabled = enabled && (onClick != null || (isSwitch && onCheckedChange != null)),
-                onClick = {
-                    onClick?.invoke()
-                    if (isSwitch) {
-                        onCheckedChange?.invoke(!checked)
-                    }
-                }
-            )
+            .heightIn(min = 48.dp)
+            .then(action)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -74,7 +96,7 @@ fun SettingsItem(
 
         if (isSwitch) {
             Box(modifier = Modifier.padding(4.dp)) {
-                Switch(checked = checked, enabled = enabled, onCheckedChange = onCheckedChange)
+                Switch(checked = checked, enabled = enabled, onCheckedChange = null)
             }
         }
     }

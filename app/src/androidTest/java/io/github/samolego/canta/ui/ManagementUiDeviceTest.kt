@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.test.platform.app.InstrumentationRegistry
+import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.dialog.preset.PresetApplyDialog
 import io.github.samolego.canta.ui.menu.FiltersMenu
@@ -103,17 +104,22 @@ class ManagementUiDeviceTest {
     }
     @Test fun allProfileApplyRequiresProfileHintConfirmation() = runBlocking {
         ready()
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val preset = CantaPresetData("Both profiles", "", 1, emptySet(), lockdown = listOf(LockdownSettings(pkg, denyMetered = true)), profileKind = "WORK")
         compose.setContent { CantaTheme { PresetApplyDialog(preset, 10, {}) } }
         compose.waitUntil(60_000) { compose.onAllNodesWithText("Apply to all profiles").fetchSemanticsNodes().isNotEmpty() }
-        compose.onAllNodes(isToggleable())[0].performClick()
+        compose.onNodeWithText(context.getString(R.string.preset_all_profiles)).performScrollTo().performClick()
         compose.waitUntil(60_000) { compose.onAllNodes(isToggleable()).fetchSemanticsNodes().size == 2 }
-        compose.onNodeWithText("Apply to users: 0, 10").assertIsDisplayed()
+        val expectedProfiles = context.getString(R.string.preset_apply_profiles,
+            listOf(context.getString(R.string.profile_personal), context.getString(R.string.profile_work)).joinToString())
+        compose.onNodeWithText(expectedProfiles).performScrollTo().assertIsDisplayed()
         compose.onAllNodesWithText("Apply Preset")[1].assertIsNotEnabled()
-        compose.onAllNodes(isToggleable())[1].performClick()
+        compose.onNodeWithText(context.getString(R.string.safety_acknowledge)).performScrollTo().performClick()
         compose.waitUntil(60_000) { !compose.onAllNodesWithText("Apply Preset")[1].fetchSemanticsNode().config.contains(androidx.compose.ui.semantics.SemanticsProperties.Disabled) }
         compose.onAllNodesWithText("Apply Preset")[1].performClick()
-        compose.waitUntil(90_000) { compose.onAllNodesWithText("2 succeeded · 0 failed").fetchSemanticsNodes().isNotEmpty() }
+        val expectedOutcome = context.getString(R.string.batch_outcome_counts, 2, 0, 0, 0)
+        compose.waitUntil(90_000) { compose.onAllNodesWithText(expectedOutcome).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithText(expectedOutcome).performScrollTo().assertIsDisplayed()
         val records = services.undo.lastBatch()
         assertEquals(setOf(0, 10), records.map { it.userId }.toSet())
         assertEquals(0, services.undo.undo(records).failureCount)

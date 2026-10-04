@@ -1,0 +1,33 @@
+{
+  "unit_tests": {
+    "tests": 237,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "unit_suites": 59,
+  "lint_severity": {
+    "Warning": 728,
+    "Hint": 1
+  },
+  "lint_issue_counts": {
+    "OldTargetApi": 1,
+    "PrivateApi": 4,
+    "WrongRegion": 1,
+    "GradleDependency": 6,
+    "NewerVersionAvailable": 5,
+    "LocalContextResourcesRead": 3,
+    "ModifierParameter": 2,
+    "MissingQuantity": 6,
+    "MissingTranslation": 583,
+    "PluralsCandidate": 24,
+    "UnusedQuantity": 2,
+    "ObsoleteSdkInt": 2,
+    "AutoboxingStateCreation": 1,
+    "UnusedResources": 75,
+    "IconLauncherShape": 5,
+    "UseKtx": 7,
+    "UseTomlInstead": 2
+  },
+  "png_count": 153
+}

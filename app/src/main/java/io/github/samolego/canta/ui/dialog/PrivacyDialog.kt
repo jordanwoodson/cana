@@ -17,12 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.testTag
 import io.github.samolego.canta.R
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ui.component.StatusChip
+import io.github.samolego.canta.ui.component.CheckboxRow
 import io.github.samolego.canta.ui.component.StatusTone
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.withPackageAuthentication
@@ -116,14 +119,12 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                                 val label = remember(name) { runCatching {
                                     context.packageManager.getPermissionInfo(name, 0).loadLabel(context.packageManager).toString()
                                 }.getOrDefault(name.removePrefix("android.permission.")) }
-                                Row(Modifier.testTag("privacy-permission-$name"), verticalAlignment = Alignment.CenterVertically) {
-                                    Checkbox(checked = name in selected, enabled = !busy && mutable,
-                                        onCheckedChange = { selected = if (it) selected + name else selected - name })
-                                    Column {
-                                        Text(label)
-                                        Text(stringResource(if (!mutable) R.string.privacy_permission_fixed else if (permission.getBoolean("granted"))
-                                            R.string.privacy_permission_granted else R.string.privacy_permission_denied), style = MaterialTheme.typography.bodySmall)
-                                    }
+                                CheckboxRow(checked = name in selected, enabled = !busy && mutable,
+                                    modifier = Modifier.testTag("privacy-permission-$name"),
+                                    onCheckedChange = { selected = if (it) selected + name else selected - name }) {
+                                    Text(label)
+                                    Text(stringResource(if (!mutable) R.string.privacy_permission_fixed else if (permission.getBoolean("granted"))
+                                        R.string.privacy_permission_granted else R.string.privacy_permission_denied), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -151,7 +152,8 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                             PrivacyAction.NETWORK -> if (restricted) R.string.privacy_live_blocked else R.string.privacy_live_allowed
                             PrivacyAction.PERMISSIONS -> R.string.privacy_live_unavailable
                         }
-                        ListItem(headlineContent = { Text(stringResource(action.title)) },
+                        val actionLabel = stringResource(action.title)
+                        ListItem(headlineContent = { Text(actionLabel) },
                             supportingContent = {
                                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                     if (action == PrivacyAction.NETWORK) Text(stringResource(R.string.privacy_network_description))
@@ -168,7 +170,8 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                                     }
                                 }
                             }, trailingContent = {
-                                Switch(checked = restricted, modifier = Modifier.testTag("privacy-switch-${action.key}"),
+                                Switch(checked = restricted, modifier = Modifier.testTag("privacy-switch-${action.key}")
+                                    .semantics { contentDescription = actionLabel },
                                     enabled = !busy && connected && value != null && packageName !in services.safety.alwaysProtected &&
                                         (!restricted || previous != null),
                                     onCheckedChange = { checked ->
@@ -198,7 +201,8 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
     if (authorize) ShizukuRequirementDialog({ authorize = false; revision++ })
     forget?.let { action ->
         AlertDialog(onDismissRequest = { forget = null }, title = { Text(stringResource(R.string.privacy_forget)) },
-            text = { Text(stringResource(R.string.privacy_forget_explanation)) }, confirmButton = {
+            text = { Text(stringResource(R.string.privacy_forget_explanation),
+                Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState())) }, confirmButton = {
                 TextButton(onClick = { forget = null; perform("${action.key}_forget") { services.privacy.forgetDesired(packageName, userId, action) } }) {
                     Text(stringResource(R.string.privacy_forget))
                 }
@@ -235,8 +239,8 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
                     report.warnings.forEach { Text("$name: ${it.kind}: ${it.detail}") }
                 }
                 if ((reports?.size ?: 0) > 1) Text(stringResource(R.string.privacy_shared_uid, reports!!.keys.joinToString()))
-                if (warning) Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(accepted, { accepted = it }); Text(stringResource(R.string.safety_acknowledge))
+                if (warning) CheckboxRow(accepted, { accepted = it }) {
+                    Text(stringResource(R.string.safety_acknowledge))
                 }
             }
         }, confirmButton = {
@@ -253,13 +257,14 @@ fun PrivacyDialog(packageName: String, userId: Int, embedded: Boolean, onDismiss
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PrivacyDisconnectedNotice(onConnect: () -> Unit, onRetry: () -> Unit) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.privacy_disconnected_title), style = MaterialTheme.typography.titleSmall)
             Text(stringResource(R.string.privacy_disconnected_body))
-            Row {
+            FlowRow {
                 TextButton(onClick = onConnect) { Text(stringResource(R.string.privacy_connect)) }
                 TextButton(onClick = onRetry) { Text(stringResource(R.string.privacy_retry)) }
             }

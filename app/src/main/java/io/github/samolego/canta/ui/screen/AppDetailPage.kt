@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ops.ActionChoices
@@ -47,6 +48,7 @@ import io.github.samolego.canta.util.LogUtils
 import io.github.samolego.canta.util.openWebLink
 import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
+import io.github.samolego.canta.util.shizuku.AuthorizationState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -63,6 +65,8 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
     var showRiskInfo by remember { mutableStateOf(false) }
     var showSizeInfo by remember { mutableStateOf(false) }
     var moreActions by remember { mutableStateOf(false) }
+    var connect by remember { mutableStateOf(false) }
+    val authorization by ShizukuPermission.state.collectAsStateWithLifecycle()
     val state = services.inventory.state(target.userId)
     val app = state.apps.find { it.packageName == target.packageName }
     LaunchedEffect(target) { if (!state.loaded || state.stale) services.inventory.snapshot(target.userId) }
@@ -88,20 +92,22 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         AppIconImage(app, target.userId, size = 56.dp)
-                        Column(Modifier.weight(1f)) {
-                            Text(app.name, style = MaterialTheme.typography.titleLarge)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                SelectionContainer(modifier = Modifier.weight(1f)) { Text(target.packageName,
-                                    style = MaterialTheme.typography.bodySmall, maxLines = 1) }
-                                IconButton(onClick = { scope.launch { clipboard.setClipEntry(
-                                    ClipEntry(ClipData.newPlainText("Package", target.packageName))) } }) {
-                                    Icon(Icons.Default.ContentCopy, stringResource(R.string.copy_package_name))
-                                }
-                            }
+                        Text(app.name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        SelectionContainer(modifier = Modifier.weight(1f)) {
+                            Text(target.packageName, style = MaterialTheme.typography.bodySmall)
+                        }
+                        IconButton(onClick = { scope.launch { clipboard.setClipEntry(
+                            ClipEntry(ClipData.newPlainText("Package", target.packageName))) } }) {
+                            Icon(Icons.Default.ContentCopy, stringResource(R.string.copy_package_name))
                         }
                     }
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        app.shownRisk?.let { RiskChip(it, Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true }) }
+                        app.shownRisk?.let { risk ->
+                            Box(Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true },
+                                contentAlignment = Alignment.Center) { RiskChip(risk) }
+                        }
                         val stateLabel = when {
                             app.isUninstalled -> R.string.tab_removed
                             app.isDisabled -> R.string.app_state_disabled
@@ -113,27 +119,36 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                             app.isSuspended -> Icons.Default.PauseCircle
                             else -> Icons.Default.CheckCircle
                         }
-                        StatusChip(stringResource(stateLabel), stateIcon)
-                        StatusChip(stringResource(if (app.isSystemApp) R.string.scope_system_apps else R.string.scope_user_apps), Icons.Default.Android)
+                        Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+                            StatusChip(stringResource(stateLabel), stateIcon)
+                        }
+                        Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+                            StatusChip(stringResource(if (app.isSystemApp) R.string.scope_system_apps else R.string.scope_user_apps), Icons.Default.Android)
+                        }
+                    }
+                    Column {
                         Text(stringResource(R.string.app_version_short, app.versionName, app.versionCode),
-                            style = MaterialTheme.typography.labelMedium)
-                        Text(if (app.apkSizeBytes > 0) formatShortFileSize(context, app.apkSizeBytes)
-                            else stringResource(R.string.app_size_unavailable), style = MaterialTheme.typography.labelMedium)
-                        IconButton(onClick = { showSizeInfo = true }, modifier = Modifier.size(48.dp)) {
+                            style = MaterialTheme.typography.bodySmall)
+                        TextButton(onClick = { showSizeInfo = true }, contentPadding = PaddingValues(horizontal = 0.dp)) {
                             Icon(Icons.Default.Info, stringResource(R.string.app_apk_size_details), modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(if (app.apkSizeBytes > 0) formatShortFileSize(context, app.apkSizeBytes)
+                                else stringResource(R.string.app_size_unavailable))
                         }
                     }
                     val choices = ActionChoices.forSelection(listOf(app), app.isUninstalled)
                     val uninstallChoice = if (!app.isUninstalled && choices.primary != PackageAction.UNINSTALL) PackageAction.UNINSTALL else null
                     val remaining = (choices.reversible + choices.removing).filterNot { it == uninstallChoice }
+                    val destructivePrimary = choices.primary in setOf(PackageAction.UNINSTALL, PackageAction.UNINSTALL_KEEP_DATA, PackageAction.REMOVE_UPDATES)
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = { onAction(choices.primary) }, modifier = Modifier.weight(1f)) {
-                            Text(stringResource(choices.primary.label), maxLines = 1)
-                        }
-                        if (uninstallChoice != null) OutlinedButton(onClick = { onAction(uninstallChoice) },
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
-                            Text(stringResource(R.string.uninstall))
+                        Button(onClick = { onAction(choices.primary) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (destructivePrimary) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                                contentColor = if (destructivePrimary) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary,
+                            )) {
+                            Text(stringResource(choices.primary.label))
                         }
                         if (remaining.isNotEmpty()) Box {
                             IconButton(onClick = { moreActions = true }) { Icon(Icons.Default.MoreVert, stringResource(R.string.more_options_action)) }
@@ -143,6 +158,12 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                                 }) }
                             }
                         }
+                    }
+                    if (uninstallChoice != null) OutlinedButton(onClick = { onAction(uninstallChoice) },
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)) {
+                        Text(stringResource(R.string.uninstall))
+                    }
                     }
                     HorizontalDivider()
                     Text(stringResource(R.string.about_this_app), style = MaterialTheme.typography.titleMedium)
@@ -218,11 +239,15 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     message?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 }
                 app.isUninstalled -> Text(stringResource(R.string.app_removed_sections), Modifier.padding(24.dp))
-                !ShizukuPermission.isCantaAuthorized() -> Text(stringResource(R.string.inventory_disconnected), Modifier.padding(24.dp))
-                else -> Box(Modifier.padding(16.dp)) { io.github.samolego.canta.ui.dialog.ComponentsDialog(target.packageName, target.userId, embedded = true, onDismiss = { tab = 0 }) }
+                authorization != AuthorizationState.GRANTED -> Column(Modifier.padding(24.dp)) {
+                    Text(stringResource(R.string.inventory_disconnected))
+                    TextButton(onClick = { connect = true }) { Text(stringResource(R.string.privacy_connect)) }
+                }
+                else -> Box(Modifier.weight(1f).fillMaxWidth().padding(16.dp)) { io.github.samolego.canta.ui.dialog.ComponentsDialog(target.packageName, target.userId, embedded = true, onDismiss = { tab = 0 }) }
             }
         }
     }
+    if (connect) io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog { connect = false }
     if (showRiskInfo) io.github.samolego.canta.ui.dialog.ExplainBadgesDialog { showRiskInfo = false }
     if (showSizeInfo) AlertDialog(onDismissRequest = { showSizeInfo = false },
         title = { Text(stringResource(R.string.app_apk_size_details)) },

@@ -16,6 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +32,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.github.samolego.canta.R
@@ -85,6 +90,9 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
     val clipboardManager = LocalClipboardManager.current
     val copiedText = stringResource(R.string.log_copied)
     val uiMessages = remember { CanaServices.getInstance().uiMessages }
+    val expansionLabel = stringResource(if (expanded) R.string.logs_collapse_entry else R.string.logs_expand_entry)
+    val expansionState = stringResource(if (expanded) R.string.logs_entry_expanded else R.string.logs_entry_collapsed)
+    val copyLabel = stringResource(R.string.logs_copy_entry)
     val scheme = MaterialTheme.colorScheme
     val colors = when (logEntry.level) {
         LogUtils.LogLevel.DEBUG -> RiskColors(scheme.surfaceVariant, scheme.onSurfaceVariant)
@@ -98,8 +106,11 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
             .fillMaxWidth()
             .padding(top = 8.dp)
             .padding(horizontal = 8.dp)
+            .semantics { stateDescription = expansionState }
             .combinedClickable(
+                onClickLabel = expansionLabel,
                 onClick = { expanded = !expanded },
+                onLongClickLabel = copyLabel,
                 onLongClick = {
                     val logText = "[${logEntry.getFormattedTime()}] ${logEntry.level} ${logEntry.tag}: ${logEntry.message}"
                     clipboardManager.setText(AnnotatedString(logText))
@@ -113,16 +124,20 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
         Column(modifier = Modifier.padding(8.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = "${logEntry.level} ${logEntry.tag}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = logEntry.getFormattedTime(),
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = "${logEntry.level} ${logEntry.tag}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = logEntry.getFormattedTime(),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+                Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, contentDescription = null)
             }
 
             AnimatedVisibility(visible = expanded) {

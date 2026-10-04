@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.AlertDialog
@@ -138,13 +137,6 @@ fun SettingsScreen(
                 onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
             )
 
-            SectionHeader(stringResource(R.string.settings_appearance))
-            SettingsItem(
-                title = stringResource(R.string.dracula_theme),
-                description = stringResource(R.string.dracula_theme_description),
-                icon = Icons.Default.Palette,
-            )
-
             SectionHeader(stringResource(R.string.settings_permissions))
             SelfGrantSettings()
 
@@ -166,6 +158,12 @@ fun SettingsScreen(
                 Text(
                     text = stringResource(R.string.brand_tagline),
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = stringResource(R.string.settings_theme_summary),
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )

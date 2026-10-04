@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,6 +20,9 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.CanaServices
+import io.github.samolego.canta.ui.dialog.ShizukuRequirementDialog
+import io.github.samolego.canta.util.shizuku.ShizukuPermission
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 @Composable
@@ -29,31 +33,45 @@ fun SelfGrantSettings() {
     var busy by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
     var failed by remember { mutableIntStateOf(0) }
+    var connect by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    fun grant() {
+        scope.launch {
+            busy = true
+            result = null
+            failed = 0
+            try {
+                val results = grants.grantMissing()
+                failed = results.count { !it.success }
+                result = results.filterNot { it.success }.joinToString("\n") { it.message }
+            } catch (e: CancellationException) { throw e }
+            catch (e: Exception) { failed = 1; result = e.message }
+            finally { busy = false }
+        }
+    }
     Column(Modifier.fillMaxWidth()) {
         ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_secure)) },
-            trailingContent = { StatusChip(stringResource(if (status.secureSettings) R.string.grant_allowed else R.string.settings_permission_missing),
+            supportingContent = { StatusChip(stringResource(if (status.secureSettings) R.string.grant_allowed else R.string.settings_permission_missing),
                 if (status.secureSettings) Icons.Default.CheckCircle else Icons.Default.Warning,
                 if (status.secureSettings) StatusTone.NEUTRAL else StatusTone.WARNING) })
         ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_usage)) },
-            trailingContent = { StatusChip(stringResource(if (status.usageStats) R.string.grant_allowed else R.string.settings_permission_missing),
+            supportingContent = { StatusChip(stringResource(if (status.usageStats) R.string.grant_allowed else R.string.settings_permission_missing),
                 if (status.usageStats) Icons.Default.CheckCircle else Icons.Default.Warning,
                 if (status.usageStats) StatusTone.NEUTRAL else StatusTone.WARNING) })
         Text(stringResource(R.string.self_grants_description), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (!status.secureSettings || !status.usageStats) {
             Button(modifier = Modifier.padding(horizontal = 16.dp), enabled = !busy, onClick = {
-                scope.launch {
-                    busy = true
-                    try {
-                        val results = grants.grantMissing()
-                        failed = results.count { !it.success }
-                        result = results.filterNot { it.success }.joinToString("\n") { it.message }
-                    } finally { busy = false }
-                }
+                if (ShizukuPermission.isCantaAuthorized()) grant() else connect = true
             }) { Text(stringResource(R.string.self_grants_action)) }
         }
-        if (failed > 0) Text(stringResource(R.string.operation_failure_count, failed))
-        result?.takeIf { it.isNotBlank() }?.let { Text(it) }
+        if (busy) LinearProgressIndicator(Modifier.fillMaxWidth().padding(16.dp))
+        if (failed > 0) Text(stringResource(R.string.operation_failure_count, failed),
+            Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.error)
+        result?.takeIf { it.isNotBlank() }?.let { Text(it, Modifier.padding(horizontal = 16.dp)) }
+    }
+    if (connect) ShizukuRequirementDialog { authorized ->
+        connect = false
+        if (authorized) grant()
     }
 }
