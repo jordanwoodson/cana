@@ -1,0 +1,167 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #5 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+       |-Node #6 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #55 at (l=0.0, t=88.0, r=360.0, b=192.0)px
+          | IsContainer = 'true'
+          | Shape = 'RectangleShape'
+          | [SelectableGroup]
+          |  |-Node #58 at (l=0.0, t=88.0, r=180.0, b=192.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Tab'
+          |  | Selected = 'true'
+          |  | Text = '[Installed · 5]'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #64 at (l=180.0, t=88.0, r=360.0, b=192.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Tab'
+          |  | Selected = 'false'
+          |  | Text = '[Removed · 1]'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #73 at (l=16.0, t=189.0, r=163.0, b=192.0)px
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 3.0.dp), topEnd = CornerSize(size = 3.0.dp), bottomEnd = CornerSize(size = 3.0.dp), bottomStart = CornerSize(size = 3.0.dp))'
+          |-Node #46 at (l=12.0, t=197.0, r=243.0, b=235.0)px
+          | ContentDescription = '[Remove System apps filter]'
+          | Focused = 'false'
+          | Role = 'Checkbox'
+          | Selected = 'true'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          | Text = '[System apps]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #53 at (l=0.0, t=240.0, r=360.0, b=800.0)px
+          | CollectionInfo = 'CollectionInfo(rowCount=1, columnCount=2)'
+          | HorizontalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=360.0, reverseScrolling=false)'
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@6cf3e82'
+          | Actions = [GetScrollViewportLength, IndexForKey, PageLeft, PageRight, ScrollBy, ScrollByOffset, ScrollToIndex]
+          |  |-Node #77 at (l=0.0, t=240.0, r=360.0, b=288.0)px, Tag: 'select-visible-row'
+          |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  | ContentDescription = '[5 apps]'
+          |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@5d56993'
+          |  | Focused = 'false'
+          |  | Role = 'Checkbox'
+          |  | ToggleableState = 'Off'
+          |  | Actions = [OnClick, OnFillData, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #81 at (l=0.0, t=288.0, r=360.0, b=800.0)px
+          |  | CollectionInfo = 'CollectionInfo(rowCount=6, columnCount=1)'
+          |  | IsTraversalGroup = 'true'
+          |  | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+          |  | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=100.0, reverseScrolling=false)'
+          |  | Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+          |  |  |-Node #88 at (l=0.0, t=288.0, r=360.0, b=458.0)px
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Shape = 'RectangleShape'
+          |  |  | Text = '[Android System Intelligence, com.google.android.as, 84 MB]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #99 at (l=72.0, t=374.0, r=230.0, b=410.0)px
+          |  |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |  | Text = '[Advanced]'
+          |  |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #109 at (l=308.0, t=312.0, r=332.0, b=336.0)px
+          |  |  |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |  |    ContentDescription = '[Select Android System Intelligence]'
+          |  |  |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@eecd1c9'
+          |  |  |    Focused = 'false'
+          |  |  |    Role = 'Checkbox'
+          |  |  |    ToggleableState = 'Off'
+          |  |  |    Actions = [OnClick, OnFillData, RequestFocus]
+          |  |  |    MergeDescendants = 'true'
+          |  |  |-Node #113 at (l=0.0, t=458.0, r=360.0, b=628.0)px
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Shape = 'RectangleShape'
+          |  |  | Text = '[Camera, com.android.camera2, 26 MB]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #124 at (l=72.0, t=544.0, r=275.0, b=580.0)px
+          |  |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |  | Text = '[Recommended]'
+          |  |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #134 at (l=308.0, t=482.0, r=332.0, b=506.0)px
+          |  |  |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |  |    ContentDescription = '[Select Camera]'
+          |  |  |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@d36c0ce'
+          |  |  |    Focused = 'false'
+          |  |  |    Role = 'Checkbox'
+          |  |  |    ToggleableState = 'Off'
+          |  |  |    Actions = [OnClick, OnFillData, RequestFocus]
+          |  |  |    MergeDescendants = 'true'
+          |  |  |-Node #138 at (l=0.0, t=628.0, r=360.0, b=836.0)px
+          |  |    Focused = 'false'
+          |  |    IsContainer = 'true'
+          |  |    Shape = 'RectangleShape'
+          |  |    Text = '[Digital Wellbeing, com.google.android.apps.wellbeing, 52 MB]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |     |-Node #149 at (l=72.0, t=714.0, r=275.0, b=750.0)px
+          |  |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |     | Text = '[Recommended]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #152 at (l=72.0, t=752.0, r=230.0, b=788.0)px
+          |  |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |     | Text = '[Disabled]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #162 at (l=308.0, t=652.0, r=332.0, b=676.0)px
+          |  |       ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |       ContentDescription = '[Select Digital Wellbeing]'
+          |  |       FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@c630bef'
+          |  |       Focused = 'false'
+          |  |       Role = 'Checkbox'
+          |  |       ToggleableState = 'Off'
+          |  |       Actions = [OnClick, OnFillData, RequestFocus]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #82 at (l=160.0, t=200.0, r=200.0, b=240.0)px
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |     |-Node #84 at (l=172.0, t=212.0, r=188.0, b=228.0)px
+          |        |-Node #85 at (l=172.0, t=212.0, r=188.0, b=228.0)px
+          |          ClearAndSetSemantics = 'true'
+          |-Node #10 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+            Shape = 'RectangleShape'
+             |-Node #11 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+               IsTraversalGroup = 'true'
+                |-Node #12 at (l=0.0, t=24.0, r=360.0, b=88.0)px
+                  Shape = 'RectangleShape'
+                   |-Node #14 at (l=16.0, t=30.0, r=216.0, b=82.0)px
+                   |  |-Node #28 at (l=16.0, t=30.0, r=216.0, b=82.0)px, Tag: 'profile-chip'
+                   |    Focused = 'false'
+                   |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                   |    Text = '[Personal]'
+                   |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+                   |    MergeDescendants = 'true'
+                   |-Node #18 at (l=212.0, t=32.0, r=260.0, b=80.0)px
+                   | ContentDescription = '[Search]'
+                   | Focused = 'false'
+                   | Role = 'Button'
+                   | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                   | Actions = [OnClick, RequestFocus]
+                   | MergeDescendants = 'true'
+                   |-Node #20 at (l=260.0, t=32.0, r=308.0, b=80.0)px
+                   | ContentDescription = '[Filters]'
+                   | Focused = 'false'
+                   | Role = 'Button'
+                   | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                   | Actions = [OnClick, RequestFocus]
+                   | MergeDescendants = 'true'
+                   |-Node #23 at (l=308.0, t=32.0, r=356.0, b=80.0)px
+                     ContentDescription = '[More options]'
+                     Focused = 'false'
+                     Role = 'Button'
+                     Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+                     Actions = [OnClick, RequestFocus]
+                     MergeDescendants = 'true'

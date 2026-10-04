@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.text.TextLayoutResult
@@ -307,6 +308,10 @@ class PopulatedReleaseUiTest {
         }
         assertTrue("The screenshot window did not render", drawn.await(5, TimeUnit.SECONDS))
         instrumentation.waitForIdleSync()
+        val roots = compose.onAllNodes(isRoot())
+        roots.fetchSemanticsNodes().indices.forEach {
+            roots[it].captureToImage().asAndroidBitmap().recycle()
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

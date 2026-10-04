@@ -1,0 +1,91 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #2958 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #2978 at (l=20.0, t=126.0, r=340.0, b=150.0)px
+       | ProgressBarRangeInfo = 'ProgressBarRangeInfo(current=0.6666667, range=0.0..1.0, steps=0)'
+       | MergeDescendants = 'true'
+       |-Node #2979 at (l=20.0, t=156.0, r=340.0, b=252.0)px
+       | Text = '[Connect Shizuku]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #2980 at (l=20.0, t=268.0, r=340.0, b=624.0)px
+       | IsTraversalGroup = 'true'
+       | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+       | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=933.0, reverseScrolling=false)'
+       | Actions = [ScrollBy, ScrollByOffset]
+       |  |-Node #3004 at (l=20.0, t=268.0, r=340.0, b=646.0)px
+       |  | Text = '[Cana uses Shizuku to uninstall apps without requiring root access. Shizuku provides a secure way to access system-level SDKs.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3007 at (l=50.0, t=658.0, r=280.0, b=734.0)px
+       |  | Text = '[Install Shizuku app]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3008 at (l=292.0, t=672.0, r=340.0, b=720.0)px
+       |  | ContentDescription = '[Install Shizuku app]'
+       |  | Focused = 'false'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | Actions = [OnClick, RequestFocus]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3012 at (l=50.0, t=746.0, r=280.0, b=822.0)px
+       |  | Text = '[Start Shizuku service]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3013 at (l=292.0, t=760.0, r=340.0, b=808.0)px
+       |  | ContentDescription = '[Start Shizuku service]'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | [Disabled]
+       |  | Actions = [OnClick]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3017 at (l=50.0, t=834.0, r=280.0, b=986.0)px
+       |  | Text = '[Grant permission to Cana in Shizuku]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3018 at (l=292.0, t=886.0, r=340.0, b=934.0)px
+       |  | ContentDescription = '[Grant permission to Cana in Shizuku]'
+       |  | Role = 'Button'
+       |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       |  | [Disabled]
+       |  | Actions = [OnClick]
+       |  | MergeDescendants = 'true'
+       |  |-Node #3020 at (l=20.0, t=998.0, r=340.0, b=1188.0)px
+       |  | Text = '[Start Shizuku, then return here to authorize Cana. This screen updates automatically.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3022 at (l=20.0, t=1213.0, r=340.0, b=1469.0)px
+       |  | Text = '[Optional recovery preparation: USB debugging lets you connect a computer if you need help restoring apps. It is not required for authorization.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #3025 at (l=50.0, t=1481.0, r=340.0, b=1557.0)px
+       |    Text = '[(Optional) Enable USB debugging]'
+       |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #3026 at (l=120.0, t=640.0, r=340.0, b=694.0)px
+       | Focused = 'false'
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Skip for now]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #3029 at (l=161.0, t=702.0, r=340.0, b=756.0)px
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Continue]'
+       | [Disabled]
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #2962 at (l=0.0, t=0.0, r=360.0, b=116.0)px
+         IsTraversalGroup = 'true'
+          |-Node #2963 at (l=0.0, t=24.0, r=360.0, b=116.0)px
+            Shape = 'RectangleShape'
+             |-Node #3001 at (l=8.0, t=50.0, r=48.0, b=90.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #2965 at (l=56.0, t=24.0, r=352.0, b=116.0)px
+                |-Node #2966 at (l=56.0, t=24.0, r=352.0, b=116.0)px
+                  Text = '[Welcome to Cana]'
+                  Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

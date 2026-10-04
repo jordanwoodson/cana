@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 
 /** Lives above navigation, so progress and recovery survive leaving an initiating screen. */
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun BatchProgressBanner(onHistory: () -> Unit) {
     val services = CanaServices.getInstance()
     val active by services.batches.active.collectAsStateWithLifecycle()
@@ -37,7 +38,7 @@ fun BatchProgressBanner(onHistory: () -> Unit) {
         details = {
             if (current != null) LinearProgressIndicator(progress = { if (current.total == 0) 0f else current.completed.toFloat() / current.total }, modifier = Modifier.fillMaxWidth())
             if (stopFailed) Text(stringResource(R.string.batch_stop_failed), color = MaterialTheme.colorScheme.error)
-            Row {
+            FlowRow {
                 TextButton(onClick = onHistory) { Text(stringResource(R.string.batch_review)) }
                 if (current != null) TextButton(enabled = !current.stopping, onClick = {
                     scope.launch { stopFailed = !services.batches.requestStop(current.id) }

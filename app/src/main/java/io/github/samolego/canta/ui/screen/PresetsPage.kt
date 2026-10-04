@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -247,19 +249,19 @@ private fun ImportDialog(
 @Composable
 private fun EmptyPresetsState(onCreateClick: () -> Unit, onImportClick: () -> Unit) {
     Column(
-            modifier = Modifier.fillMaxSize().padding(32.dp),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
     ) {
         Surface(
                 modifier = Modifier.size(80.dp),
-                shape = RoundedCornerShape(20.dp),
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                         imageVector = Icons.Default.Inventory2,
-                        contentDescription = stringResource(R.string.presets),
+                        contentDescription = null,
                         modifier = Modifier.size(40.dp),
                         tint = MaterialTheme.colorScheme.primary
                 )
@@ -287,13 +289,13 @@ private fun EmptyPresetsState(onCreateClick: () -> Unit, onImportClick: () -> Un
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = onCreateClick, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.create_preset))
+                Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.create_preset))
             }
 
             OutlinedButton(onClick = onImportClick, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Download, contentDescription = stringResource(R.string.import_preset))
+                Icon(Icons.Default.Download, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.import_preset))
             }
@@ -398,7 +400,7 @@ private fun PresetCard(
                                     onEdit(preset)
                                 },
                                 leadingIcon = {
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
+                                    Icon(Icons.Default.Edit, contentDescription = null)
                                 }
                         )
                         DropdownMenuItem(
@@ -407,7 +409,7 @@ private fun PresetCard(
                                     showMenu = false
                                     onAddApps(preset)
                                 },
-                                leadingIcon = { Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_apps)) }
+                                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) }
                         )
                         DropdownMenuItem(
                                 text = { Text(stringResource(R.string.preset_copy_action)) },
@@ -429,7 +431,7 @@ private fun PresetCard(
                                 leadingIcon = {
                                     Icon(
                                             Icons.Default.Delete,
-                                            contentDescription = stringResource(R.string.delete),
+                                            contentDescription = null,
                                             tint = MaterialTheme.colorScheme.error
                                     )
                                 },
@@ -455,7 +457,7 @@ private fun PresetCard(
             ) {
                 Icon(
                         Icons.Default.PlayArrow,
-                        contentDescription = stringResource(R.string.apply_preset),
+                        contentDescription = null,
                         modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))

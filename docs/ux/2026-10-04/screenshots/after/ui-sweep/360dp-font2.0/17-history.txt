@@ -1,0 +1,47 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #2374 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+       |-Node #2375 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #2398 at (l=0.0, t=88.0, r=360.0, b=776.0)px
+          | CollectionInfo = 'CollectionInfo(rowCount=1, columnCount=1)'
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+          |  |-Node #2401 at (l=144.0, t=128.0, r=216.0, b=200.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |-Node #2404 at (l=40.0, t=208.0, r=320.0, b=300.0)px
+          |  | Text = '[No changes yet]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2405 at (l=40.0, t=308.0, r=320.0, b=422.0)px
+          |    Text = '[Actions you take appear here, with undo.]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2379 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+            IsContainer = 'true'
+            Shape = 'RectangleShape'
+             |-Node #2381 at (l=4.0, t=32.0, r=52.0, b=80.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #2384 at (l=60.0, t=33.0, r=207.0, b=80.0)px
+             | [Heading]
+             |  |-Node #2385 at (l=60.0, t=33.0, r=207.0, b=80.0)px
+             |    Text = '[History]'
+             |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+             |-Node #2387 at (l=312.0, t=36.0, r=352.0, b=76.0)px
+               ContentDescription = '[Export recovery script]'
+               Focused = 'false'
+               Role = 'Button'
+               Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+               Actions = [OnClick, RequestFocus]
+               MergeDescendants = 'true'

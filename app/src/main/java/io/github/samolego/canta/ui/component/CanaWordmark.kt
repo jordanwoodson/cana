@@ -3,6 +3,12 @@ package io.github.samolego.canta.ui.component
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,4 +38,16 @@ fun CanaWordmark(modifier: Modifier = Modifier, style: TextStyle = LocalTextStyl
         fontWeight = FontWeight.Normal,
         maxLines = 1,
     )
+}
+
+@Composable
+fun CanaBrandLockup(modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null,
+            modifier = Modifier.size(88.dp))
+        CanaWordmark(style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(R.string.brand_tagline), style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+    }
 }

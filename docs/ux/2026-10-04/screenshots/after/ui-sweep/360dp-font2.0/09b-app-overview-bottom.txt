@@ -1,0 +1,172 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #709 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+       |-Node #710 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #733 at (l=0.0, t=114.0, r=360.0, b=186.0)px
+          | IsContainer = 'true'
+          | Shape = 'RectangleShape'
+          |  |-Node #736 at (l=0.0, t=114.0, r=360.0, b=186.0)px
+          |    HorizontalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=290.0, reverseScrolling=false)'
+          |    IsTraversalGroup = 'true'
+          |    Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@6cf3e82'
+          |    [SelectableGroup]
+          |    Actions = [ScrollBy, ScrollByOffset]
+          |     |-Node #738 at (l=0.0, t=114.0, r=163.0, b=186.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'true'
+          |     | Text = '[Overview]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #742 at (l=163.0, t=114.0, r=455.0, b=186.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'false'
+          |     | Text = '[Privacy and data]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #746 at (l=455.0, t=114.0, r=650.0, b=186.0)px
+          |     | Focused = 'false'
+          |     | Role = 'Tab'
+          |     | Selected = 'false'
+          |     | Text = '[Components]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |     | MergeDescendants = 'true'
+          |     |-Node #751 at (l=16.0, t=183.0, r=147.0, b=186.0)px
+          |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 3.0.dp), topEnd = CornerSize(size = 3.0.dp), bottomEnd = CornerSize(size = 3.0.dp), bottomStart = CornerSize(size = 3.0.dp))'
+          |-Node #752 at (l=0.0, t=186.0, r=360.0, b=776.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=936.0, maxValue=952.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #753 at (l=16.0, t=-734.0, r=344.0, b=-256.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #757 at (l=100.0, t=-718.0, r=328.0, b=-592.0)px
+          |  |  | Text = '[Android System Intelligence]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #759 at (l=32.0, t=-584.0, r=280.0, b=-520.0)px
+          |  |  | Focused = 'false'
+          |  |  | Actions = [RequestFocus]
+          |  |  |  |-Node #761 at (l=32.0, t=-584.0, r=280.0, b=-520.0)px
+          |  |  |    Text = '[com.google.android.as]'
+          |  |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #762 at (l=284.0, t=-572.0, r=324.0, b=-532.0)px
+          |  |  | ContentDescription = '[Copy package name]'
+          |  |  | Focused = 'false'
+          |  |  | Role = 'Button'
+          |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |  | Actions = [OnClick, RequestFocus]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #766 at (l=32.0, t=-512.0, r=190.0, b=-464.0)px
+          |  |  | Focused = 'false'
+          |  |  | Actions = [OnClick, RequestFocus]
+          |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #767 at (l=32.0, t=-506.0, r=190.0, b=-470.0)px
+          |  |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |    Text = '[Advanced]'
+          |  |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |    MergeDescendants = 'true'
+          |  |  |-Node #771 at (l=32.0, t=-454.0, r=205.0, b=-418.0)px
+          |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  | Text = '[Installed]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #775 at (l=32.0, t=-402.0, r=235.0, b=-366.0)px
+          |  |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  | Text = '[System apps]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #779 at (l=32.0, t=-352.0, r=225.0, b=-320.0)px
+          |  |  | Text = '[v15.0.42 (42)]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #780 at (l=32.0, t=-316.0, r=140.0, b=-276.0)px
+          |  |    ContentDescription = '[About this size]'
+          |  |    Focused = 'false'
+          |  |    Role = 'Button'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    Text = '[84 MB]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #787 at (l=16.0, t=-240.0, r=288.0, b=-186.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Uninstall]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #791 at (l=300.0, t=-233.0, r=340.0, b=-193.0)px
+          |  | ContentDescription = '[More options]'
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #794 at (l=16.0, t=-153.0, r=261.0, b=-111.0)px
+          |  | Text = '[About this app]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #795 at (l=16.0, t=-95.0, r=344.0, b=134.0)px
+          |  | MergeDescendants = 'true'
+          |  |-Node #796 at (l=16.0, t=150.0, r=344.0, b=214.0)px
+          |  | Text = '[List source: Android Debloat List]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #799 at (l=16.0, t=247.0, r=147.0, b=285.0)px
+          |  | Text = '[Trackers]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #825 at (l=16.0, t=279.0, r=344.0, b=303.0)px
+          |  | ProgressBarRangeInfo = 'ProgressBarRangeInfo(current=0.0, range=0.0..0.0, steps=0)'
+          |  | MergeDescendants = 'true'
+          |  |-Node #826 at (l=16.0, t=297.0, r=344.0, b=393.0)px
+          |  | Text = '[Reading the APK files for tracker signatures…]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #803 at (l=16.0, t=397.0, r=138.0, b=451.0)px
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Rescan]'
+          |  | [Disabled]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #806 at (l=16.0, t=451.0, r=252.0, b=505.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Exodus report]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #810 at (l=16.0, t=509.0, r=344.0, b=601.0)px
+          |  | ContentDescription = '[Expand]'
+          |  | Focused = 'false'
+          |  | Text = '[About tracker scanning]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #815 at (l=16.0, t=634.0, r=344.0, b=776.0)px
+          |    Focused = 'false'
+          |    IsContainer = 'true'
+          |    Shape = 'RectangleShape'
+          |    Text = '[Open in Android settings]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |-Node #714 at (l=0.0, t=0.0, r=360.0, b=114.0)px
+            IsContainer = 'true'
+            Shape = 'RectangleShape'
+             |-Node #716 at (l=4.0, t=45.0, r=52.0, b=93.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #719 at (l=60.0, t=32.0, r=348.0, b=74.0)px
+             | [Heading]
+             |  |-Node #720 at (l=60.0, t=32.0, r=348.0, b=74.0)px
+             |    Text = '[Android System Intelligence]'
+             |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+             |-Node #721 at (l=60.0, t=74.0, r=180.0, b=106.0)px
+               Text = '[Personal]'
+               Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

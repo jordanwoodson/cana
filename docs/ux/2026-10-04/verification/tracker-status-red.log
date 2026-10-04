@@ -1,0 +1,41 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ExpressiveComponentsUiTest:
+INSTRUMENTATION_STATUS: test=trackerScanStatusAndActionRemainReadableAtLargeText
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: The scan action should follow its readable status
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.trackerScanStatusAndActionRemainReadableAtLargeText(ExpressiveComponentsUiTest.kt:116)
+
+INSTRUMENTATION_STATUS: stream=
+Error in trackerScanStatusAndActionRemainReadableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest):
+java.lang.AssertionError: The scan action should follow its readable status
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.trackerScanStatusAndActionRemainReadableAtLargeText(ExpressiveComponentsUiTest.kt:116)
+
+INSTRUMENTATION_STATUS: test=trackerScanStatusAndActionRemainReadableAtLargeText
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 8.752
+There was 1 failure:
+1) trackerScanStatusAndActionRemainReadableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest)
+java.lang.AssertionError: The scan action should follow its readable status
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.trackerScanStatusAndActionRemainReadableAtLargeText(ExpressiveComponentsUiTest.kt:116)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

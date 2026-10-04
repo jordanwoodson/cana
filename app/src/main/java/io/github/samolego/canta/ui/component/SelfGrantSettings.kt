@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -51,17 +52,19 @@ fun SelfGrantSettings() {
     }
     Column(Modifier.fillMaxWidth()) {
         ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_secure)) },
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
             supportingContent = { StatusChip(stringResource(if (status.secureSettings) R.string.grant_allowed else R.string.settings_permission_missing),
                 if (status.secureSettings) Icons.Default.CheckCircle else Icons.Default.Warning,
                 if (status.secureSettings) StatusTone.NEUTRAL else StatusTone.WARNING) })
         ListItem(headlineContent = { Text(stringResource(R.string.settings_permission_usage)) },
+            colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
             supportingContent = { StatusChip(stringResource(if (status.usageStats) R.string.grant_allowed else R.string.settings_permission_missing),
                 if (status.usageStats) Icons.Default.CheckCircle else Icons.Default.Warning,
                 if (status.usageStats) StatusTone.NEUTRAL else StatusTone.WARNING) })
         Text(stringResource(R.string.self_grants_description), Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         if (!status.secureSettings || !status.usageStats) {
-            Button(modifier = Modifier.padding(horizontal = 16.dp), enabled = !busy, onClick = {
+            Button(modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 12.dp), enabled = !busy, onClick = {
                 if (ShizukuPermission.isCantaAuthorized()) grant() else connect = true
             }) { Text(stringResource(R.string.self_grants_action)) }
         }

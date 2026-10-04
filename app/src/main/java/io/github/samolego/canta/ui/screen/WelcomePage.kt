@@ -28,6 +28,7 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.SHIZUKU_PACKAGE_NAME
 import io.github.samolego.canta.ops.CanaServices
 import io.github.samolego.canta.ui.dialog.ShizukuRequirementContent
+import io.github.samolego.canta.ui.component.CanaBrandLockup
 import io.github.samolego.canta.ui.menu.displayName
 import io.github.samolego.canta.ui.menu.icon
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
@@ -107,6 +108,7 @@ fun WelcomePage(appListViewModel: AppListViewModel, onExit: () -> Unit, onFinish
         )
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            LinearProgressIndicator(progress = { step / 3f }, modifier = Modifier.fillMaxWidth())
             Text(stringResource(when (step) {
                 1 -> R.string.welcome_step_one
                 2 -> R.string.welcome_step_two
@@ -116,6 +118,7 @@ fun WelcomePage(appListViewModel: AppListViewModel, onExit: () -> Unit, onFinish
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 when (step) {
                     1 -> {
+                        CanaBrandLockup(Modifier.padding(bottom = 8.dp))
                         Text(stringResource(R.string.welcome_bullet_one))
                         Text(stringResource(R.string.welcome_bullet_two))
                         Text(stringResource(R.string.welcome_bullet_three))

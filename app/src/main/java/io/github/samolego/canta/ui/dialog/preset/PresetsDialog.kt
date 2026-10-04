@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ui.component.ChoiceOption
 import io.github.samolego.canta.ui.component.ChoiceRow
@@ -43,7 +44,10 @@ fun ImportPresetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        modifier = Modifier.imePadding(),
+        // Own the keyboard/system insets instead of allowing the floating window
+        // to pan a tall, enlarged-text dialog partly offscreen.
+        properties = DialogProperties(decorFitsSystemWindows = false),
+        modifier = Modifier.safeDrawingPadding(),
         title = {
             Text(
                 text = stringResource(R.string.import_preset),

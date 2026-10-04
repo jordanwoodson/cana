@@ -1,0 +1,189 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #1237 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+       |-Node #1238 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #1261 at (l=0.0, t=88.0, r=360.0, b=776.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=1098.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #1262 at (l=8.0, t=96.0, r=352.0, b=182.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:13.493]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1269 at (l=8.0, t=190.0, r=352.0, b=276.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:13.504]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1276 at (l=8.0, t=284.0, r=352.0, b=370.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:13.512]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1283 at (l=8.0, t=378.0, r=352.0, b=464.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:27.688]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1290 at (l=8.0, t=472.0, r=352.0, b=558.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:41.166]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1297 at (l=8.0, t=566.0, r=352.0, b=652.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:43.933]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1304 at (l=8.0, t=660.0, r=352.0, b=746.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:48:45.471]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1311 at (l=8.0, t=754.0, r=352.0, b=840.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:49:12.709]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1318 at (l=8.0, t=848.0, r=352.0, b=934.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:49:13.098]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1325 at (l=8.0, t=942.0, r=352.0, b=1028.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:49:40.702]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1332 at (l=8.0, t=1036.0, r=352.0, b=1122.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:50:45.074]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1339 at (l=8.0, t=1130.0, r=352.0, b=1216.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:50:46.214]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1346 at (l=8.0, t=1224.0, r=352.0, b=1310.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:50:47.416]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1353 at (l=8.0, t=1318.0, r=352.0, b=1404.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:50:50.715]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1360 at (l=8.0, t=1412.0, r=352.0, b=1498.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:50:54.131]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1367 at (l=8.0, t=1506.0, r=352.0, b=1592.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:51:16.751]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1374 at (l=8.0, t=1600.0, r=352.0, b=1686.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:51:17.254]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1381 at (l=8.0, t=1694.0, r=352.0, b=1780.0)px
+          |  | Focused = 'false'
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[WARNING AppIcon, 17:51:17.830]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #1388 at (l=8.0, t=1788.0, r=352.0, b=1874.0)px
+          |    Focused = 'false'
+          |    IsContainer = 'true'
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 8.0.dp), topEnd = CornerSize(size = 8.0.dp), bottomEnd = CornerSize(size = 8.0.dp), bottomStart = CornerSize(size = 8.0.dp))'
+          |    StateDescription = 'Collapsed'
+          |    Text = '[WARNING AppIcon, 17:51:18.500]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnLongClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |-Node #1242 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+            IsContainer = 'true'
+            Shape = 'RectangleShape'
+             |-Node #1244 at (l=4.0, t=32.0, r=52.0, b=80.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #1247 at (l=60.0, t=33.0, r=144.0, b=80.0)px
+             | [Heading]
+             |  |-Node #1248 at (l=60.0, t=33.0, r=144.0, b=80.0)px
+             |    Text = '[Logs]'
+             |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+             |-Node #1250 at (l=308.0, t=32.0, r=356.0, b=80.0)px
+               ContentDescription = '[Copy logs]'
+               Focused = 'false'
+               Role = 'Button'
+               Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+               Actions = [OnClick, RequestFocus]
+               MergeDescendants = 'true'

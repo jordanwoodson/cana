@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Dangerous
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Lock
@@ -51,7 +52,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.BuildConfig
 import io.github.samolego.canta.R
 import io.github.samolego.canta.util.openWebLink
-import io.github.samolego.canta.ui.component.CanaWordmark
+import io.github.samolego.canta.ui.component.CanaBrandLockup
+import io.github.samolego.canta.ui.component.SettingsGroup
+import io.github.samolego.canta.ui.component.SettingsGroupDivider
 import io.github.samolego.canta.ui.component.IconClickButton
 import io.github.samolego.canta.ui.component.SettingsItem
 import io.github.samolego.canta.ui.component.SelfGrantSettings
@@ -66,7 +69,6 @@ import io.github.samolego.canta.util.showBiometricPrompt
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
     settingsViewModel: SettingsViewModel,
-    onVersionTap: () -> Unit,
     onOpenLogs: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -90,105 +92,107 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             SectionHeader(stringResource(R.string.settings_safety))
-            SettingsItem(
-                title = stringResource(R.string.require_auth_setting),
-                description = stringResource(R.string.require_auth_setting_desc),
-                icon = Icons.Default.Lock,
-                isSwitch = true,
-                checked = authEnabled,
-                onCheckedChange = {
-                    showBiometricPrompt(context = context, onSuccess = { settingsViewModel.saveAuthEnabled(it) })
-                },
-            )
-            SettingsItem(
-                title = stringResource(R.string.allow_unsafe_removal),
-                description = stringResource(R.string.allow_unsafe_removal_description),
-                icon = Icons.Default.Close,
-                isSwitch = true,
-                checked = allowUnsafe,
-                onCheckedChange = settingsViewModel::saveAllowUnsafeUninstalls,
-            )
-
-            SectionHeader(stringResource(R.string.settings_bloat_list))
-            SettingsItem(
-                title = stringResource(R.string.auto_update_bloat_list),
-                description = stringResource(R.string.auto_update_bloat_list_description),
-                icon = Icons.Default.Update,
-                isSwitch = true,
-                checked = autoUpdateBloatList,
-                onCheckedChange = {
-                    settingsViewModel.saveAutoUpdateBloatList(it)
-                }
-            )
-
-            SettingsItem(
-                title = stringResource(R.string.bloat_unmetered_only),
-                description = stringResource(R.string.bloat_unmetered_only_description),
-                icon = Icons.Default.Update,
-                isSwitch = true,
-                checked = unmeteredOnly,
-                enabled = autoUpdateBloatList,
-                onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
-            )
-            SettingsItem(
-                title = stringResource(R.string.bloat_list_url),
-                description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
-                icon = Icons.Default.Link,
-                onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
-            )
-
-            SectionHeader(stringResource(R.string.settings_permissions))
-            SelfGrantSettings()
-
-            SectionHeader(stringResource(R.string.settings_diagnostics))
-            SettingsItem(title = stringResource(R.string.logs), icon = Icons.Default.BugReport,
-                onClick = onOpenLogs)
-            Row(Modifier.padding(horizontal = 8.dp)) { RestoreExportButton() }
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-            SectionHeader(stringResource(R.string.settings_about))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CanaWordmark(style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    text = stringResource(R.string.brand_tagline),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
+            SettingsGroup {
+                SettingsItem(
+                    title = stringResource(R.string.require_auth_setting),
+                    description = stringResource(R.string.require_auth_setting_desc),
+                    icon = Icons.Default.Lock,
+                    isSwitch = true,
+                    checked = authEnabled,
+                    onCheckedChange = {
+                        showBiometricPrompt(context = context, onSuccess = { settingsViewModel.saveAuthEnabled(it) })
+                    },
                 )
-                Text(
-                    text = stringResource(R.string.settings_theme_summary),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
-
-                // App version
-                Text(
-                    text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.clickable {
-                        onVersionTap()
-                    }
-                )
-
-                // App homepage
-                Text(
-                    text = "https://github.com/jordanwoodson/cana",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.clickable {
-                        context.openWebLink("https://github.com/jordanwoodson/cana")
-                    }
+                SettingsGroupDivider()
+                SettingsItem(
+                    title = stringResource(R.string.allow_unsafe_removal),
+                    description = stringResource(R.string.allow_unsafe_removal_description),
+                    icon = Icons.Default.Dangerous,
+                    isSwitch = true,
+                    checked = allowUnsafe,
+                    onCheckedChange = settingsViewModel::saveAllowUnsafeUninstalls,
                 )
             }
+
+            SectionHeader(stringResource(R.string.settings_bloat_list))
+            SettingsGroup {
+                SettingsItem(
+                    title = stringResource(R.string.auto_update_bloat_list),
+                    description = stringResource(R.string.auto_update_bloat_list_description),
+                    icon = Icons.Default.Update,
+                    isSwitch = true,
+                    checked = autoUpdateBloatList,
+                    onCheckedChange = {
+                        settingsViewModel.saveAutoUpdateBloatList(it)
+                    }
+                )
+                SettingsGroupDivider()
+                SettingsItem(
+                    title = stringResource(R.string.bloat_unmetered_only),
+                    description = stringResource(R.string.bloat_unmetered_only_description),
+                    icon = Icons.Default.Update,
+                    isSwitch = true,
+                    checked = unmeteredOnly,
+                    enabled = autoUpdateBloatList,
+                    onCheckedChange = settingsViewModel::saveBloatUnmeteredOnly,
+                )
+                SettingsGroupDivider()
+                SettingsItem(
+                    title = stringResource(R.string.bloat_list_url),
+                    description = urlEditor.currentUrl.ifEmpty { stringResource(R.string.maintenance_loading_url) },
+                    icon = Icons.Default.Link,
+                    onClick = if (urlEditor.loaded) settingsViewModel::beginBloatListUrlEdit else null,
+                )
+            }
+
+            SectionHeader(stringResource(R.string.settings_permissions))
+            SettingsGroup { SelfGrantSettings() }
+
+            SectionHeader(stringResource(R.string.settings_diagnostics))
+            SettingsGroup {
+                SettingsItem(title = stringResource(R.string.logs), icon = Icons.Default.BugReport,
+                    onClick = onOpenLogs)
+                SettingsGroupDivider()
+                Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) { RestoreExportButton() }
+            }
+
+            SectionHeader(stringResource(R.string.settings_about))
+            SettingsGroup {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    CanaBrandLockup()
+                    Text(
+                        text = stringResource(R.string.settings_theme_summary),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    // App version
+                    Text(
+                        text = stringResource(R.string.app_version, BuildConfig.VERSION_NAME),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                    // App homepage
+                    Text(
+                        text = "https://github.com/jordanwoodson/cana",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.clickable {
+                            context.openWebLink("https://github.com/jordanwoodson/cana")
+                        }
+                    )
+            }
+            }
+            Spacer(Modifier.size(24.dp))
         }
     }
 

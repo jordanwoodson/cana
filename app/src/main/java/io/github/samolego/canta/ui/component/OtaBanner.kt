@@ -41,12 +41,10 @@ fun OtaBanner() {
         Icons.Default.SystemUpdate,
         stringResource(R.string.ota_summary, state.pendingCount),
         modifier = Modifier.padding(horizontal = 16.dp),
-        details = {
-            Row {
-                TextButton(onClick = { review = state.pendingList.toList() }) { Text(stringResource(R.string.ota_review)) }
-                if (Build.VERSION.SDK_INT >= 33) TextButton(onClick = { notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }) {
-                    Text(stringResource(R.string.ota_enable_notifications))
-                }
+        actions = {
+            TextButton(onClick = { review = state.pendingList.toList() }) { Text(stringResource(R.string.ota_review)) }
+            if (Build.VERSION.SDK_INT >= 33) TextButton(onClick = { notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }) {
+                Text(stringResource(R.string.ota_enable_notifications))
             }
         },
     )

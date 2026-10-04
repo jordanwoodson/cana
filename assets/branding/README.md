@@ -18,6 +18,11 @@ labels, prose, search, and accessibility names.
   the launcher icon.
 - The default Android palette and documentation share the Dracula colors.
   Red `#FF5555` is reserved for errors and destructive actions.
+- Android uses a lighter red tone `#FF9CA3` for small error text and destructive
+  controls on raised surfaces. Unsafe badges retain the original red fill.
+- The Android interface uses stepped dark surfaces (`#2D2F3D`, `#323443`,
+  `#383A4B`) and secondary text `#D3D1DF` to separate content without adding
+  more accent colors. Cards use 20–24 dp corners; dialogs use 28 dp corners.
 - Credit the original project as **Canta by samolego**.
 
 `cana-mark.svg` is the source for the two-color Android foreground and solid

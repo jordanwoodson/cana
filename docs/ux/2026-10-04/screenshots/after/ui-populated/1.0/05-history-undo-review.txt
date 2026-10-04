@@ -1,0 +1,105 @@
+Native configuration: 360 x 800dp; fontScale=1.0
+Printing with useUnmergedTree = 'false'
+Node #1066 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #1067 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #1090 at (l=0.0, t=88.0, r=360.0, b=776.0)px
+    | CollectionInfo = 'CollectionInfo(rowCount=1, columnCount=1)'
+    | IsTraversalGroup = 'true'
+    | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@2757073'
+    | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+    | Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+    |  |-Node #1099 at (l=16.0, t=104.0, r=344.0, b=292.0)px
+    |    IsContainer = 'true'
+    |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 20.0.dp), topEnd = CornerSize(size = 20.0.dp), bottomEnd = CornerSize(size = 20.0.dp), bottomStart = CornerSize(size = 20.0.dp))'
+    |     |-Node #1102 at (l=28.0, t=116.0, r=305.0, b=140.0)px
+    |     | Text = '[Disable · 2 apps · Personal]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+    |     |-Node #1105 at (l=28.0, t=148.0, r=140.0, b=164.0)px
+    |     | Text = '[9/21/26 9:13 AM]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+    |     |-Node #1106 at (l=148.0, t=148.0, r=284.0, b=176.0)px
+    |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+    |     | Text = '[Partly failed]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+    |     | MergeDescendants = 'true'
+    |     |-Node #1109 at (l=28.0, t=184.0, r=192.0, b=200.0)px
+    |     | Text = '[1 succeeded · 1 failed]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+    |     |-Node #1110 at (l=28.0, t=208.0, r=258.0, b=224.0)px
+    |     | Text = '[Recovery: 1 change not restored]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+    |     |-Node #1112 at (l=28.0, t=236.0, r=86.0, b=276.0)px, Tag: 'history-undo-ui-populated-history'
+    |     | Focused = 'false'
+    |     | Role = 'Button'
+    |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+    |     | Text = '[Undo]'
+    |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+    |     | MergeDescendants = 'true'
+    |     |-Node #1115 at (l=86.0, t=236.0, r=168.0, b=276.0)px
+    |       Focused = 'false'
+    |       Role = 'Button'
+    |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+    |       Text = '[Details]'
+    |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+    |       MergeDescendants = 'true'
+    |-Node #1071 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #1073 at (l=4.0, t=32.0, r=52.0, b=80.0)px
+       | ContentDescription = '[Back]'
+       | Focused = 'false'
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Actions = [OnClick, RequestFocus]
+       | MergeDescendants = 'true'
+       |-Node #1076 at (l=60.0, t=42.0, r=151.0, b=71.0)px
+       | [Heading]
+       |  |-Node #1077 at (l=60.0, t=42.0, r=151.0, b=71.0)px
+       |    Text = '[History]'
+       |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #1079 at (l=312.0, t=36.0, r=352.0, b=76.0)px
+         ContentDescription = '[Export recovery script]'
+         Focused = 'false'
+         Role = 'Button'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+         Actions = [OnClick, RequestFocus]
+         MergeDescendants = 'true'
+Printing with useUnmergedTree = 'false'
+Node #1118 at (l=0.0, t=0.0, r=320.0, b=316.0)px
+ |-Node #1119 at (l=0.0, t=0.0, r=320.0, b=316.0)px
+   [IsDialog]
+    |-Node #1120 at (l=0.0, t=0.0, r=320.0, b=316.0)px
+      PaneTitle = 'Dialog'
+       |-Node #1121 at (l=0.0, t=0.0, r=320.0, b=316.0)px
+         IsContainer = 'true'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 28.0.dp), topEnd = CornerSize(size = 28.0.dp), bottomEnd = CornerSize(size = 28.0.dp), bottomStart = CornerSize(size = 28.0.dp))'
+          |-Node #1124 at (l=24.0, t=24.0, r=290.0, b=56.0)px
+          | Text = '[Undo these changes?]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #1126 at (l=24.0, t=72.0, r=296.0, b=220.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@2757073'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #1127 at (l=24.0, t=72.0, r=296.0, b=172.0)px
+          |  | Text = '[Restore the captured values in reverse order. Deleted app data and removed APK updates cannot be recreated; any incomplete recovery is counted as a failure.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1128 at (l=24.0, t=180.0, r=296.0, b=220.0)px
+          |    Text = '[example.cana.visual.calendar · Disable · Personal]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #1131 at (l=156.0, t=248.0, r=230.0, b=288.0)px
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Cancel]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #1134 at (l=238.0, t=248.0, r=296.0, b=288.0)px
+            Focused = 'false'
+            Role = 'Button'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+            Text = '[Undo]'
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

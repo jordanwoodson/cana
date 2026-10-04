@@ -20,3 +20,13 @@ val DraculaPersonalContainer = Color(0xFF3B344C)
 val DraculaWorkContainer = Color(0xFF2D3D47)
 val DraculaOtherContainer = Color(0xFF463247)
 val DraculaDeepBackground = Color(0xFF21222C)
+
+// Tonal steps make cards, sheets and dialogs legible as separate surfaces.
+val DraculaSurfaceLow = Color(0xFF2D2F3D)
+val DraculaSurface = Color(0xFF323443)
+val DraculaSurfaceHigh = Color(0xFF383A4B)
+val DraculaSecondaryText = Color(0xFFD3D1DF)
+val DraculaOutline = Color(0xFF9B98AE)
+// The original red remains the Unsafe badge fill. This tone also works as
+// small error text on every raised surface (including selection).
+val DraculaError = Color(0xFFFF9CA3)

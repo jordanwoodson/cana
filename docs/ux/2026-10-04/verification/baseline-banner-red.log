@@ -1,0 +1,38 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ExpressiveComponentsUiTest:
+INSTRUMENTATION_STATUS: test=bannerKeepsMessageReadableAndActionsReachableAtLargeText
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Recommendations need a refresh' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:47)
+
+INSTRUMENTATION_STATUS: stream=
+Error in bannerKeepsMessageReadableAndActionsReachableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest):
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Recommendations need a refresh' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:47)
+
+INSTRUMENTATION_STATUS: test=bannerKeepsMessageReadableAndActionsReachableAtLargeText
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 20.374
+There was 1 failure:
+1) bannerKeepsMessageReadableAndActionsReachableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest)
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'Recommendations need a refresh' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:47)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

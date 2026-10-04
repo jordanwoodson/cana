@@ -77,8 +77,8 @@ fun CantaTopBar(
                     Surface(
                         onClick = onProfilesClick,
                         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("profile-chip"),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(18.dp),
-                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.42f),
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        color = MaterialTheme.colorScheme.surfaceContainerLow,
                     ) {
                         Row(Modifier.padding(horizontal = 8.dp, vertical = 7.dp),
                             verticalAlignment = Alignment.CenterVertically,

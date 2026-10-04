@@ -181,7 +181,6 @@ fun CantaApp(
             SettingsScreen(
                 onNavigateBack = { navController.navigateUp() },
                 settingsViewModel = settingsViewModel,
-                onVersionTap = {},
                 onOpenLogs = { navController.navigate(Screen.Logs.route) },
             )
         }

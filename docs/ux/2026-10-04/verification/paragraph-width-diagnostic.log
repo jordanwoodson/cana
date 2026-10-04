@@ -1,0 +1,44 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ExpressiveComponentsUiTest:
+INSTRUMENTATION_STATUS: test=bannerKeepsMessageReadableAndActionsReachableAtLargeText
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Text is clipped: [Try again: 147 x 38, paragraph=280.0, lines=1, right=145.59999, width=true, height=false, constraints=Constraints(minWidth = 0, maxWidth = 280, minHeight = 0, maxHeight = 668)]
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.assertTextNotClipped(ExpressiveComponentsUiTest.kt:76)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:63)
+
+INSTRUMENTATION_STATUS: stream=
+Error in bannerKeepsMessageReadableAndActionsReachableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest):
+java.lang.AssertionError: Text is clipped: [Try again: 147 x 38, paragraph=280.0, lines=1, right=145.59999, width=true, height=false, constraints=Constraints(minWidth = 0, maxWidth = 280, minHeight = 0, maxHeight = 668)]
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.assertTextNotClipped(ExpressiveComponentsUiTest.kt:76)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:63)
+
+INSTRUMENTATION_STATUS: test=bannerKeepsMessageReadableAndActionsReachableAtLargeText
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 9.821
+There was 1 failure:
+1) bannerKeepsMessageReadableAndActionsReachableAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest)
+java.lang.AssertionError: Text is clipped: [Try again: 147 x 38, paragraph=280.0, lines=1, right=145.59999, width=true, height=false, constraints=Constraints(minWidth = 0, maxWidth = 280, minHeight = 0, maxHeight = 668)]
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.assertTextNotClipped(ExpressiveComponentsUiTest.kt:76)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.bannerKeepsMessageReadableAndActionsReachableAtLargeText(ExpressiveComponentsUiTest.kt:63)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

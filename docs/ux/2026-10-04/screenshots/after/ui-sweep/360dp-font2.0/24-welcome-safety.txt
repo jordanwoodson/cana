@@ -1,0 +1,71 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #2958 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+      IsContainer = 'true'
+      Shape = 'RectangleShape'
+       |-Node #2978 at (l=20.0, t=98.0, r=340.0, b=122.0)px
+       | ProgressBarRangeInfo = 'ProgressBarRangeInfo(current=0.33333334, range=0.0..1.0, steps=0)'
+       | MergeDescendants = 'true'
+       |-Node #2979 at (l=20.0, t=128.0, r=340.0, b=224.0)px
+       | Text = '[Manage apps with care]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |-Node #2980 at (l=20.0, t=240.0, r=340.0, b=686.0)px
+       | IsTraversalGroup = 'true'
+       | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+       | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=1922.0, reverseScrolling=false)'
+       | Actions = [ScrollBy, ScrollByOffset]
+       |  |-Node #2982 at (l=136.0, t=240.0, r=224.0, b=328.0)px
+       |  | Shape = 'RectangleShape'
+       |  |-Node #2983 at (l=114.0, t=336.0, r=246.0, b=385.0)px
+       |  | ContentDescription = '[Cana]'
+       |  | ClearAndSetSemantics = 'true'
+       |  |-Node #2984 at (l=20.0, t=393.0, r=340.0, b=469.0)px
+       |  | Text = '[Do more. Because you can.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #2985 at (l=20.0, t=489.0, r=340.0, b=615.0)px
+       |  | Text = '[• See installed and removed apps in each profile.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #2986 at (l=20.0, t=627.0, r=340.0, b=795.0)px
+       |  | Text = '[• Remove, disable or restore apps with a record in History.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #2987 at (l=20.0, t=807.0, r=340.0, b=933.0)px
+       |  | Text = '[• Review privacy controls before applying them.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #2989 at (l=20.0, t=958.0, r=340.0, b=2428.0)px
+       |  | Text = '[This app provides app removal recommendations based on third-party information. These recommendations are informational in nature and do not guarantee safety or compatibility with your specific device. Uninstalling system apps can cause unexpected issues, including but not limited to: loss of functionality, system instability, device bootloops, data loss, etc. The developer of this app is not responsible for any damage done to your device resulting from following the recommendations provided.]'
+       |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+       |  |-Node #2990 at (l=20.0, t=2440.0, r=340.0, b=2608.0)px
+       |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+       |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@c155c78'
+       |    Focused = 'false'
+       |    Role = 'Checkbox'
+       |    Text = '[I understand removing system apps can break my device]'
+       |    ToggleableState = 'Off'
+       |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       |    MergeDescendants = 'true'
+       |-Node #2995 at (l=63.0, t=702.0, r=153.0, b=756.0)px
+       | Focused = 'false'
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Exit]'
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #2998 at (l=161.0, t=702.0, r=340.0, b=756.0)px
+       | Role = 'Button'
+       | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+       | Text = '[Continue]'
+       | [Disabled]
+       | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+       | MergeDescendants = 'true'
+       |-Node #2962 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+         IsTraversalGroup = 'true'
+          |-Node #2963 at (l=0.0, t=24.0, r=360.0, b=88.0)px
+            Shape = 'RectangleShape'
+             |-Node #2965 at (l=16.0, t=32.0, r=331.0, b=79.0)px
+                |-Node #2966 at (l=16.0, t=32.0, r=331.0, b=79.0)px
+                  Text = '[Welcome to Cana]'
+                  Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

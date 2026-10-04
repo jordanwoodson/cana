@@ -1,0 +1,103 @@
+Native configuration: 360 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+Printing with useUnmergedTree = 'false'
+Node #2890 at (l=0.0, t=0.0, r=320.0, b=752.0)px
+ |-Node #2891 at (l=0.0, t=0.0, r=320.0, b=752.0)px
+   [IsDialog]
+    |-Node #2892 at (l=0.0, t=0.0, r=320.0, b=752.0)px
+      PaneTitle = 'Dialog'
+       |-Node #2893 at (l=0.0, t=0.0, r=320.0, b=752.0)px
+         IsContainer = 'true'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 28.0.dp), topEnd = CornerSize(size = 28.0.dp), bottomEnd = CornerSize(size = 28.0.dp), bottomStart = CornerSize(size = 28.0.dp))'
+          |-Node #2896 at (l=24.0, t=24.0, r=296.0, b=168.0)px
+          | Text = '[Review preset import]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2898 at (l=24.0, t=184.0, r=296.0, b=650.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@cbaedd0'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=1953.0, maxValue=2273.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #2899 at (l=24.0, t=-1769.0, r=296.0, b=-1685.0)px
+          |  | Text = '[Work profile cleanup]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2900 at (l=24.0, t=-1677.0, r=296.0, b=-1525.0)px
+          |  | Text = '[Remove optional apps and review saved privacy restrictions.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2901 at (l=24.0, t=-1517.0, r=188.0, b=-1485.0)px
+          |  | Text = '[Format: 1.0]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2902 at (l=24.0, t=-1477.0, r=296.0, b=-1135.0)px
+          |  | Text = '[Review the saved actions below. Importing only saves the preset. Apply it separately to change apps or privacy settings.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2903 at (l=24.0, t=-1127.0, r=296.0, b=-1013.0)px
+          |  | Text = '[This imports a new saved preset.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2905 at (l=24.0, t=-996.0, r=296.0, b=-920.0)px
+          |  | Text = '[Changes to saved actions]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2906 at (l=24.0, t=-912.0, r=296.0, b=-798.0)px
+          |  | Text = '[Added removal: example.optional.partner]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2907 at (l=24.0, t=-790.0, r=296.0, b=-676.0)px
+          |  | Text = '[Added removal: example.optional.weather]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2908 at (l=24.0, t=-668.0, r=268.0, b=-630.0)px
+          |  | Text = '[Privacy changes]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2909 at (l=24.0, t=-622.0, r=296.0, b=-546.0)px
+          |  | Text = '[example.optional.analytics]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2910 at (l=24.0, t=-538.0, r=296.0, b=-474.0)px
+          |  | Text = '[Before: No saved privacy actions]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2911 at (l=24.0, t=-466.0, r=296.0, b=-370.0)px
+          |  | Text = '[After: Deny metered background data]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2913 at (l=24.0, t=-353.0, r=296.0, b=-277.0)px
+          |  | Text = '[Actions after import]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2914 at (l=24.0, t=-269.0, r=296.0, b=-155.0)px
+          |  | Text = '[Preset profile kind: Work profile]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2915 at (l=24.0, t=-147.0, r=296.0, b=-33.0)px
+          |  | Text = '[Uninstall: example.optional.partner]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2916 at (l=24.0, t=-25.0, r=296.0, b=89.0)px
+          |  | Text = '[Uninstall: example.optional.weather]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2917 at (l=24.0, t=97.0, r=296.0, b=173.0)px
+          |  | Text = '[example.optional.analytics]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2918 at (l=24.0, t=181.0, r=296.0, b=245.0)px
+          |  | Text = '[Deny metered background data]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2920 at (l=24.0, t=262.0, r=155.0, b=300.0)px
+          |  | Text = '[Personal]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2921 at (l=24.0, t=308.0, r=296.0, b=650.0)px
+          |  | Text = '[A selected profile differs from this preset’s profile kind. Confirm that these actions are appropriate there.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2922 at (l=24.0, t=658.0, r=296.0, b=810.0)px
+          |  | Text = '[Unavailable target: example.optional.analytics]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #2923 at (l=24.0, t=818.0, r=296.0, b=970.0)px
+          |    Text = '[Unavailable target: example.optional.partner]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #2926 at (l=44.0, t=674.0, r=166.0, b=728.0)px
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Cancel]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #2929 at (l=174.0, t=674.0, r=296.0, b=728.0)px
+            Focused = 'false'
+            Role = 'Button'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+            Text = '[Import]'
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

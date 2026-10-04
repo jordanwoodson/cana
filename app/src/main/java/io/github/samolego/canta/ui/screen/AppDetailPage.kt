@@ -34,7 +34,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
@@ -72,7 +74,8 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
     LaunchedEffect(target) { if (!state.loaded || state.stale) services.inventory.snapshot(target.userId) }
     Scaffold(snackbarHost = { SnackbarHost(io.github.samolego.canta.ui.LocalCanaSnackbar.current) }, topBar = { ScreenTopBar(
         onNavigateBack = onNavigateBack,
-        title = { Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium) },
+        title = { Text(app?.name ?: target.packageName, style = MaterialTheme.typography.titleMedium,
+            maxLines = 1, overflow = TextOverflow.Ellipsis) },
         subtitle = profileName(target.userId),
     ) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
@@ -90,57 +93,64 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                 }
                 tab == 0 -> Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        AppIconImage(app, target.userId, size = 56.dp)
-                        Text(app.name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
-                    }
-                    if (app.metadataIncomplete) CanaBanner(Icons.Default.Info,
-                        stringResource(R.string.app_metadata_incomplete), StatusTone.WARNING,
-                        details = { Text(stringResource(R.string.app_metadata_incomplete_detail)) })
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        SelectionContainer(modifier = Modifier.weight(1f)) {
-                            Text(target.packageName, style = MaterialTheme.typography.bodySmall)
-                        }
-                        IconButton(onClick = { scope.launch { clipboard.setClipEntry(
-                            ClipEntry(ClipData.newPlainText("Package", target.packageName))) } }) {
-                            Icon(Icons.Default.ContentCopy, stringResource(R.string.copy_package_name))
-                        }
-                    }
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        app.shownRisk?.let { risk ->
-                            Box(Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true },
-                                contentAlignment = Alignment.Center) { RiskChip(risk) }
-                        }
-                        val stateLabel = when {
-                            app.isUninstalled -> R.string.tab_removed
-                            app.isDisabled -> R.string.app_state_disabled
-                            app.isSuspended -> R.string.app_state_suspended
-                            else -> R.string.tab_installed
-                        }
-                        val stateIcon = when {
-                            app.isUninstalled || app.isDisabled -> Icons.Default.Block
-                            app.isSuspended -> Icons.Default.PauseCircle
-                            else -> Icons.Default.CheckCircle
-                        }
-                        Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
-                            StatusChip(stringResource(stateLabel), stateIcon)
-                        }
-                        Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
-                            StatusChip(stringResource(when {
-                                !app.appTypeKnown -> R.string.app_type_unavailable
-                                app.isSystemApp -> R.string.scope_system_apps
-                                else -> R.string.scope_user_apps
-                            }), Icons.Default.Android)
-                        }
-                    }
-                    Column {
-                        Text(stringResource(R.string.app_version_short, app.versionName, app.versionCode),
-                            style = MaterialTheme.typography.bodySmall)
-                        TextButton(onClick = { showSizeInfo = true }, contentPadding = PaddingValues(horizontal = 0.dp)) {
-                            Icon(Icons.Default.Info, stringResource(R.string.app_apk_size_details), modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Text(if (app.apkSizeBytes > 0) formatShortFileSize(context, app.apkSizeBytes)
-                                else stringResource(R.string.app_size_unavailable))
+                    Surface(color = MaterialTheme.colorScheme.surfaceContainerLow,
+                        shape = MaterialTheme.shapes.large) {
+                        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                AppIconImage(app, target.userId, size = 56.dp)
+                                Text(app.name, modifier = Modifier.weight(1f),
+                                    style = if (LocalDensity.current.fontScale >= 1.3f) MaterialTheme.typography.titleMedium
+                                        else MaterialTheme.typography.titleLarge)
+                            }
+                            if (app.metadataIncomplete) CanaBanner(Icons.Default.Info,
+                                stringResource(R.string.app_metadata_incomplete), StatusTone.WARNING,
+                                details = { Text(stringResource(R.string.app_metadata_incomplete_detail)) })
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                SelectionContainer(modifier = Modifier.weight(1f)) {
+                                    Text(target.packageName, style = MaterialTheme.typography.bodySmall)
+                                }
+                                IconButton(onClick = { scope.launch { clipboard.setClipEntry(
+                                    ClipEntry(ClipData.newPlainText("Package", target.packageName))) } }) {
+                                    Icon(Icons.Default.ContentCopy, stringResource(R.string.copy_package_name))
+                                }
+                            }
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                app.shownRisk?.let { risk ->
+                                    Box(Modifier.heightIn(min = 48.dp).clickable { showRiskInfo = true },
+                                        contentAlignment = Alignment.Center) { RiskChip(risk) }
+                                }
+                                val stateLabel = when {
+                                    app.isUninstalled -> R.string.tab_removed
+                                    app.isDisabled -> R.string.app_state_disabled
+                                    app.isSuspended -> R.string.app_state_suspended
+                                    else -> R.string.tab_installed
+                                }
+                                val stateIcon = when {
+                                    app.isUninstalled || app.isDisabled -> Icons.Default.Block
+                                    app.isSuspended -> Icons.Default.PauseCircle
+                                    else -> Icons.Default.CheckCircle
+                                }
+                                Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+                                    StatusChip(stringResource(stateLabel), stateIcon)
+                                }
+                                Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+                                    StatusChip(stringResource(when {
+                                        !app.appTypeKnown -> R.string.app_type_unavailable
+                                        app.isSystemApp -> R.string.scope_system_apps
+                                        else -> R.string.scope_user_apps
+                                    }), Icons.Default.Android)
+                                }
+                            }
+                            Column {
+                                Text(stringResource(R.string.app_version_short, app.versionName, app.versionCode),
+                                    style = MaterialTheme.typography.bodySmall)
+                                TextButton(onClick = { showSizeInfo = true }, contentPadding = PaddingValues(horizontal = 0.dp)) {
+                                    Icon(Icons.Default.Info, stringResource(R.string.app_apk_size_details), modifier = Modifier.size(18.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(if (app.apkSizeBytes > 0) formatShortFileSize(context, app.apkSizeBytes)
+                                        else stringResource(R.string.app_size_unavailable))
+                                }
+                            }
                         }
                     }
                     val choices = ActionChoices.forSelection(listOf(app), app.isUninstalled)

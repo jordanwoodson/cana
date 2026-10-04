@@ -29,12 +29,11 @@ internal val DraculaColorScheme = darkColorScheme(
     surface = DraculaBackground,
     onSurface = DraculaForeground,
     surfaceVariant = DraculaSelection,
-    // Dracula's comment blue is reserved for outlines; it is too dim for small body text.
-    onSurfaceVariant = DraculaForeground,
-    surfaceContainer = DraculaBackground,
-    surfaceContainerLow = DraculaBackground,
+    onSurfaceVariant = DraculaSecondaryText,
+    surfaceContainer = DraculaSurface,
+    surfaceContainerLow = DraculaSurfaceLow,
     surfaceContainerLowest = DraculaDeepBackground,
-    surfaceContainerHigh = DraculaBackground,
+    surfaceContainerHigh = DraculaSurfaceHigh,
     surfaceContainerHighest = DraculaSelection,
     surfaceDim = DraculaDeepBackground,
     surfaceBright = DraculaSelection,
@@ -42,13 +41,13 @@ internal val DraculaColorScheme = darkColorScheme(
     inverseSurface = DraculaSelection,
     inverseOnSurface = DraculaForeground,
     inversePrimary = DraculaCyan,
-    outline = DraculaComment,
+    outline = DraculaOutline,
     outlineVariant = DraculaSelection,
-    error = DraculaRed,
+    error = DraculaError,
     onError = DraculaBackground,
     // Error banners can contain red inline errors and purple action buttons.
     errorContainer = DraculaDeepBackground,
-    onErrorContainer = DraculaRed,
+    onErrorContainer = DraculaError,
     scrim = DraculaDeepBackground,
 )
 
@@ -67,7 +66,7 @@ fun CantaTheme(content: @Composable () -> Unit) {
     }
 
     CompositionLocalProvider(LocalCanaColors provides CanaColors.dracula()) {
-        MaterialTheme(colorScheme = DraculaColorScheme, typography = Typography) {
+        MaterialTheme(colorScheme = DraculaColorScheme, typography = Typography, shapes = CanaShapes) {
             CompositionLocalProvider(
                 LocalTextSelectionColors provides TextSelectionColors(
                     handleColor = DraculaPurple,

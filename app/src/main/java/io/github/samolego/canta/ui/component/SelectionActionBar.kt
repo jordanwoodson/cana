@@ -62,7 +62,8 @@ fun SelectionActionBar(model: AppListViewModel, appType: AppsType) {
         }
         TextButton(modifier = Modifier.weight(1f), onClick = { review = true }) { Text(selectionLabel) }
     }
-    Surface(tonalElevation = 4.dp) {
+    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp), shadowElevation = 4.dp) {
         BoxWithConstraints(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 8.dp, vertical = 8.dp)) {
             if (compactWidth <= maxWidth) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -102,6 +103,7 @@ private fun SelectionActionButtons(model: AppListViewModel, choices: ActionChoic
     val destructive = choices.primary in setOf(PackageAction.UNINSTALL, PackageAction.REMOVE_UPDATES, PackageAction.UNINSTALL_KEEP_DATA)
     val actionColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val onActionColor = if (destructive) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimary
+    val menuEnabled = !model.isOperating && (choices.reversible.isNotEmpty() || choices.removing.isNotEmpty())
     Box {
         Row(if (expand) Modifier.fillMaxWidth() else Modifier,
             horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -111,9 +113,10 @@ private fun SelectionActionButtons(model: AppListViewModel, choices: ActionChoic
                 colors = ButtonDefaults.buttonColors(containerColor = actionColor, contentColor = onActionColor)) {
                 Text(stringResource(choices.primary.label))
             }
-            IconButton(enabled = !model.isOperating && (choices.reversible.isNotEmpty() || choices.removing.isNotEmpty()),
+            IconButton(enabled = menuEnabled,
                 onClick = { actions = true },
-                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 24.dp, bottomEnd = 24.dp)).background(actionColor),
+                modifier = Modifier.size(48.dp).clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 24.dp, bottomEnd = 24.dp))
+                    .background(if (menuEnabled) actionColor else ButtonDefaults.buttonColors().disabledContainerColor),
                 colors = IconButtonDefaults.iconButtonColors(contentColor = onActionColor)) {
                 Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.selection_more_actions))
             }

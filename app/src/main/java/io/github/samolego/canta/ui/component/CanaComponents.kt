@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -98,13 +100,14 @@ private fun CompactChip(label: String, icon: ImageVector, colors: RiskColors, mo
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun CanaBanner(
     icon: ImageVector,
     text: String,
     tone: StatusTone = StatusTone.NEUTRAL,
     modifier: Modifier = Modifier,
     details: (@Composable () -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
+    actions: (@Composable FlowRowScope.() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
     val (container, content) = when (tone) {
@@ -112,15 +115,20 @@ fun CanaBanner(
         StatusTone.WARNING -> LocalCanaColors.current.advanced.let { it.container to it.onContainer }
         StatusTone.ERROR -> scheme.errorContainer to scheme.onErrorContainer
     }
-    Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = container)) {
+    Card(modifier = modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = container)) {
         Column {
-            Row(Modifier.fillMaxWidth().padding(start = 12.dp, top = 8.dp, end = 12.dp, bottom = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
                 Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
                 Text(text, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = content)
-                actions()
             }
-            details?.let { Column(Modifier.fillMaxWidth().padding(start = 42.dp, end = 12.dp, bottom = 8.dp)) { it() } }
+            details?.let { Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) { it() } }
+            actions?.let {
+                FlowRow(Modifier.fillMaxWidth().padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                    verticalArrangement = Arrangement.spacedBy(4.dp), content = it)
+            }
         }
     }
 }
@@ -143,7 +151,7 @@ fun InfoDisclosure(title: String, modifier: Modifier = Modifier, content: @Compo
 
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier = modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+    Text(text, modifier = modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 8.dp),
         style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
 }
 
@@ -157,8 +165,13 @@ fun EmptyState(
 ) {
     Column(modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(40.dp))
-        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+        androidx.compose.material3.Surface(Modifier.size(72.dp), shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.primaryContainer) {
+            androidx.compose.foundation.layout.Box(contentAlignment = Alignment.Center) {
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+            }
+        }
+        Text(title, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
         Text(body, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
         action?.invoke()
     }

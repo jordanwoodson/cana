@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -65,8 +66,9 @@ import java.util.concurrent.TimeUnit
  * are in memory only, and the temporary onboarding preference is restored in finally.
  * Shizuku-dependent screens show their real disconnected states when Shizuku is absent.
  * This deliberately does not replace connected operation/device tests.
- * Optional instrumentation argument startAt=secondary or startAt=dialogs resumes a partial sweep;
+ * Optional instrumentation argument startAt=details, secondary, or dialogs resumes a partial sweep;
  * omit it for complete coverage. Screenshots from a resumed run cover only that suffix.
+ * captureComparison=false skips the comparison screen's real package-inventory refresh.
  */
 @SdkSuppress(minSdkVersion = 30)
 class UiReleaseSweepDeviceTest {
@@ -83,7 +85,10 @@ class UiReleaseSweepDeviceTest {
     @Test fun captureNonMutatingReleaseSweep() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish")) { "Use an emulator for fixture screenshots" }
         val startAt = InstrumentationRegistry.getArguments().getString("startAt", "main")
-        require(startAt in setOf("main", "secondary", "dialogs")) { "startAt must be main, secondary, or dialogs" }
+        val captureComparison = InstrumentationRegistry.getArguments().getString("captureComparison", "true").toBooleanStrict()
+        require(startAt in setOf("main", "details", "secondary", "dialogs")) {
+            "startAt must be main, details, secondary, or dialogs"
+        }
         val settings = SettingsStore.getInstance()
         val originalOnboarding = settings.disableRiskDialogFlow.first()
         val inventory = inventoryStates()
@@ -153,6 +158,10 @@ class UiReleaseSweepDeviceTest {
                 capture("03-filters-top")
                 compose.onNodeWithText("AOSP").performScrollTo().assertIsDisplayed()
                 capture("04-filters-categories")
+                text(R.string.tracker_scan_all).performScrollTo().assertIsDisplayed()
+                compose.onNodeWithText(context.getString(R.string.tracker_scanned_count, 0,
+                    apps.count { !it.isUninstalled })).assertIsDisplayed()
+                capture("04b-filters-privacy")
                 text(R.string.clear).performClick()
                 compose.onNodeWithText(context.resources.getQuantityString(
                     R.plurals.show_app_count, apps.count { !it.isUninstalled }, apps.count { !it.isUninstalled },
@@ -181,7 +190,9 @@ class UiReleaseSweepDeviceTest {
                 capture("08-hidden-selection")
                 description(R.string.close_search).performClick()
                 description(R.string.clear_selection).performClick()
+            }
 
+            if (startAt == "main" || startAt == "details") {
                 compose.onNodeWithText(apps.first().name).performClick()
                 text(R.string.app_overview).assertIsDisplayed()
                 capture("09-app-overview")
@@ -219,16 +230,18 @@ class UiReleaseSweepDeviceTest {
                 capture("18-privacy-dashboard")
                 description(R.string.back).performClick()
                 // Comparison refreshes the real package inventory; keep it last in the main-app run.
-                openPage(R.string.comparison_title)
-                compose.waitUntil(30_000) {
-                    compose.onAllNodesWithText(context.getString(R.string.comparison_loading)).fetchSemanticsNodes().isEmpty() &&
-                        compose.onAllNodes(hasContentDescription(context.getString(R.string.comparison_refresh)) and isEnabled())
-                            .fetchSemanticsNodes().size == 1
+                if (captureComparison) {
+                    openPage(R.string.comparison_title)
+                    compose.waitUntil(90_000) {
+                        compose.onAllNodesWithText(context.getString(R.string.comparison_loading)).fetchSemanticsNodes().isEmpty() &&
+                            compose.onAllNodes(hasContentDescription(context.getString(R.string.comparison_refresh)) and isEnabled())
+                                .fetchSemanticsNodes().size == 1
+                    }
+                    text(R.string.comparison_loading).assertDoesNotExist()
+                    description(R.string.comparison_refresh).assertIsDisplayed().assertIsEnabled()
+                    capture("19-comparison")
+                    description(R.string.back).performClick()
                 }
-                text(R.string.comparison_loading).assertDoesNotExist()
-                description(R.string.comparison_refresh).assertIsDisplayed().assertIsEnabled()
-                capture("19-comparison")
-                description(R.string.back).performClick()
 
             }
 
@@ -240,6 +253,9 @@ class UiReleaseSweepDeviceTest {
             observeImeWindow()
             compose.onNode(hasSetTextAction()).performClick().performTextReplacement("{}")
             waitForIme(visible = true)
+            assertOnScreenAboveIme(text(R.string.import_preset))
+            assertOnScreenAboveIme(text(R.string.preset_review_button))
+            assertOnScreenAboveIme(text(R.string.cancel))
             capture("20c-preset-import-keyboard")
             pressBack()
             waitForIme(visible = false)
@@ -360,6 +376,8 @@ class UiReleaseSweepDeviceTest {
             }
             text(R.string.log_copied).assertIsDisplayed()
             // Let copy feedback leave before capturing the next Settings section.
+            // The v2 rule's virtual clock also drives SnackbarHost's timeout.
+            compose.mainClock.advanceTimeBy(5_000)
             compose.waitUntil(10_000) {
                 compose.onAllNodesWithText(context.getString(R.string.log_copied)).fetchSemanticsNodes().isEmpty()
             }
@@ -430,16 +448,36 @@ class UiReleaseSweepDeviceTest {
             bounds.height > 0f && bounds.bottom < keyboardTop)
     }
 
+    private fun assertOnScreenAboveIme(node: SemanticsNodeInteraction) {
+        var windowTop = 0
+        var keyboardTop = 0
+        instrumentation.runOnMainSync {
+            val window = checkNotNull(WindowInspector.getGlobalWindowViews().lastOrNull {
+                it.isAttachedToWindow && it.hasWindowFocus()
+            })
+            val location = IntArray(2)
+            window.getLocationOnScreen(location)
+            windowTop = location[1]
+            val insets = checkNotNull(window.rootWindowInsets)
+            check(insets.isVisible(WindowInsets.Type.ime()))
+            keyboardTop = windowTop + window.height - insets.getInsets(WindowInsets.Type.ime()).bottom
+        }
+        val bounds = node.assertIsDisplayed().fetchSemanticsNode().boundsInWindow
+        assertTrue("Dialog content $bounds at window y=$windowTop must fit above keyboard y=$keyboardTop",
+            bounds.height > 0f && bounds.top + windowTop >= 0f && bounds.bottom + windowTop < keyboardTop)
+    }
+
     private fun waitForExpandedFilters() {
         val title = compose.onNode(hasText(context.getString(R.string.filters_title)) and hasAnyAncestor(isDialog()))
         val clear = compose.onNode(hasText(context.getString(R.string.clear)) and hasAnyAncestor(isDialog()))
-        val screenHeight = context.resources.displayMetrics.heightPixels
+        val dialog = compose.onNode(isDialog())
         var lastBounds: List<androidx.compose.ui.geometry.Rect>? = null
         var stableSince = SystemClock.uptimeMillis()
-        compose.waitUntil(10_000) {
+        compose.waitUntil(30_000) {
+            val viewport = dialog.fetchSemanticsNode().boundsInWindow
             val bounds = listOf(title.fetchSemanticsNode().boundsInWindow, clear.fetchSemanticsNode().boundsInWindow)
-            val expanded = bounds[0].top >= 0f && bounds[0].top < screenHeight * 0.35f &&
-                bounds[1].top > screenHeight * 0.6f && bounds[1].bottom <= screenHeight
+            val expanded = bounds[0].top >= viewport.top && bounds[0].top < viewport.top + viewport.height * 0.35f &&
+                bounds[1].top > viewport.top + viewport.height * 0.6f && bounds[1].bottom <= viewport.bottom
             if (!expanded || bounds != lastBounds) {
                 lastBounds = bounds
                 stableSince = SystemClock.uptimeMillis()
@@ -459,6 +497,12 @@ class UiReleaseSweepDeviceTest {
         }
         assertTrue("The screenshot window did not render", drawn.await(5, TimeUnit.SECONDS))
         instrumentation.waitForIdleSync()
+        // Force and copy the current app frame before taking the display capture.
+        // Animation callbacks alone can precede RenderThread on software emulators.
+        val roots = compose.onAllNodes(isRoot())
+        roots.fetchSemanticsNodes().indices.forEach {
+            roots[it].captureToImage().asAndroidBitmap().recycle()
+        }
     }
 
     private fun switchHost(next: Host) {
@@ -480,6 +524,16 @@ class UiReleaseSweepDeviceTest {
             }
         } finally { screenshot.recycle() }
         val roots = compose.onAllNodes(isRoot())
+        // Capture the app directly only when there is one root. Dialogs and
+        // popups use the display capture above, which includes all windows.
+        if (roots.fetchSemanticsNodes().size == 1) {
+            val rootBitmap = roots[0].captureToImage().asAndroidBitmap()
+            try {
+                File(folder, "$name-window.png").outputStream().use {
+                    assertTrue("Could not save $name window", rootBitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
+                }
+            } finally { rootBitmap.recycle() }
+        }
         File(folder, "$name.txt").writeText(
             "Native configuration: ${config.screenWidthDp} x ${config.screenHeightDp}dp; fontScale=${config.fontScale}\n" +
                 roots.fetchSemanticsNodes().indices.joinToString("\n") { roots[it].printToString() },

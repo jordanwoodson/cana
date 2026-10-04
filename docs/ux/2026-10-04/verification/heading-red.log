@@ -1,0 +1,59 @@
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+io.github.samolego.canta.ui.ExpressiveComponentsUiTest:
+INSTRUMENTATION_STATUS: test=secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=io.github.samolego.canta.ui.ExpressiveComponentsUiTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (Heading is defined)
+Semantics of the node:
+Node #9 at (l=12.0, t=32.0, r=260.0, b=124.0)px
+Text = '[Device settings]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (Text + InputText + EditableText contains 'Device settings' (ignoreCase: false))
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText(ExpressiveComponentsUiTest.kt:149)
+
+INSTRUMENTATION_STATUS: stream=
+Error in secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest):
+java.lang.AssertionError: Failed to assert the following: (Heading is defined)
+Semantics of the node:
+Node #9 at (l=12.0, t=32.0, r=260.0, b=124.0)px
+Text = '[Device settings]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (Text + InputText + EditableText contains 'Device settings' (ignoreCase: false))
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText(ExpressiveComponentsUiTest.kt:149)
+
+INSTRUMENTATION_STATUS: test=secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 8.794
+There was 1 failure:
+1) secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText(io.github.samolego.canta.ui.ExpressiveComponentsUiTest)
+java.lang.AssertionError: Failed to assert the following: (Heading is defined)
+Semantics of the node:
+Node #9 at (l=12.0, t=32.0, r=260.0, b=124.0)px
+Text = '[Device settings]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (Text + InputText + EditableText contains 'Device settings' (ignoreCase: false))
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at io.github.samolego.canta.ui.ExpressiveComponentsUiTest.secondaryHeaderWrapsAndBackRemainsReachableInRtlAtLargeText(ExpressiveComponentsUiTest.kt:149)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

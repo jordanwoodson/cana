@@ -59,6 +59,17 @@ class CanaColorsTest {
         }
     }
 
+    @Test fun secondaryTextAndControlsRemainReadableAtEverySurfaceLevel() {
+        with(DraculaColorScheme) {
+            listOf(surface, surfaceContainerLow, surfaceContainer, surfaceContainerHigh,
+                surfaceContainerHighest, primaryContainer, secondaryContainer, tertiaryContainer).forEach { container ->
+                assertTextContrast("Secondary text", container, onSurfaceVariant)
+                assertTextContrast("Inline error", container, error)
+                assertTrue("Control outline must contrast against its surface", contrastRatio(container, outline) >= 3.0)
+            }
+        }
+    }
+
     private fun assertTextContrast(name: String, background: Color, foreground: Color) {
         val contrast = contrastRatio(background, foreground)
         assertTrue("$name contrast is $contrast", contrast >= 4.5)

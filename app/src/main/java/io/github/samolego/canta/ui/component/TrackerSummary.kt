@@ -104,9 +104,11 @@ fun TrackerScanControls(model: AppListViewModel) {
     val installed = model.allApps.filter { !it.isUninstalled }
     val scanned = installed.count { app -> repository.count(app) != null }
     if (progress != null) TrackerScanProgressRow(progress, onCancel = repository::cancelScanAll)
-    else Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(stringResource(R.string.tracker_scanned_count, scanned, installed.size), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
-        TextButton(enabled = installed.isNotEmpty(), onClick = { startTrackerScan(context, model) }) { Text(stringResource(R.string.tracker_scan_all)) }
+    else Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(stringResource(R.string.tracker_scanned_count, scanned, installed.size), style = MaterialTheme.typography.bodySmall)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(enabled = installed.isNotEmpty(), onClick = { startTrackerScan(context, model) }) { Text(stringResource(R.string.tracker_scan_all)) }
+        }
     }
 }
 
