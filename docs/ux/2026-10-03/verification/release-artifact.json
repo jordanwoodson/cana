@@ -1,0 +1,11 @@
+{
+  "apk": "cana-v3.2.2-cana.18.apk",
+  "bytes": 6750814,
+  "sha256": "e2cc3d9507c147d43e1354766aa69b45b5610161334beb263708c37ebb7917c7",
+  "certificate_sha256": "748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345",
+  "package": "io.github.jordanwoodson.cana",
+  "version_name": "3.2.2-cana.18",
+  "version_code": 242,
+  "signature_verifies": true,
+  "checksum_matches_published_manifest_and_api": true
+}

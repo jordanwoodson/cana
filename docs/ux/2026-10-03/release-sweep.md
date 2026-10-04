@@ -87,6 +87,14 @@ Long-press copying of a single log entry and every data-source validation/error 
 
 This review does not cover physical/OEM devices, every Android version, every translation, or a formal TalkBack/switch-access audit. Large-text and semantics checks improve confidence in the tested English layouts and named controls but do not establish full accessibility conformance. Release lint's translation warnings remain an explicit limitation.
 
-## CI and release — pending
+## CI and release
 
-Local checks above are recorded before publication. Root will append the pushed `master` commit, GitHub Actions release-build result, and resulting release identifier/link. Version numbers, tags, releases, and the signing key are not changed manually; the existing release workflow assigns the next `3.2.2-cana.N` and signs the update.
+Application changes were pushed to `master` in [`c2172b7`](https://github.com/jordanwoodson/cana/commit/c2172b7d78c9c2688ea95791a024b58fe53633c1). The [release workflow](https://github.com/jordanwoodson/cana/actions/runs/37167319218) completed successfully and published [Cana 3.2.2-cana.18](https://github.com/jordanwoodson/cana/releases/tag/3.2.2-cana.18), version code **242**, from that exact commit. CI ran unit tests, release lint, release assembly, and its signing-certificate check. Version numbers, tags, releases, and the signing key were not changed manually.
+
+The published 6,750,814-byte APK was downloaded through the authenticated GitHub assets API. Its SHA-256 matches both the published checksum manifest and GitHub's asset digest; Android's `apksigner verify` succeeds with the unchanged Cana certificate:
+
+- APK SHA-256: `e2cc3d9507c147d43e1354766aa69b45b5610161334beb263708c37ebb7917c7`
+- Signing certificate SHA-256: `748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345`
+- Package: `io.github.jordanwoodson.cana`; version `3.2.2-cana.18` / `242`.
+
+Machine-readable evidence: [CI result](verification/release-ci.json), [release metadata](verification/release.json), [artifact verification](verification/release-artifact.json), and [signature verification](verification/release-signature.txt). Obtainium can pick up the published update; installation on the physical phone was not asserted. The temporary verification emulator was stopped after the checks.

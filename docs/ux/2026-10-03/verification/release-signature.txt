@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Cana, O=jordanwoodson
+Signer #1 certificate SHA-256 digest: 748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345
+Signer #1 certificate SHA-1 digest: d880d189c7c9f190a867f925eabdcd145f840bfb
+Signer #1 certificate MD5 digest: a6a69f383d6d10c58c2b88848e92b0c9
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 4096
+Signer #1 public key SHA-256 digest: 5bfa395cdcc80e9c4577b4e2e994c0c2d302988ab95ea24d1b525449c8ad9d56
+Signer #1 public key SHA-1 digest: 80fb22ddf1a6fe20812c706bd0fa3fea3d7060c9
+Signer #1 public key MD5 digest: b215cbf9ae5034699f3059c51b17dae1
