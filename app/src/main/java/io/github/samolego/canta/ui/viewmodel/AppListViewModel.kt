@@ -199,7 +199,8 @@ class AppListViewModel(
                     it.name.contains(searchQuery, true) ||
                             it.packageName.contains(searchQuery, true)
                 }
-                .filter { it.isSystemApp || !onlySystem }
+                // Keep entries whose Android metadata could not identify their app type visible.
+                .filter { it.isSystemApp || !it.appTypeKnown || !onlySystem }
     }
 
     val needsReload: Boolean get() = inventoryState.stale

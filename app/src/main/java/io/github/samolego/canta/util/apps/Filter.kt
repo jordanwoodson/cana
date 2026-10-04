@@ -30,7 +30,7 @@ class Filter(
          */
         val any: Filter = Filter(name = "Any", shouldShow = { true }, nameRes = R.string.filter_any)
 
-        val user = Filter(name = "User", shouldShow = { app -> !app.isSystemApp }, nameRes = R.string.filter_user)
+        val user = Filter(name = "User", shouldShow = { app -> !app.isSystemApp || !app.appTypeKnown }, nameRes = R.string.filter_user)
         val leftoverUpdates = Filter("Leftover updates", { it.isUninstalled && it.isUpdatedSystemApp },
             nameRes = R.string.leftover_updates)
         /** Apps whose APK code matched at least one tracker signature in a Cana scan. */

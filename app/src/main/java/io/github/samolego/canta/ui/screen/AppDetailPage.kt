@@ -94,6 +94,9 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         AppIconImage(app, target.userId, size = 56.dp)
                         Text(app.name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
                     }
+                    if (app.metadataIncomplete) CanaBanner(Icons.Default.Info,
+                        stringResource(R.string.app_metadata_incomplete), StatusTone.WARNING,
+                        details = { Text(stringResource(R.string.app_metadata_incomplete_detail)) })
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         SelectionContainer(modifier = Modifier.weight(1f)) {
                             Text(target.packageName, style = MaterialTheme.typography.bodySmall)
@@ -123,7 +126,11 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                             StatusChip(stringResource(stateLabel), stateIcon)
                         }
                         Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
-                            StatusChip(stringResource(if (app.isSystemApp) R.string.scope_system_apps else R.string.scope_user_apps), Icons.Default.Android)
+                            StatusChip(stringResource(when {
+                                !app.appTypeKnown -> R.string.app_type_unavailable
+                                app.isSystemApp -> R.string.scope_system_apps
+                                else -> R.string.scope_user_apps
+                            }), Icons.Default.Android)
                         }
                     }
                     Column {

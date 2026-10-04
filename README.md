@@ -53,6 +53,9 @@ that profile's apps, and uninstall / reinstall then act on that profile only
   after the package is removed from every profile, and preserves their removed states.
 * Every profile uses the same debloat-list ratings and descriptions. Before making changes,
   Cana checks the selected profile's active roles, administrators and installed dependencies.
+* Removed apps keep their icons while Android still retains the APK. Icons load in the
+  background, with separate caches for each profile. Apps with unreadable metadata stay
+  listed under their package name and show an incomplete-details notice.
 * Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
 
 ### Roadmap features

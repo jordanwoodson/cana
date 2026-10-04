@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
+    <string name="app_metadata_incomplete">Some app details unavailable</string>
+    <string name="app_type_unavailable">App type unavailable</string>
+    <string name="app_metadata_incomplete_detail">Android could not provide all of this app’s details. The package remains listed with its debloat guidance. Refresh to try again.</string>
     <string name="profile_badges_explanation">Every profile uses the same debloat-list ratings. Before applying changes, Cana checks the selected profile’s active roles, administrator and installed dependencies.</string>
     <string name="update_cleanup_in_use">Updates are shared across profiles. Remove this app from every profile before cleaning up its update APK. Cleanup is blocked while any profile still uses it.</string>
     <string name="update_cleanup_profile_names">Still used by: %1$s. Cleanup is blocked.</string>
