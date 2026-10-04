@@ -5,6 +5,24 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class RestoreScriptTest {
+    @Test fun exportedRecoveryDefersRemovalToCanaInsteadOfRunningAnUnguardedUninstall() {
+        val script = RestoreScript.generate(listOf(record("reinstall", "{\"installed\":false}")))
+        // Execute the generated script with a fake pm that records any mutation.
+        val dir = java.nio.file.Files.createTempDirectory("cana-restore-test").toFile()
+        try {
+            val marker = java.io.File(dir, "called")
+            java.io.File(dir, "pm").apply {
+                writeText("#!/bin/sh\nprintf called > " + RestoreScript.quote(marker.absolutePath) + "\n")
+                setExecutable(true)
+            }
+            val process = ProcessBuilder("sh", "-c", script).apply {
+                environment()["PATH"] = dir.absolutePath + ":" + environment()["PATH"]
+            }.start()
+            val output = process.inputStream.bufferedReader().readText()
+            assertEquals(output, 2, process.waitFor())
+            assertFalse("Export must not run a removal without Cana's live profile guard", marker.exists())
+        } finally { dir.deleteRecursively() }
+    }
     @Test fun meteredRecoveryCancelsDesiredReapplyBeforeRestoringPolicy() {
         val plan = RestoreScript.plan(record("metered", "{\"appId\":10153,\"meteredPolicy\":0,\"desiredMetered\":false}"))
         assertEquals(listOf("cana-privacy", "metered-desired-set", "test.app", "10", "10153", "false"), plan.commands.first())

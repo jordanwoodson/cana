@@ -55,7 +55,7 @@ class AppListViewModel(
     }
 
     suspend fun inspectUpdates(request: PackageActionRequest): List<UpdateImpact> =
-        if (request.action in setOf(PackageAction.UNINSTALL, PackageAction.REMOVE_UPDATES))
+        if (request.action == PackageAction.REMOVE_UPDATES)
             request.apps.filter { it.isUpdatedSystemApp }.map { packageOps.inspectUpdates(it.packageName, request.userId) }
         else emptyList()
 

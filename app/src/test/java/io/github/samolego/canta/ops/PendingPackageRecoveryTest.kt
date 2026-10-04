@@ -8,6 +8,20 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class PendingPackageRecoveryTest {
+    @Test fun delayedRemovalCannotSucceedWithoutVerifyingThePersistedOtherProfiles() {
+        for (action in listOf("uninstall", "uninstall_keep_data", "remove_updates", "reinstall")) {
+            val record = removal(action).toBuilder().setPreviousState(
+                "{\"installed\":true,\"otherProfiles\":{\"0\":{\"installed\":true,\"versionCode\":4}}}")
+                .setIntendedState("{\"installed\":false}").build()
+            val removedPeer = "{\"installed\":false,\"otherProfiles\":{\"0\":{\"installed\":false,\"versionCode\":0}}}"
+            assertEquals(action, false, PendingPackageRecovery.settle(record, removedPeer, Result(true, null), false))
+            assertNull(PendingPackageRecovery.settle(record, "{\"installed\":false}", Result(true, null), false))
+            assertNull(PendingPackageRecovery.settle(record, removedPeer, null, false))
+            val preserved = "{\"installed\":false,\"otherProfiles\":{\"0\":{\"installed\":true,\"versionCode\":4}}}"
+            assertEquals(true, PendingPackageRecovery.settle(record, preserved, Result(true, null), false))
+            assertEquals(true, PendingPackageRecovery.settle(record, preserved, null, false))
+        }
+    }
     private fun removal(action: String = "uninstall") = OperationRecord.newBuilder().setId("pending").setAction(action)
         .setPackageName("test.app").setUserId(10).setPreviousState("{\"installed\":true,\"updatedSystemApp\":true}").build()
 

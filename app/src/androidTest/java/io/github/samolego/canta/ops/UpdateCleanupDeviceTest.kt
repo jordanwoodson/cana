@@ -18,7 +18,7 @@ import rikka.shizuku.Shizuku
 
 @RunWith(AndroidJUnit4::class)
 class UpdateCleanupDeviceTest {
-    @Test fun cleanupRequiresSharedConsentAndVerifiesBothProfilesAndSavedBytes() = runBlocking {
+    @Test fun cleanupRefusesSharedUpdatesEvenWithOldConsentAndCleansOnlyUnusedUpdates() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         withTimeout(30_000) { while (!Shizuku.pingBinder()) delay(100) }
         val services = CanaServices.getInstance()
@@ -43,17 +43,17 @@ class UpdateCleanupDeviceTest {
                 assertFalse(denied.changed)
                 assertTrue(ops.canResetToFactory(name, selected))
                 val removed = ops.removeUpdates(name, selected, setOf(other))
-                assertTrue(removed.message, removed.success)
-                assertTrue(removed.changed)
+                assertFalse(removed.message, removed.success)
+                assertFalse(removed.changed)
                 assertEquals(0L, removed.freedBytes)
-                assertFalse(ops.inspectUpdates(name, selected).updated)
+                assertTrue(ops.inspectUpdates(name, selected).updated)
                 assertFalse(ops.inspectUpdates(name, selected).installed)
                 assertTrue(ops.inspectUpdates(name, other).installed)
+                assertTrue(ops.inspectUpdates(name, other).updated)
                 val record = services.history.records.first().last()
                 assertEquals("remove_updates", record.action)
-                assertTrue(record.completed && record.success)
+                assertTrue(record.completed && !record.success && !record.changed)
                 assertEquals(selected, record.userId)
-                assertTrue(ops.removeUpdates(name, selected).skipped)
             }
             assertTrue(ops.reinstall(name, 0).success)
             assertTrue(ops.reinstall(name, 10).success)
@@ -74,7 +74,7 @@ class UpdateCleanupDeviceTest {
         }
     }
 
-    @Test fun directResetOfUninstalledUpdatePreservesBothProfiles() = runBlocking {
+    @Test fun rawResetCannotBypassTheProfileGuard() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         withTimeout(30_000) { while (!Shizuku.pingBinder()) delay(100) }
         assertEquals(PackageManager.PERMISSION_GRANTED, Shizuku.checkSelfPermission())
@@ -87,14 +87,16 @@ class UpdateCleanupDeviceTest {
             assertTrue(staged.message, staged.success)
             assertTrue(services.packageOps.uninstall(name, selected).success)
             assertTrue(services.packageOps.canResetToFactory(name, selected))
-            val direct = services.packageOps.uninstallStep(name, selected, 0)
-            assertTrue("Direct reset user $selected: ${direct.message}", direct.success)
-            val selectedInfo = ShizukuPackageInstallerUtils.getPackageInfo(name, PackageManager.MATCH_UNINSTALLED_PACKAGES, selected)!!.applicationInfo!!
-            val otherInfo = ShizukuPackageInstallerUtils.getPackageInfo(name, PackageManager.MATCH_UNINSTALLED_PACKAGES, other)!!.applicationInfo!!
-            assertEquals(0, selectedInfo.flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)
-            assertEquals(0, selectedInfo.flags and ApplicationInfo.FLAG_INSTALLED)
-            assertNotEquals(0, otherInfo.flags and ApplicationInfo.FLAG_INSTALLED)
-            assertTrue(selectedInfo.sourceDir, selectedInfo.sourceDir.startsWith("/system/"))
+            try {
+                services.packageOps.uninstallStep(name, selected, 0, allowUpdateReset = true)
+                fail("Shared update reset must be refused before it reaches Android")
+            } catch (expected: IllegalStateException) {
+                assertTrue(expected.message.orEmpty().contains("shared"))
+            }
+            assertTrue(services.packageOps.inspectUpdates(name, selected).updated)
+            assertTrue(services.packageOps.inspectUpdates(name, other).updated)
+            assertFalse(services.packageOps.inspectUpdates(name, selected).installed)
+            assertTrue(services.packageOps.inspectUpdates(name, other).installed)
             assertTrue(services.packageOps.reinstall(name, selected).success)
         }
     }

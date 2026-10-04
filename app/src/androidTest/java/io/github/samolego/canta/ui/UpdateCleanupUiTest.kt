@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 class UpdateCleanupUiTest {
     @get:Rule val compose = createComposeRule()
 
-    @Test fun sharedUpdateStartsSkippedAndRequiresExplicitSelection() = runBlocking {
+    @Test fun sharedUpdateCannotBeSelectedOrApproved() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         val services = CanaServices.getInstance()
         val ops = services.packageOps
@@ -46,15 +46,13 @@ class UpdateCleanupUiTest {
             }
             compose.waitUntil(30_000) { compose.onAllNodesWithText("Checking updates and other profiles…").fetchSemanticsNodes().isEmpty() }
             compose.onNodeWithText("Work profile", substring = true).assertIsDisplayed()
-            compose.onNode(hasText("Removing updates also downgrades", substring = true)).performScrollTo().assertIsDisplayed()
+            compose.onNode(hasText("Still used by:", substring = true)).performScrollTo().assertIsDisplayed()
             compose.onNode(hasText("Remove updates") and hasClickAction()).assertIsNotEnabled()
             compose.onNodeWithText(app.name).performScrollTo().performClick()
-            compose.onNodeWithText("I understand these warnings and want to continue.").performScrollTo().performClick()
-            compose.onNode(hasText("Remove updates") and hasClickAction()).assertIsEnabled().performClick()
-            assertEquals(setOf(0), consent)
+            compose.onNode(hasText("Remove updates") and hasClickAction()).assertIsNotEnabled()
+            assertNull(consent)
             assertFalse(ops.inspectUpdates(name, 10).installed)
         } finally {
-            ops.removeUpdates(name, 10, setOf(0))
             ops.reinstall(name, 0)
             ops.reinstall(name, 10)
         }

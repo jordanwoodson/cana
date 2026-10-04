@@ -17,6 +17,10 @@ data class UserProfile(
     val blocksShell: Boolean = false,
     /** The profile's admin set DISALLOW_UNINSTALL_APPS. */
     val blocksUninstall: Boolean = false,
+    /** Parent of an Android profile; null for a full user. */
+    val parentId: Int? = null,
+    /** Null means Android's uninstall propagation policy could not be read. */
+    val deleteAppWithParent: Boolean? = null,
 ) {
     enum class Kind {
         PERSONAL,

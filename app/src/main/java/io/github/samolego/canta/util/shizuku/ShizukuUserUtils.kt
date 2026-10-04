@@ -77,6 +77,8 @@ object ShizukuUserUtils {
             else -> UserProfile.Kind.USER
         }
 
+        val group = userInfoClass.getField("profileGroupId").getInt(userInfo)
+
         return UserProfile(
             id = id,
             name = name,
@@ -85,6 +87,9 @@ object ShizukuUserUtils {
             blocksShell = shizukuIsShell &&
                     hasUserRestriction(userManager, DISALLOW_DEBUGGING_FEATURES, id),
             blocksUninstall = hasUserRestriction(userManager, DISALLOW_UNINSTALL_APPS, id),
+            parentId = group.takeIf { it >= 0 && it != id },
+            // Android 14 introduced deleteAppWithParent; newer versions are read via dumpsys.
+            deleteAppWithParent = if (android.os.Build.VERSION.SDK_INT < 34) false else null,
         )
     }
 

@@ -151,7 +151,7 @@ internal fun PackageActionConfirmation(
     val unavailableMessage = stringResource(R.string.inventory_unavailable)
     var impacts by remember { mutableStateOf<List<UpdateImpact>?>(null) }
     var included by remember { mutableStateOf(request.apps.map { it.packageName }.toSet()) }
-    var reset by remember { mutableStateOf(false) }
+    val reset = false
     var safety by remember { mutableStateOf<Map<String, SafetyAssessment>>(emptyMap()) }
     var warningsAccepted by remember(included, reset) { mutableStateOf(false) }
     var inspectionError by remember { mutableStateOf<String?>(null) }
@@ -161,7 +161,7 @@ internal fun PackageActionConfirmation(
         val inspected = if (request.action == PackageAction.REINSTALL) emptyList() else model.inspectUpdates(request)
         safety = if (request.action == PackageAction.REINSTALL) emptyMap() else model.inspectSafety(request)
         impacts = inspected
-        if (cleanup) included = inspected.filter { it.updated && it.error == null && it.otherInstalledProfiles.isEmpty() }.map { it.packageName }.toSet()
+        if (cleanup) included = inspected.filter { it.updated && !it.installed && it.error == null && it.otherInstalledProfiles.isEmpty() }.map { it.packageName }.toSet()
 
         included = included.filter { pkg -> safety[pkg]?.protected != true && safety[pkg]?.error == null && inspected.none { it.packageName == pkg && it.error != null } }.toSet()
         } catch (e: CancellationException) { throw e }
@@ -193,6 +193,9 @@ internal fun PackageActionConfirmation(
                     PackageAction.SUSPEND -> R.string.confirm_suspend_consequence
                     else -> R.string.plan_reversible
                 }))
+                if (request.action in setOf(PackageAction.UNINSTALL, PackageAction.UNINSTALL_KEEP_DATA))
+                    Text(stringResource(R.string.uninstall_profile_only))
+                if (cleanup) Text(stringResource(R.string.update_cleanup_in_use))
                 inspectionError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 if (checked == null && inspectionError == null) {
                     Text(stringResource(R.string.checking_update_profiles))
@@ -203,7 +206,7 @@ internal fun PackageActionConfirmation(
                         val assessment = safety[pkg]
                         val impact = checked.orEmpty().find { it.packageName == pkg }
                         val eligible = app != null && assessment?.protected != true && assessment?.error == null && impact?.error == null &&
-                            (!cleanup || impact?.updated == true)
+                            (!cleanup || impact?.let { it.updated && !it.installed && it.otherInstalledProfiles.isEmpty() } == true)
                         Row(Modifier.fillMaxWidth().toggleable(pkg in included, enabled = eligible, role = Role.Checkbox,
                             onValueChange = { included = if (it) included + pkg else included - pkg }), verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(pkg in included, enabled = eligible, onCheckedChange = null)
@@ -211,11 +214,17 @@ internal fun PackageActionConfirmation(
                                 Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium)
                                 if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall)
                                 app?.removalInfo?.let { RiskChip(it) }
+                                app?.profileGuidance?.let { guidance ->
+                                    Text(stringResource(guidance.need.label), style = MaterialTheme.typography.labelMedium)
+                                    Text(stringResource(guidance.reason), style = MaterialTheme.typography.bodySmall)
+                                }
                                 val reason = when {
                                     app == null -> stringResource(R.string.plan_unavailable)
                                     assessment?.protected == true -> stringResource(R.string.safety_protected, pkg)
                                     assessment?.error != null -> assessment.error
                                     impact?.error != null -> impact.error
+                                    cleanup && impact?.installed == true -> stringResource(R.string.update_cleanup_in_use)
+                                    cleanup && impact?.otherInstalledProfiles?.isNotEmpty() == true -> stringResource(R.string.update_cleanup_in_use)
                                     cleanup && impact?.updated != true -> stringResource(R.string.no_leftover_updates)
                                     pkg !in included -> stringResource(R.string.plan_excluded)
                                     else -> null
@@ -245,7 +254,7 @@ internal fun PackageActionConfirmation(
                                 }
                             }
                         })
-                    if (checked.orEmpty().any { it.updated }) {
+                    if (cleanup && checked.orEmpty().any { it.updated }) {
                         CanaBanner(Icons.Default.Warning, stringResource(R.string.update_global_warning), StatusTone.ERROR,
                             details = {
                                 val selectedUpdateBytes = knownApkTotal(checked.orEmpty()
@@ -253,15 +262,10 @@ internal fun PackageActionConfirmation(
                                 Text(stringResource(R.string.selected_update_apks, selectedUpdateBytes?.let {
                                     formatFileSize(context, it)
                                 } ?: stringResource(R.string.app_size_unavailable)))
-                                if (!cleanup) {
-                                    io.github.samolego.canta.ui.component.CheckboxRow(reset, { reset = it }) {
-                                        Text(stringResource(R.string.reset_to_factory_version))
-                                    }
-                                }
                                 checked.orEmpty().filter { it.updated }.forEach { impact ->
                                     if (impact.otherInstalledProfiles.isNotEmpty()) {
                                         Text(impact.packageName, style = MaterialTheme.typography.labelMedium)
-                                        Text(stringResource(if (cleanup) R.string.update_shared_warning else R.string.update_shared_uninstall_warning,
+                                        Text(stringResource(R.string.update_cleanup_profile_names,
                                             impact.otherInstalledProfiles.joinToString { "${it.name ?: it.kind.name} (${it.id})" }),
                                             style = MaterialTheme.typography.bodySmall)
                                     }

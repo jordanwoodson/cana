@@ -118,7 +118,14 @@ object RestoreScript {
 
     fun generate(records: List<OperationRecord>, ownerUserId: Int = 0): String {
         require(ownerUserId >= 0)
-        val steps = records.asReversed().filter { it.changed || !it.completed }.map { it to plan(it) }
+        val steps = records.asReversed().filter { it.changed || !it.completed }.map { record ->
+            val plan = plan(record)
+            val removals = plan.commands.filter { it.take(2) == listOf("pm", "uninstall") }
+            record to plan.copy(commands = plan.commands - removals.toSet(), notes = plan.notes +
+                if (removals.isEmpty()) emptyList() else listOf(
+                    "Undo the installation of ${record.packageName} in Cana (user ${record.userId}). " +
+                        "A standalone uninstall cannot check whether Android would also remove it from another profile."))
+        }
         val manual = steps.sumOf { it.second.notes.size }
         return buildString {
             append("#!/system/bin/sh\n# Cana recovery: run with adb shell sh /data/local/tmp/cana-restore.sh\n")

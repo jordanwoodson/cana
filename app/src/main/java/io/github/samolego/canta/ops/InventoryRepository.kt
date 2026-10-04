@@ -64,8 +64,9 @@ class InventoryRepository(
                 val packages = context.packageManager.getAllPackagesInfo(userId)
                 val usage = runCatching { UsageRepository(context).lastUsed(userId) }.getOrNull()
                 val cached = parseMetadata(BloatListRepository(context).cached())
-                packages.map { app -> app.copy(bloatData = cached[app.packageName],
-                    lastUsed = if (usage == null || app.isUninstalled) null else usage[app.packageName] ?: 0L) } to (usage != null)
+                val decorated = packages.map { app -> app.copy(bloatData = cached[app.packageName],
+                    lastUsed = if (usage == null || app.isUninstalled) null else usage[app.packageName] ?: 0L) }
+                applyProfileGuidance(decorated, userId, cached) to (usage != null)
             }
             publish { it.copy(apps = apps, loading = false, loadingMetadata = refreshMetadata, loaded = true,
                 stale = refreshMetadata, usageAvailable = usageAvailable) }
@@ -73,10 +74,26 @@ class InventoryRepository(
             val metadata = withContext(Dispatchers.IO) {
                 parseMetadata(metadataLoader?.invoke(context, forceMetadata) ?: BloatListRepository(context).load(forceMetadata))
             }
-            publish { old -> old.copy(apps = old.apps.map { it.copy(bloatData = metadata[it.packageName]) }, stale = false) }
+            val currentApps = state(userId).apps
+            val decorated = withContext(Dispatchers.IO) {
+                applyProfileGuidance(currentApps.map { it.copy(bloatData = metadata[it.packageName]) }, userId, metadata)
+            }
+            publish { it.copy(apps = decorated, stale = false) }
         } catch (e: CancellationException) { throw e }
         catch (e: Exception) { publish { it.copy(error = (e.cause ?: e).message ?: e.toString()) } }
         finally { publish { it.copy(loading = false, loadingMetadata = false) } }
+    }
+
+    private suspend fun applyProfileGuidance(apps: List<AppInfo>, userId: Int, metadata: Map<String, BloatData>): List<AppInfo> {
+        val services = CanaServices.getInstance()
+        val kind = try { io.github.samolego.canta.util.shizuku.ShizukuUserUtils.getUsers().firstOrNull { it.id == userId }?.kind }
+            catch (e: Exception) { services.profiles.find(userId)?.kind }
+        if (kind != io.github.samolego.canta.util.apps.UserProfile.Kind.WORK) return apps
+        val installed = apps.filterNot { it.isUninstalled }.map { it.packageName }.toSet()
+        val assessments = services.safety.inspect(apps.map { it.packageName }, userId)
+        return apps.map { app -> app.copy(profileGuidance = WorkProfileGuidance.assess(app.packageName, kind,
+            app.bloatData, assessments[app.packageName] ?: SafetyAssessment(error = "Unavailable"),
+            WorkProfileGuidance.installedDependents(app.packageName, metadata, installed))) }
     }
 
     private fun parseMetadata(json: JSONObject): Map<String, BloatData> = buildMap {

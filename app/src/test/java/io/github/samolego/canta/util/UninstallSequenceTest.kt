@@ -2,61 +2,51 @@ package io.github.samolego.canta.util
 
 import org.junit.Assert.*
 import org.junit.Test
+import kotlinx.coroutines.runBlocking
 
 class UninstallSequenceTest {
-    @Test fun resetRemovesUpdatesBeforeUninstallingForUser() {
+    @Test fun ordinaryRemovalAlwaysRequestsPerUserSystemAppSemantics() = runBlocking {
+        for (requested in listOf(0, 4)) {
+            val flags = mutableListOf<Int>()
+            val result = UninstallSequence.execute(false, requested, { error("Unexpected update query") }) {
+                flags += it
+                PackageInstallerResult.Result(true, null)
+            }
+            assertTrue(result.success)
+            assertEquals(listOf(4), flags)
+        }
+    }
+
+    @Test fun keptDataRemovalStillCannotDowngradeTheSharedApk() = runBlocking {
         val flags = mutableListOf<Int>()
-        val result = UninstallSequence.execute(true, 4, { false }) {
+        val result = UninstallSequence.execute(false, 1, { error("Unexpected update query") }) {
             flags += it
             PackageInstallerResult.Result(true, null)
         }
         assertTrue(result.success)
-        assertEquals(listOf(0, 4), flags)
+        assertEquals(listOf(5), flags)
     }
 
-    @Test fun failedResetDoesNotContinueOrReportSuccess() {
-        val flags = mutableListOf<Int>()
+    @Test fun factoryResetIsRefusedBeforeAnyMutation() = runBlocking {
         val result = UninstallSequence.execute(true, 4, { false }) {
-            flags += it
-            PackageInstallerResult.Result(false, "Reset denied")
-        }
-        assertFalse(result.success)
-        assertEquals("Reset denied", result.message)
-        assertEquals(listOf(0), flags)
-    }
-
-    @Test fun successfulCallbackWithUpdateStillPresentIsFailure() {
-        val flags = mutableListOf<Int>()
-        val result = UninstallSequence.execute(true, 4, { true }) {
-            flags += it
-            PackageInstallerResult.Result(true, null)
-        }
-        assertFalse(result.success)
-        assertEquals(listOf(0), flags)
-    }
-
-    @Test fun missingPackageAfterResetIsNotProofOfSuccess() {
-        val result = UninstallSequence.execute(true, 4, { null }) {
+            fail("Profile removal must never reset a shared APK")
             PackageInstallerResult.Result(true, null)
         }
         assertFalse(result.success)
     }
 
-    @Test fun finalUninstallFailureIsPreserved() {
-        val result = UninstallSequence.execute(true, 4, { false }) {
-            PackageInstallerResult.Result(it == 0, if (it == 0) null else "User restricted")
+    @Test fun allUsersAndUnknownFlagsAreRefusedBeforeAnyMutation() = runBlocking {
+        for (flags in listOf(2, 6, 8, -1)) {
+            val result = UninstallSequence.execute(false, flags, { false }) {
+                fail("Unsafe delete flags must never reach Android")
+                PackageInstallerResult.Result(true, null)
+            }
+            assertFalse(result.success)
         }
-        assertFalse(result.success)
-        assertEquals("User restricted", result.message)
     }
 
-    @Test fun ordinaryUninstallDoesNotResetOrQueryUpdates() {
-        val flags = mutableListOf<Int>()
-        val result = UninstallSequence.execute(false, 0, { error("Unexpected query") }) {
-            flags += it
-            PackageInstallerResult.Result(true, null)
-        }
-        assertTrue(result.success)
-        assertEquals(listOf(0), flags)
+    @Test fun installerFailureAndUncertaintyArePreserved() = runBlocking {
+        val failure = PackageInstallerResult.Result(false, "Still pending", outcomeUnknown = true, requestId = "request")
+        assertEquals(failure, UninstallSequence.execute(false, 4, { false }) { failure })
     }
 }

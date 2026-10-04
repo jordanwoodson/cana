@@ -31,13 +31,14 @@ data class AppInfo(
     /** Null means unavailable for this profile; zero means no use in Android's retained history. */
     val lastUsed: Long? = null,
     val apkIdentity: String = "",
+    val profileGuidance: io.github.samolego.canta.ops.ProfileGuidance? = null,
 ) : Parcelable {
 
     val name: String
         get() = appName ?: packageName.substringAfterLast('.')
     val removalInfo: RemovalRecommendation?
-        get() = bloatData?.removal
-    /** Display the list's own recommendation. */
+        get() = profileGuidance?.recommendation ?: bloatData?.removal
+    /** Work guidance, when available, is also used by filters and action selection. */
     val shownRisk: RemovalRecommendation?
         get() = removalInfo
     val description: String?

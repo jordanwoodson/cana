@@ -29,7 +29,8 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
     val alwaysProtected = SafetyPolicy.protectedPackages(context.packageName)
 
     /** Role holders, keyboards, admins, installed set and bloat metadata from one privileged query. */
-    private class Baseline(val snapshot: SafetySnapshot, val metadata: JSONObject)
+    private class Baseline(val snapshot: SafetySnapshot, val metadata: Map<String, BloatData>,
+        val kind: io.github.samolego.canta.util.apps.UserProfile.Kind)
 
     // Querying the platform costs about ten shell commands. A batch shares one baseline per profile
     // instead of paying that for every package; the batch drops it again when it finishes.
@@ -41,9 +42,11 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
             val baseline = baselines.getOrCompute(userId) { queryBaseline(userId) }
             val allowUnsafe = SettingsStore.getInstance().allowUnsafeUninstallsFlow.first()
             names.associateWith { name ->
-                val data = baseline.metadata.optJSONObject(name)?.let(BloatData::fromJson)
-                val assessment = SafetyPolicy.assess(name, baseline.snapshot, data?.neededBy.orEmpty(), userId)
-                if (removing && !allowUnsafe && data?.removal == RemovalRecommendation.UNSAFE)
+                val data = baseline.metadata[name]
+                val dependents = WorkProfileGuidance.installedDependents(name, baseline.metadata, baseline.snapshot.installedPackages)
+                val assessment = SafetyPolicy.assess(name, baseline.snapshot, dependents, userId)
+                val guidance = WorkProfileGuidance.assess(name, baseline.kind, data, assessment, dependents)
+                if (removing && !allowUnsafe && (guidance?.recommendation ?: data?.removal) == RemovalRecommendation.UNSAFE)
                     assessment.copy(error = context.getString(R.string.unsafe_uninstall_blocked)) else assessment
             }
         } catch (e: CancellationException) { throw e }
@@ -75,8 +78,14 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
             checked(listOf("settings", "--user", "$userId", "get", "secure", "enabled_input_methods")).trim())
         val installed = ShizukuPackageInstallerUtils.getInstalledPackages(0, userId)
             .filter { (it.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_INSTALLED != 0 }.map { it.packageName }.toSet()
-        val snapshot = SafetySnapshot(protected, roles, keyboards, activeAdmins(userId), installed)
-        return Baseline(snapshot, BloatListRepository(context).load(false))
+        val admins = activeAdmins(userId)
+        if (profile.kind == io.github.samolego.canta.util.apps.UserProfile.Kind.WORK) protected += admins
+        val snapshot = SafetySnapshot(protected, roles, keyboards, admins, installed)
+        val json = BloatListRepository(context).load(false)
+        val metadata = buildMap {
+            for (name in json.keys()) json.optJSONObject(name)?.let { put(name, BloatData.fromJson(it)) }
+        }
+        return Baseline(snapshot, metadata, profile.kind)
     }
 
     suspend fun requireAllowed(name: String, userId: Int, approved: Set<String>, removing: Boolean = false) {

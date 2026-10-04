@@ -46,7 +46,7 @@ class FoundationDeviceTest {
         assertEquals(count, services.history.records.first().size)
     }
 
-    @Test fun factoryResetRemovesUpdateAndOnlyUninstallsSelectedUser() = runBlocking {
+    @Test fun factoryResetIsRefusedAndOrdinaryUninstallKeepsTheSharedUpdate() = runBlocking {
         val name = "com.android.printspooler"
         assertTrue(services.packageOps.reinstall(name, 0).success)
         assertTrue(services.packageOps.reinstall(name, 10).success)
@@ -56,10 +56,16 @@ class FoundationDeviceTest {
             assertTrue(services.packageOps.canResetToFactory(name, userId))
             val result = services.packageOps.uninstall(name, userId, resetToFactory = true,
                 approvedDowngradeUsers = setOf(otherUser))
-            assertTrue(result.message, result.success)
+            assertFalse(result.message, result.success)
+            assertFalse(result.changed)
+            assertTrue(installed(name, userId))
+            assertTrue(services.packageOps.canResetToFactory(name, otherUser))
+            val removed = services.packageOps.uninstall(name, userId)
+            assertTrue(removed.message, removed.success)
             assertFalse(installed(name, userId))
             assertTrue(installed(name, otherUser))
-            assertFalse(services.packageOps.canResetToFactory(name, userId))
+            assertTrue(services.packageOps.canResetToFactory(name, userId))
+            assertTrue(services.packageOps.canResetToFactory(name, otherUser))
             val record = services.history.records.first().last { it.packageName == name }
             assertTrue(record.completed && record.success && record.changed)
             assertEquals(userId, record.userId)

@@ -18,6 +18,11 @@ internal object PendingPackageRecovery {
         // Empty pre-state means preflight failed before the mutation closure could run.
         if (before.length() == 0) return false
         val state = runCatching { SnapshotState.read(after) }.getOrNull() ?: return null
+        if (before.has("otherProfiles")) {
+            val peersBefore = before.optJSONObject("otherProfiles") ?: return null
+            val peersAfter = state.optJSONObject("otherProfiles") ?: return null
+            if (!SnapshotState.equal(peersBefore, peersAfter)) return if (terminal != null) false else null
+        }
         if (record.action in setOf("enable", "disable", "suspend", "unsuspend", "component") &&
             before.optBoolean("installed") && !state.optBoolean("installed")) {
             return if (terminal != null) false else null

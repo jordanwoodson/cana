@@ -126,6 +126,10 @@ fun AppTile(
                 Column(Modifier.alpha(contentAlpha)) {
                     Text(appInfo.packageName, style = MaterialTheme.typography.bodySmall,
                         color = scheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    appInfo.profileGuidance?.let {
+                        Text(stringResource(it.need.label), style = MaterialTheme.typography.labelSmall,
+                            color = scheme.onSurfaceVariant)
+                    }
                     Layout(modifier = Modifier.fillMaxWidth().heightIn(min = 26.dp), content = {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(2.dp),
                             verticalArrangement = Arrangement.spacedBy(2.dp)) {

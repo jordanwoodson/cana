@@ -166,6 +166,18 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                     }
                     }
                     HorizontalDivider()
+                    app.profileGuidance?.let { guidance ->
+                        Text(stringResource(R.string.work_guidance_title), style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(guidance.need.label), style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(guidance.reason))
+                        guidance.details.forEach { Text(it, style = MaterialTheme.typography.bodySmall) }
+                        Text(stringResource(R.string.work_guidance_source), style = MaterialTheme.typography.bodySmall)
+                        app.bloatData?.removal?.let { original ->
+                            Text(stringResource(R.string.work_general_rating), style = MaterialTheme.typography.labelMedium)
+                            RiskChip(original)
+                        }
+                        HorizontalDivider()
+                    }
                     Text(stringResource(R.string.about_this_app), style = MaterialTheme.typography.titleMedium)
                     app.bloatData?.warning?.let { warning ->
                         CanaBanner(Icons.Default.Warning, stringResource(R.string.app_list_warning), StatusTone.WARNING,

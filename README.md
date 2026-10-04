@@ -47,7 +47,13 @@ that profile's apps, and uninstall / reinstall then act on that profile only
   and unknown installer outcomes remain visible in History; an outstanding request blocks
   conflicting package changes until it can be reconciled.
 * Every uninstall targets only the selected profile, including Cana's own profile.
-  Removing a system app update is device-wide and requires review when other profiles use it.
+  Android can cascade a parent's uninstall into a linked clone/profile; Cana refuses that
+  removal and offers disabling the app instead. Unknown propagation policy also blocks removal.
+* Shared system updates are kept during uninstall. Leftover-update cleanup is available only
+  after the package is removed from every profile, and preserves their removed states.
+* Work profiles get separate Keep / Optional / Review guidance based on their active roles,
+  administrators, installed dependencies and known package purposes. The original list rating
+  stays visible in app details. Unknown work requirements never become automatic removal advice.
 * Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
 
 ### Roadmap features
@@ -70,6 +76,8 @@ after reboot; they are not guaranteed to remain active during startup. Usage sta
 profiles are hidden when Android provides no supported query. Undo cannot recover deleted app data
 or an APK Android has completely removed. See the [roadmap report](docs/roadmap/release-report.md)
 for verification and device-specific limitations.
+Exported recovery scripts leave removal steps for Cana's live profile checks; other recovery
+commands remain available in the script.
 
 ## Install
 
