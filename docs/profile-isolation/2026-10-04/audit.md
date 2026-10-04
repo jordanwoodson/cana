@@ -1,5 +1,11 @@
 # Profile isolation and work recommendations audit
 
+> Follow-up on October 4: work-specific recommendations were removed at the user's request.
+> All profiles now use the normal debloat-list ratings and descriptions. The profile-isolation
+> protections below remain active; the work-guidance section records the earlier implementation.
+> The follow-up passed 247 unit tests, release lint, the debug build, and two Android 15
+> emulator tests covering real personal/work inventory parity and unchanged badges on profile switching.
+
 Cana now refuses operations that would remove or downgrade an app still used by another profile. This audit covers app-list and detail actions, presets, OTA reapplication, cleanup fallback, in-app Undo, pending installer recovery, and exported restore scripts.
 
 ## Findings and changes

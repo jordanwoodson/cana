@@ -49,16 +49,28 @@ class ProfileIsolationDeviceTest {
         }
     }
 
-    @Test fun realWorkInventoryHasProfileSpecificGuidanceWithoutChangingPersonalRatings() = runBlocking {
+    @Test fun personalAndWorkInventoriesUseTheSameDebloatListRatings() = runBlocking {
         check(Build.HARDWARE in setOf("ranchu", "goldfish"))
         val inventory = CanaServices.getInstance().inventory
         val work = inventory.snapshot(10)
         assertNull(work.error)
         assertTrue(work.apps.isNotEmpty())
-        assertTrue(work.apps.all { it.profileGuidance != null })
         val personal = inventory.snapshot(0)
         assertNull(personal.error)
         assertTrue(personal.apps.isNotEmpty())
-        assertTrue(personal.apps.all { it.profileGuidance == null })
+        for (state in listOf(personal, work)) {
+            for (app in state.apps) {
+                assertEquals(app.packageName, app.bloatData?.removal, app.removalInfo)
+                assertEquals(app.packageName, app.bloatData?.removal, app.shownRisk)
+            }
+        }
+        val personalApps = personal.apps.associateBy { it.packageName }
+        val shared = work.apps.filter { it.packageName in personalApps }
+        assertTrue(shared.isNotEmpty())
+        for (app in shared) {
+            val other = personalApps.getValue(app.packageName)
+            assertEquals(app.packageName, other.removalInfo, app.removalInfo)
+            assertEquals(app.packageName, other.description, app.description)
+        }
     }
 }

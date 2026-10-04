@@ -51,9 +51,8 @@ that profile's apps, and uninstall / reinstall then act on that profile only
   removal and offers disabling the app instead. Unknown propagation policy also blocks removal.
 * Shared system updates are kept during uninstall. Leftover-update cleanup is available only
   after the package is removed from every profile, and preserves their removed states.
-* Work profiles get separate Keep / Optional / Review guidance based on their active roles,
-  administrators, installed dependencies and known package purposes. The original list rating
-  stays visible in app details. Unknown work requirements never become automatic removal advice.
+* Every profile uses the same debloat-list ratings and descriptions. Before making changes,
+  Cana checks the selected profile's active roles, administrators and installed dependencies.
 * Application id is `io.github.jordanwoodson.cana`, so Cana installs next to Canta.
 
 ### Roadmap features

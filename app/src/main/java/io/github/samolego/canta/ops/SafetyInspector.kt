@@ -29,8 +29,7 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
     val alwaysProtected = SafetyPolicy.protectedPackages(context.packageName)
 
     /** Role holders, keyboards, admins, installed set and bloat metadata from one privileged query. */
-    private class Baseline(val snapshot: SafetySnapshot, val metadata: Map<String, BloatData>,
-        val kind: io.github.samolego.canta.util.apps.UserProfile.Kind)
+    private class Baseline(val snapshot: SafetySnapshot, val metadata: Map<String, BloatData>)
 
     // Querying the platform costs about ten shell commands. A batch shares one baseline per profile
     // instead of paying that for every package; the batch drops it again when it finishes.
@@ -43,10 +42,9 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
             val allowUnsafe = SettingsStore.getInstance().allowUnsafeUninstallsFlow.first()
             names.associateWith { name ->
                 val data = baseline.metadata[name]
-                val dependents = WorkProfileGuidance.installedDependents(name, baseline.metadata, baseline.snapshot.installedPackages)
+                val dependents = SafetyPolicy.installedDependents(name, baseline.metadata, baseline.snapshot.installedPackages)
                 val assessment = SafetyPolicy.assess(name, baseline.snapshot, dependents, userId)
-                val guidance = WorkProfileGuidance.assess(name, baseline.kind, data, assessment, dependents)
-                if (removing && !allowUnsafe && (guidance?.recommendation ?: data?.removal) == RemovalRecommendation.UNSAFE)
+                if (removing && !allowUnsafe && data?.removal == RemovalRecommendation.UNSAFE)
                     assessment.copy(error = context.getString(R.string.unsafe_uninstall_blocked)) else assessment
             }
         } catch (e: CancellationException) { throw e }
@@ -85,7 +83,7 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
         val metadata = buildMap {
             for (name in json.keys()) json.optJSONObject(name)?.let { put(name, BloatData.fromJson(it)) }
         }
-        return Baseline(snapshot, metadata, profile.kind)
+        return Baseline(snapshot, metadata)
     }
 
     suspend fun requireAllowed(name: String, userId: Int, approved: Set<String>, removing: Boolean = false) {

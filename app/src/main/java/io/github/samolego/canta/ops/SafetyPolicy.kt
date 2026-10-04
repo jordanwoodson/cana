@@ -1,5 +1,7 @@
 package io.github.samolego.canta.ops
 
+import io.github.samolego.canta.util.BloatData
+
 data class SafetyWarning(val kind: String, val detail: String, val packageName: String = "", val userId: Int = 0) {
     val key: String get() = "$userId:$packageName:$kind:$detail"
 }
@@ -14,6 +16,11 @@ internal data class SafetySnapshot(
     val installedPackages: Set<String> = emptySet(),
 )
 internal object SafetyPolicy {
+    fun installedDependents(packageName: String, metadata: Map<String, BloatData>, installed: Set<String>): List<String> =
+        (metadata[packageName]?.neededBy.orEmpty() + metadata.filter { (name, data) ->
+            name in installed && packageName in data.dependencies
+        }.keys).filter { it != packageName && it in installed }.distinct().sorted()
+
     fun protectedPackages(self: String): Set<String> = setOf(self, "moe.shizuku.privileged.api",
         "com.android.shell", "android", "com.android.systemui", "com.android.settings",
         "com.android.packageinstaller", "com.google.android.packageinstaller",

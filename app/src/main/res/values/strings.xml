@@ -1,23 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <resources>
-    <string name="work_guidance_title">Needed in this work profile?</string>
-    <string name="work_need_keep">Keep for work</string>
-    <string name="work_need_optional">Optional for work</string>
-    <string name="work_need_review">Review for work</string>
-    <string name="work_guidance_source">Cana work-profile guidance. Based on this profile’s roles, apps and known dependencies; not a complete dependency scan.</string>
-    <string name="work_general_rating">General debloat-list rating</string>
-    <string name="work_badges_explanation">In work profiles, Cana adjusts risk badges and filters using work-specific guidance. Open an app to see why it may be needed there and to compare the original debloat-list rating.</string>
-    <string name="work_reason_core">Keep this shared Android infrastructure available in the work profile. Work apps can need it for permissions, files, downloads, accounts or local data even without an app icon.</string>
-    <string name="work_reason_management">Keep the work-profile manager and provisioning components. Removing them can break profile management or access to work apps.</string>
-    <string name="work_reason_active">This app has an active role or keyboard in this profile. Set up and test a replacement here before removing it.</string>
-    <string name="work_reason_dependents">Installed apps in this work profile are listed as depending on this package. Keep it while those apps need it.</string>
-    <string name="work_reason_google">Work apps may need this for managed app installation, updates, sign-in, notifications or Google APIs. A copy in the personal profile does not supply these services to work apps. Keep it unless your work apps have been verified without it.</string>
-    <string name="work_reason_webview">Work apps may use this browser or WebView provider for sign-in and embedded pages. Verify another provider is available to this profile before removing it.</string>
-    <string name="work_reason_personal">Usually optional in a work profile: keep it only if you use this app with your work account or workflow. Its personal-profile copy can remain installed.</string>
-    <string name="work_reason_productivity">Keep this if your work account or workflow uses its mail, calendar, contacts, documents, camera or communication features. Personal-profile apps and data are separate; check sharing and replacements before removal.</string>
-    <string name="work_reason_unknown">Cana has no verified work-specific requirement for this package. The general removal rating alone does not establish whether your work apps or administrator need it. Review its purpose and try disabling it first.</string>
-    <string name="work_reason_unavailable">Cana could not verify this profile’s roles, administrator or dependencies. Reconnect Shizuku and refresh before deciding whether to remove this app.</string>
-    <string name="work_reason_list_caution">The debloat list flags this package as risky. Being in a work profile does not establish that it is safe to remove; review the warning and dependencies below.</string>
+    <string name="profile_badges_explanation">Every profile uses the same debloat-list ratings. Before applying changes, Cana checks the selected profile’s active roles, administrator and installed dependencies.</string>
     <string name="update_cleanup_in_use">Updates are shared across profiles. Remove this app from every profile before cleaning up its update APK. Cleanup is blocked while any profile still uses it.</string>
     <string name="update_cleanup_profile_names">Still used by: %1$s. Cleanup is blocked.</string>
     <string name="uninstall_profile_cascade">Android would also remove this app from %1$s. Uninstall is blocked to protect that profile. Disable the app in the selected profile instead.</string>

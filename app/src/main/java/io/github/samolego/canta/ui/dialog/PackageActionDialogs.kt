@@ -214,10 +214,6 @@ internal fun PackageActionConfirmation(
                                 Text(app?.name ?: pkg, style = MaterialTheme.typography.bodyMedium)
                                 if (app != null) Text(pkg, style = MaterialTheme.typography.bodySmall)
                                 app?.removalInfo?.let { RiskChip(it) }
-                                app?.profileGuidance?.let { guidance ->
-                                    Text(stringResource(guidance.need.label), style = MaterialTheme.typography.labelMedium)
-                                    Text(stringResource(guidance.reason), style = MaterialTheme.typography.bodySmall)
-                                }
                                 val reason = when {
                                     app == null -> stringResource(R.string.plan_unavailable)
                                     assessment?.protected == true -> stringResource(R.string.safety_protected, pkg)

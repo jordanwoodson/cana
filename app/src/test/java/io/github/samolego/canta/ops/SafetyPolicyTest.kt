@@ -1,9 +1,20 @@
 package io.github.samolego.canta.ops
 
+import io.github.samolego.canta.util.BloatData
+import io.github.samolego.canta.util.RemovalRecommendation.RECOMMENDED
 import org.junit.Assert.*
 import org.junit.Test
 
 class SafetyPolicyTest {
+    @Test fun dependenciesAreCheckedInBothDirectionsWithinSelectedProfileOnly() {
+        val data = BloatData(null, "General guidance", RECOMMENDED)
+        val metadata = mapOf("service" to data.copy(neededBy = listOf("personal.client")),
+            "work.client" to data.copy(dependencies = listOf("service")))
+        assertEquals(listOf("work.client"), SafetyPolicy.installedDependents("service", metadata, setOf("service", "work.client")))
+        assertEquals(listOf("personal.client"), SafetyPolicy.installedDependents("service", metadata, setOf("service", "personal.client")))
+        assertTrue(SafetyPolicy.installedDependents("service", metadata, setOf("service")).isEmpty())
+    }
+
     @Test fun coreAndResolvedOemPackagesCannotBeOverridden() {
         val required = setOf("io.github.jordanwoodson.cana", "moe.shizuku.privileged.api", "com.android.shell",
             "android", "com.android.systemui", "com.android.settings", "com.android.packageinstaller",

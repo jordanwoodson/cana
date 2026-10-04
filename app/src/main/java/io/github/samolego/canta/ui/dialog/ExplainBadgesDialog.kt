@@ -53,7 +53,7 @@ fun ExplainBadgesDialog(
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 item {
-                    Text(stringResource(io.github.samolego.canta.R.string.work_badges_explanation),
+                    Text(stringResource(R.string.profile_badges_explanation),
                         style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(8.dp))
                 }
                 items(RemovalRecommendation.entries) { removalRecommendation ->
