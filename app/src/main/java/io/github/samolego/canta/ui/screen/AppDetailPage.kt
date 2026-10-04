@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.res.ResourcesCompat
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
 import io.github.samolego.canta.ops.ActionChoices
@@ -154,7 +155,12 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         val color = MaterialTheme.colorScheme.onSurface.toArgb()
                         val linkColor = MaterialTheme.colorScheme.tertiary.toArgb()
                         val selectionColor = MaterialTheme.colorScheme.surfaceVariant.toArgb()
-                        AndroidView(factory = { TextView(it).apply { setTextIsSelectable(true); movementMethod = LinkMovementMethod.getInstance(); textSize = 16f } },
+                        AndroidView(factory = { TextView(it).apply {
+                            typeface = ResourcesCompat.getFont(context, R.font.jetbrains_mono)
+                            setTextIsSelectable(true)
+                            movementMethod = LinkMovementMethod.getInstance()
+                            textSize = 16f
+                        } },
                             // List descriptions are plain text with \n between lines, which HTML would collapse
                             update = {
                                 it.text = Html.fromHtml(description.replace("\n", "<br>"), Html.FROM_HTML_MODE_COMPACT)

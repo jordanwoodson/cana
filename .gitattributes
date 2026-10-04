@@ -1,0 +1,2 @@
+# Preserve the upstream font license verbatim, including its whitespace.
+app/src/main/assets/JETBRAINS-MONO-OFL.txt -whitespace

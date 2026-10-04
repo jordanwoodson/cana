@@ -12,9 +12,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.withStyle
 import io.github.samolego.canta.R
+import io.github.samolego.canta.ui.theme.JetBrainsMono
 
 @Composable
 fun CanaWordmark(modifier: Modifier = Modifier, style: TextStyle = LocalTextStyle.current) {
@@ -28,7 +28,7 @@ fun CanaWordmark(modifier: Modifier = Modifier, style: TextStyle = LocalTextStyl
         },
         modifier = modifier.clearAndSetSemantics { contentDescription = appName },
         style = style,
-        fontFamily = FontFamily.Monospace,
+        fontFamily = JetBrainsMono,
         fontWeight = FontWeight.Normal,
         maxLines = 1,
     )

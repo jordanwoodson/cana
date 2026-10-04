@@ -1,22 +1,35 @@
 package io.github.samolego.canta.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import io.github.samolego.canta.R
+
+internal val JetBrainsMono = FontFamily(
+    Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
+    Font(R.font.jetbrains_mono_medium, FontWeight.Medium),
+    Font(R.font.jetbrains_mono_semibold, FontWeight.SemiBold),
+    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
+)
 
 private val defaults = Typography()
 
-// Terminal character in headings and controls; proportional text keeps long descriptions readable.
+// Bundle the same typeface for every role, including descriptions and controls.
 val Typography = Typography(
-    displayLarge = defaults.displayLarge.copy(fontFamily = FontFamily.Monospace),
-    displayMedium = defaults.displayMedium.copy(fontFamily = FontFamily.Monospace),
-    displaySmall = defaults.displaySmall.copy(fontFamily = FontFamily.Monospace),
-    headlineLarge = defaults.headlineLarge.copy(fontFamily = FontFamily.Monospace),
-    headlineMedium = defaults.headlineMedium.copy(fontFamily = FontFamily.Monospace),
-    headlineSmall = defaults.headlineSmall.copy(fontFamily = FontFamily.Monospace),
-    titleLarge = defaults.titleLarge.copy(fontFamily = FontFamily.Monospace),
-    titleMedium = defaults.titleMedium.copy(fontFamily = FontFamily.Monospace),
-    titleSmall = defaults.titleSmall.copy(fontFamily = FontFamily.Monospace),
-    labelLarge = defaults.labelLarge.copy(fontFamily = FontFamily.Monospace),
-    labelMedium = defaults.labelMedium.copy(fontFamily = FontFamily.Monospace),
-    labelSmall = defaults.labelSmall.copy(fontFamily = FontFamily.Monospace),
+    displayLarge = defaults.displayLarge.copy(fontFamily = JetBrainsMono),
+    displayMedium = defaults.displayMedium.copy(fontFamily = JetBrainsMono),
+    displaySmall = defaults.displaySmall.copy(fontFamily = JetBrainsMono),
+    headlineLarge = defaults.headlineLarge.copy(fontFamily = JetBrainsMono),
+    headlineMedium = defaults.headlineMedium.copy(fontFamily = JetBrainsMono),
+    headlineSmall = defaults.headlineSmall.copy(fontFamily = JetBrainsMono),
+    titleLarge = defaults.titleLarge.copy(fontFamily = JetBrainsMono),
+    titleMedium = defaults.titleMedium.copy(fontFamily = JetBrainsMono),
+    titleSmall = defaults.titleSmall.copy(fontFamily = JetBrainsMono),
+    bodyLarge = defaults.bodyLarge.copy(fontFamily = JetBrainsMono),
+    bodyMedium = defaults.bodyMedium.copy(fontFamily = JetBrainsMono),
+    bodySmall = defaults.bodySmall.copy(fontFamily = JetBrainsMono),
+    labelLarge = defaults.labelLarge.copy(fontFamily = JetBrainsMono),
+    labelMedium = defaults.labelMedium.copy(fontFamily = JetBrainsMono),
+    labelSmall = defaults.labelSmall.copy(fontFamily = JetBrainsMono),
 )
