@@ -1,0 +1,267 @@
+Native configuration: 320 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #13 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+ |-Node #14 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #716 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+       |-Node #717 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #738 at (l=0.0, t=88.0, r=320.0, b=776.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@e14a7b9'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=2058.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #739 at (l=16.0, t=104.0, r=304.0, b=188.0)px
+          |  | Text = '[Changes affect every profile on this device.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #741 at (l=16.0, t=200.0, r=304.0, b=292.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  | StateDescription = 'Collapsed'
+          |  | Text = '[How device settings work]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #747 at (l=16.0, t=304.0, r=214.0, b=358.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Refresh values]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #750 at (l=16.0, t=358.0, r=239.0, b=412.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Connect Shizuku]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #753 at (l=16.0, t=424.0, r=304.0, b=810.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #756 at (l=32.0, t=440.0, r=187.0, b=482.0)px
+          |  |  | Text = '[Private DNS]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #757 at (l=32.0, t=490.0, r=288.0, b=554.0)px
+          |  |  | Text = '[Choose how Android resolves private DNS.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #869 at (l=32.0, t=562.0, r=193.0, b=594.0)px, Tag: 'system-PRIVATE_DNS-state'
+          |  |  | Text = '[System default]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #796 at (l=32.0, t=602.0, r=288.0, b=794.0)px
+          |  |    [SelectableGroup]
+          |  |     |-Node #797 at (l=32.0, t=602.0, r=288.0, b=650.0)px, Tag: 'system-dns-default'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'true'
+          |  |     | Text = '[Default]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #800 at (l=32.0, t=650.0, r=288.0, b=698.0)px, Tag: 'system-dns-automatic'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[Automatic]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #803 at (l=32.0, t=698.0, r=288.0, b=746.0)px, Tag: 'system-dns-off'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[Off]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #806 at (l=32.0, t=746.0, r=288.0, b=794.0)px, Tag: 'system-dns-custom'
+          |  |       Focused = 'false'
+          |  |       Role = 'RadioButton'
+          |  |       Selected = 'false'
+          |  |       Text = '[Custom]'
+          |  |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #760 at (l=16.0, t=822.0, r=304.0, b=1234.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #763 at (l=32.0, t=838.0, r=288.0, b=922.0)px
+          |  |  | Text = '[Captive portal check]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #764 at (l=32.0, t=930.0, r=288.0, b=1026.0)px
+          |  |  | Text = '[Choose how Android checks network sign-in and access.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #870 at (l=32.0, t=1034.0, r=193.0, b=1066.0)px, Tag: 'system-CAPTIVE_PORTAL-state'
+          |  |  | Text = '[System default]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #810 at (l=32.0, t=1074.0, r=288.0, b=1218.0)px
+          |  |    [SelectableGroup]
+          |  |     |-Node #811 at (l=32.0, t=1074.0, r=288.0, b=1122.0)px, Tag: 'system-portal-default'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'true'
+          |  |     | Text = '[Default]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #814 at (l=32.0, t=1122.0, r=288.0, b=1170.0)px, Tag: 'system-portal-graphene'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[GrapheneOS]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #817 at (l=32.0, t=1170.0, r=288.0, b=1218.0)px, Tag: 'system-portal-off'
+          |  |       Focused = 'false'
+          |  |       Role = 'RadioButton'
+          |  |       Selected = 'false'
+          |  |       Text = '[Off]'
+          |  |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #767 at (l=16.0, t=1246.0, r=304.0, b=1616.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #770 at (l=32.0, t=1262.0, r=225.0, b=1304.0)px
+          |  |  | Text = '[Wi-Fi scanning]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #771 at (l=32.0, t=1312.0, r=288.0, b=1408.0)px
+          |  |  | Text = '[Allow Wi-Fi scans even when Wi-Fi is off.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #871 at (l=32.0, t=1416.0, r=66.0, b=1448.0)px, Tag: 'system-WIFI_SCAN-state'
+          |  |  | Text = '[Off]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #821 at (l=32.0, t=1456.0, r=288.0, b=1600.0)px
+          |  |    [SelectableGroup]
+          |  |     |-Node #822 at (l=32.0, t=1456.0, r=288.0, b=1504.0)px, Tag: 'system-WIFI_SCAN-default'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[Default]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #825 at (l=32.0, t=1504.0, r=288.0, b=1552.0)px, Tag: 'system-WIFI_SCAN-true'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[On]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #828 at (l=32.0, t=1552.0, r=288.0, b=1600.0)px, Tag: 'system-WIFI_SCAN-false'
+          |  |       Focused = 'false'
+          |  |       Role = 'RadioButton'
+          |  |       Selected = 'true'
+          |  |       Text = '[Off]'
+          |  |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #774 at (l=16.0, t=1628.0, r=304.0, b=1998.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #777 at (l=32.0, t=1644.0, r=284.0, b=1686.0)px
+          |  |  | Text = '[Bluetooth scanning]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #778 at (l=32.0, t=1694.0, r=288.0, b=1790.0)px
+          |  |  | Text = '[Allow nearby Bluetooth scans when Bluetooth is off.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #872 at (l=32.0, t=1798.0, r=193.0, b=1830.0)px, Tag: 'system-BLE_SCAN-state'
+          |  |  | Text = '[System default]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #832 at (l=32.0, t=1838.0, r=288.0, b=1982.0)px
+          |  |    [SelectableGroup]
+          |  |     |-Node #833 at (l=32.0, t=1838.0, r=288.0, b=1886.0)px, Tag: 'system-BLE_SCAN-default'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'true'
+          |  |     | Text = '[Default]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #836 at (l=32.0, t=1886.0, r=288.0, b=1934.0)px, Tag: 'system-BLE_SCAN-true'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[On]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #839 at (l=32.0, t=1934.0, r=288.0, b=1982.0)px, Tag: 'system-BLE_SCAN-false'
+          |  |       Focused = 'false'
+          |  |       Role = 'RadioButton'
+          |  |       Selected = 'false'
+          |  |       Text = '[Off]'
+          |  |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #781 at (l=16.0, t=2010.0, r=304.0, b=2422.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #784 at (l=32.0, t=2026.0, r=288.0, b=2110.0)px
+          |  |  | Text = '[Keep mobile data active]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #785 at (l=32.0, t=2118.0, r=288.0, b=2214.0)px
+          |  |  | Text = '[Keep mobile data ready while Wi-Fi is active.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #873 at (l=32.0, t=2222.0, r=61.0, b=2254.0)px, Tag: 'system-MOBILE_DATA-state'
+          |  |  | Text = '[On]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #843 at (l=32.0, t=2262.0, r=288.0, b=2406.0)px
+          |  |    [SelectableGroup]
+          |  |     |-Node #844 at (l=32.0, t=2262.0, r=288.0, b=2310.0)px, Tag: 'system-MOBILE_DATA-default'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'false'
+          |  |     | Text = '[Default]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #847 at (l=32.0, t=2310.0, r=288.0, b=2358.0)px, Tag: 'system-MOBILE_DATA-true'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'RadioButton'
+          |  |     | Selected = 'true'
+          |  |     | Text = '[On]'
+          |  |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #850 at (l=32.0, t=2358.0, r=288.0, b=2406.0)px, Tag: 'system-MOBILE_DATA-false'
+          |  |       Focused = 'false'
+          |  |       Role = 'RadioButton'
+          |  |       Selected = 'false'
+          |  |       Text = '[Off]'
+          |  |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #788 at (l=16.0, t=2434.0, r=304.0, b=2818.0)px
+          |    IsContainer = 'true'
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |     |-Node #791 at (l=32.0, t=2450.0, r=172.0, b=2492.0)px
+          |     | Text = '[Data Saver]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #792 at (l=32.0, t=2500.0, r=288.0, b=2564.0)px
+          |     | Text = '[Limit background mobile data use.]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #874 at (l=32.0, t=2572.0, r=288.0, b=2740.0)px
+          |     | Text = '[Shizuku is not running or permission is missing]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #854 at (l=32.0, t=2748.0, r=288.0, b=2802.0)px
+          |       [SelectableGroup]
+          |        |-Node #855 at (l=32.0, t=2748.0, r=160.0, b=2802.0)px, Tag: 'system-DATA_SAVER-true'
+          |        | Role = 'RadioButton'
+          |        | Selected = 'false'
+          |        | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 0.0.dp), bottomEnd = CornerSize(size = 0.0.dp), bottomStart = CornerSize(size = 50.0%))'
+          |        | Text = '[On]'
+          |        | [Disabled]
+          |        | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+          |        | MergeDescendants = 'true'
+          |        |-Node #861 at (l=159.0, t=2748.0, r=288.0, b=2802.0)px, Tag: 'system-DATA_SAVER-false'
+          |          Role = 'RadioButton'
+          |          Selected = 'true'
+          |          Shape = 'RoundedCornerShape(topStart = CornerSize(size = 0.0.dp), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 0.0.dp))'
+          |          Text = '[Off]'
+          |          [Disabled]
+          |          Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, SetTextSubstitution, ShowTextSubstitution]
+          |          MergeDescendants = 'true'
+          |-Node #721 at (l=0.0, t=0.0, r=320.0, b=88.0)px
+            IsContainer = 'true'
+            Shape = 'RectangleShape'
+             |-Node #723 at (l=4.0, t=32.0, r=52.0, b=80.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #726 at (l=60.0, t=34.0, r=299.0, b=79.0)px
+               Text = '[Device settings]'
+               [Heading]
+               Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+               MergeDescendants = 'true'

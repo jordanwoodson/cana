@@ -46,6 +46,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -90,7 +93,7 @@ private fun CompactChip(label: String, icon: ImageVector, colors: RiskColors, mo
         modifier = modifier.semantics(mergeDescendants = true) {}
             .padding(2.dp).heightIn(min = 24.dp)
             .background(colors.container, RoundedCornerShape(12.dp))
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 3.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -111,7 +114,7 @@ fun CanaBanner(
 ) {
     val scheme = MaterialTheme.colorScheme
     val (container, content) = when (tone) {
-        StatusTone.NEUTRAL -> scheme.secondaryContainer to scheme.onSecondaryContainer
+        StatusTone.NEUTRAL -> scheme.surfaceContainerHigh to scheme.onSurface
         StatusTone.WARNING -> LocalCanaColors.current.advanced.let { it.container to it.onContainer }
         StatusTone.ERROR -> scheme.errorContainer to scheme.onErrorContainer
     }
@@ -136,13 +139,17 @@ fun CanaBanner(
 @Composable
 fun InfoDisclosure(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    val expansionState = stringResource(if (expanded) R.string.logs_entry_expanded else R.string.logs_entry_collapsed)
+    val expansionAction = stringResource(if (expanded) R.string.maintenance_collapse else R.string.maintenance_expand)
     Column(modifier) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { expanded = !expanded }.padding(vertical = 8.dp),
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(MaterialTheme.shapes.small)
+            .semantics { stateDescription = expansionState }
+            .clickable(role = Role.Button, onClickLabel = expansionAction) { expanded = !expanded }.padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
             Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                contentDescription = stringResource(if (expanded) R.string.maintenance_collapse else R.string.maintenance_expand),
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         }
         AnimatedVisibility(expanded) { Column(Modifier.padding(bottom = 8.dp)) { content() } }
@@ -151,8 +158,9 @@ fun InfoDisclosure(title: String, modifier: Modifier = Modifier, content: @Compo
 
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier = modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 8.dp),
-        style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+    Text(text, modifier = modifier.fillMaxWidth().semantics { heading() }
+        .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 8.dp),
+        style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
 }
 
 @Composable

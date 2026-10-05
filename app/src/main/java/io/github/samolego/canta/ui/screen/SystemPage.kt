@@ -92,7 +92,8 @@ fun SystemPage(onNavigateBack: () -> Unit) {
             for (control in SystemControl.entries) {
                 val state = states[control]
                 val values = state?.optJSONObject("settings")
-                ElevatedCard(Modifier.fillMaxWidth()) {
+                Card(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(control.title()), style = MaterialTheme.typography.titleMedium)
                         Text(stringResource(control.description()), style = MaterialTheme.typography.bodySmall,

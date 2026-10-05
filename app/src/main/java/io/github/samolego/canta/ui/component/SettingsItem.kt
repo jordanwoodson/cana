@@ -19,7 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Surface
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +50,8 @@ fun SettingsItem(
         },
     ) else if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
     else Modifier
-    val showIcon = icon != null && LocalDensity.current.fontScale < 1.3f
+    val stacked = LocalDensity.current.fontScale >= 1.3f
+    val showIcon = icon != null && !stacked
     Column(Modifier.fillMaxWidth().heightIn(min = 56.dp).then(action).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (showIcon && icon != null) {
@@ -64,18 +65,24 @@ fun SettingsItem(
                     }
                 }
             }
-            Text(title, Modifier.weight(1f).padding(end = 12.dp),
-                style = MaterialTheme.typography.titleMedium,
-                color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
-            if (isSwitch) Switch(checked = checked, enabled = enabled, onCheckedChange = null)
-            else if (onClick != null) Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null,
+            Column(Modifier.weight(1f).padding(end = if (stacked && isSwitch) 0.dp else 16.dp)) {
+                Text(title, style = MaterialTheme.typography.bodyLarge,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
+                if (!stacked && description != null) Text(description, Modifier.padding(top = 4.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
+            }
+            if (isSwitch && !stacked) Switch(checked = checked, enabled = enabled, onCheckedChange = null)
+            else if (!isSwitch && onClick != null) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
         }
-        description?.let {
-            Text(it, Modifier.padding(top = 8.dp, start = if (showIcon) 48.dp else 0.dp),
+        if (stacked && description != null) {
+            Text(description, Modifier.padding(top = 8.dp),
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f))
         }
+        if (stacked && isSwitch) Switch(checked = checked, enabled = enabled, onCheckedChange = null,
+            modifier = Modifier.align(Alignment.End).padding(top = 8.dp))
     }
 }
 

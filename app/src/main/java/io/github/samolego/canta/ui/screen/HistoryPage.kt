@@ -78,8 +78,9 @@ fun HistoryPage(onNavigateBack: () -> Unit) {
                 stringResource(R.string.history_empty_title), stringResource(R.string.history_empty_body)) }
             items(groups, key = { it.id }) { group ->
                 var expanded by remember(group.id) { mutableStateOf(false) }
-                ElevatedCard(Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Card(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         val plan = group.plan
                         val items = plan?.itemsList.orEmpty()
                         val action = items.firstOrNull()?.action ?: group.records.firstOrNull()?.action.orEmpty()

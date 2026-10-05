@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -105,7 +104,7 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp)
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 16.dp)
             .semantics { stateDescription = expansionState }
             .combinedClickable(
                 onClickLabel = expansionLabel,
@@ -119,9 +118,9 @@ private fun LogEntryChip(logEntry: LogUtils.LogEntry) {
             ),
         color = colors.container,
         contentColor = colors.onContainer,
-        shape = RoundedCornerShape(8.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

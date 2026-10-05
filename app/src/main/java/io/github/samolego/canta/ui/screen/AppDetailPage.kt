@@ -38,8 +38,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.samolego.canta.R
 import io.github.samolego.canta.ops.*
@@ -99,8 +99,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 AppIconImage(app, target.userId, size = 56.dp)
                                 Text(app.name, modifier = Modifier.weight(1f),
-                                    style = if (LocalDensity.current.fontScale >= 1.3f) MaterialTheme.typography.titleMedium
-                                        else MaterialTheme.typography.titleLarge)
+                                    style = MaterialTheme.typography.titleLarge)
                             }
                             if (app.metadataIncomplete) CanaBanner(Icons.Default.Info,
                                 stringResource(R.string.app_metadata_incomplete), StatusTone.WARNING,
@@ -193,8 +192,10 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                         val color = MaterialTheme.colorScheme.onSurface.toArgb()
                         val linkColor = MaterialTheme.colorScheme.tertiary.toArgb()
                         val selectionColor = MaterialTheme.colorScheme.surfaceVariant.toArgb()
+                        val descriptionLineHeight = with(LocalDensity.current) { 24.sp.roundToPx() }
                         AndroidView(factory = { TextView(it).apply {
-                            typeface = ResourcesCompat.getFont(context, R.font.jetbrains_mono)
+                            typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
+                            includeFontPadding = false
                             setTextIsSelectable(true)
                             movementMethod = LinkMovementMethod.getInstance()
                             textSize = 16f
@@ -205,6 +206,7 @@ fun AppDetailPage(target: AppTarget, onNavigateBack: () -> Unit, onAction: (Pack
                                 it.setTextColor(color)
                                 it.setLinkTextColor(linkColor)
                                 it.highlightColor = selectionColor
+                                it.setLineHeight(descriptionLineHeight)
                             },
                             modifier = Modifier.fillMaxWidth())
                     } else Text(stringResource(R.string.no_description_available), style = MaterialTheme.typography.bodyLarge)

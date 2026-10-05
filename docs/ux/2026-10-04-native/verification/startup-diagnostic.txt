@@ -1,0 +1,9 @@
+10-04 21:37:51.114   541  1092 E ActivityManager: Reason: Process ProcessRecord{56bb324 784:com.android.systemui/u0a181} failed to complete startup
+10-04 21:38:01.994   541  1092 E ActivityManager: Reason: Process ProcessRecord{525160f 910:com.android.phone/1001} failed to complete startup
+10-04 21:38:29.878   541  1092 E ActivityManager: Reason: Process ProcessRecord{d9a280c 1148:com.google.android.inputmethod.latin/u0a154} failed to complete startup
+10-04 21:38:31.197   541  1092 E ActivityManager: Reason: Process ProcessRecord{8be3498 1243:com.google.android.providers.media.module/u0a205} failed to complete startup
+10-04 21:38:41.130   541  1906 E ActivityManager: Reason: Process ProcessRecord{525160f 1594:com.android.phone/1001} failed to complete startup
+10-04 21:39:04.447   541  2145 E ActivityManager: Reason: Process ProcessRecord{4a35aa9 1824:com.google.android.inputmethod.latin/u0a154} failed to complete startup
+10-04 21:39:57.245   541  2577 E ActivityManager: ANR in io.github.jordanwoodson.cana
+10-04 21:39:57.245   541  2577 E ActivityManager: Reason: Process ProcessRecord{f29690e 2301:io.github.jordanwoodson.cana/u0a209} failed to complete startup
+10-04 21:39:57.267   541  2577 I ActivityManager: Killing 2301:io.github.jordanwoodson.cana/u0a209 (adj 0): bg anr

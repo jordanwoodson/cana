@@ -1,0 +1,42 @@
+
+io.github.samolego.canta.ui.UiReleaseSweepDeviceTest:
+Error in captureNonMutatingReleaseSweep(io.github.samolego.canta.ui.UiReleaseSweepDeviceTest):
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:887)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:482)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.observeImeWindow(UiReleaseSweepDeviceTest.kt:394)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.access$observeImeWindow(UiReleaseSweepDeviceTest.kt:73)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest$captureNonMutatingReleaseSweep$1.invokeSuspend(UiReleaseSweepDeviceTest.kt:147)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.captureNonMutatingReleaseSweep(UiReleaseSweepDeviceTest.kt:85)
+
+io.github.samolego.canta.ui.PopulatedReleaseUiTest:...
+
+Time: 120.69
+There was 1 failure:
+1) captureNonMutatingReleaseSweep(io.github.samolego.canta.ui.UiReleaseSweepDeviceTest)
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 10000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:887)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:482)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.observeImeWindow(UiReleaseSweepDeviceTest.kt:394)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.access$observeImeWindow(UiReleaseSweepDeviceTest.kt:73)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest$captureNonMutatingReleaseSweep$1.invokeSuspend(UiReleaseSweepDeviceTest.kt:147)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at io.github.samolego.canta.ui.UiReleaseSweepDeviceTest.captureNonMutatingReleaseSweep(UiReleaseSweepDeviceTest.kt:85)
+
+FAILURES!!!
+Tests run: 4,  Failures: 1

@@ -35,6 +35,7 @@ import io.github.samolego.canta.ui.AppsType
 import io.github.samolego.canta.ui.menu.*
 import io.github.samolego.canta.ui.viewmodel.AppListViewModel
 import io.github.samolego.canta.util.apps.UserProfile
+import io.github.samolego.canta.ui.theme.JetBrainsMono
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +60,7 @@ fun CantaTopBar(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
     val profileTextWidth = textMeasurer.measure(currentProfileName, MaterialTheme.typography.labelLarge, softWrap = false).size.width
-    val wordmarkWidth = textMeasurer.measure("(can)a", MaterialTheme.typography.titleMedium, softWrap = false).size.width
+    val wordmarkWidth = textMeasurer.measure("(can)a", MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMono), softWrap = false).size.width
     val fullTitleWidth = with(density) { (profileTextWidth + wordmarkWidth).toDp() } + 64.dp
     val searchVisible = searchActive || appListViewModel.searchQuery.isNotEmpty()
     val closeSearch = { searchActive = false; appListViewModel.searchQuery = ""; keyboard?.hide(); Unit }
@@ -109,9 +110,18 @@ fun CantaTopBar(
                 }
             })
         if (searchVisible) {
-            OutlinedTextField(value = appListViewModel.searchQuery, onValueChange = { appListViewModel.searchQuery = it },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp).padding(bottom = 8.dp).focusRequester(focus),
-                label = { Text(stringResource(R.string.search_apps)) }, singleLine = true,
+            val searchLabel = stringResource(R.string.search_apps)
+            TextField(value = appListViewModel.searchQuery, onValueChange = { appListViewModel.searchQuery = it },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 12.dp)
+                    .focusRequester(focus),
+                label = { Text(searchLabel) }, singleLine = true,
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                ),
                 leadingIcon = { IconClickButton(onClick = closeSearch, icon = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back)) },
                 trailingIcon = { if (appListViewModel.searchQuery.isNotEmpty()) IconClickButton(onClick = { appListViewModel.searchQuery = "" },
                     icon = Icons.Default.Clear, contentDescription = stringResource(R.string.clear_search_action)) },

@@ -1,0 +1,148 @@
+Native configuration: 320 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #5 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+       |-Node #6 at (l=0.0, t=0.0, r=320.0, b=541.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #55 at (l=0.0, t=190.0, r=320.0, b=294.0)px
+          | IsContainer = 'true'
+          | Shape = 'RectangleShape'
+          | [SelectableGroup]
+          |  |-Node #58 at (l=0.0, t=190.0, r=160.0, b=294.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Tab'
+          |  | Selected = 'true'
+          |  | Text = '[Installed · 5]'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #64 at (l=160.0, t=190.0, r=320.0, b=294.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Tab'
+          |  | Selected = 'false'
+          |  | Text = '[Removed · 1]'
+          |  | Actions = [OnClick, RequestFocus]
+          |  | MergeDescendants = 'true'
+          |  |-Node #73 at (l=28.0, t=291.0, r=131.0, b=294.0)px
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 3.0.dp), topEnd = CornerSize(size = 3.0.dp), bottomEnd = CornerSize(size = 3.0.dp), bottomStart = CornerSize(size = 3.0.dp))'
+          |-Node #53 at (l=0.0, t=294.0, r=320.0, b=379.0)px
+          | CollectionInfo = 'CollectionInfo(rowCount=1, columnCount=2)'
+          | HorizontalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=320.0, reverseScrolling=false)'
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.HorizontalScrollableClipShape@fd25892'
+          | Actions = [GetScrollViewportLength, IndexForKey, PageLeft, PageRight, ScrollBy, ScrollByOffset, ScrollToIndex]
+          |  |-Node #568 at (l=124.0, t=318.0, r=196.0, b=355.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |-Node #571 at (l=66.0, t=355.0, r=255.0, b=355.0)px
+          |  | Text = '[No matches]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #572 at (l=24.0, t=355.0, r=296.0, b=355.0)px
+          |  | Text = '[No apps match this view.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #573 at (l=79.0, t=355.0, r=241.0, b=355.0)px
+          |  | Focused = 'false'
+          |  | Role = 'Button'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  | Text = '[Clear filters]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  | MergeDescendants = 'true'
+          |  |-Node #210 at (l=140.0, t=254.0, r=180.0, b=294.0)px
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |     |-Node #212 at (l=152.0, t=266.0, r=168.0, b=282.0)px
+          |        |-Node #213 at (l=152.0, t=266.0, r=168.0, b=282.0)px
+          |          ClearAndSetSemantics = 'true'
+          |-Node #10 at (l=0.0, t=0.0, r=320.0, b=190.0)px
+          | Shape = 'RectangleShape'
+          |  |-Node #11 at (l=0.0, t=0.0, r=320.0, b=88.0)px
+          |  | IsTraversalGroup = 'true'
+          |  |  |-Node #12 at (l=0.0, t=24.0, r=320.0, b=88.0)px
+          |  |    Shape = 'RectangleShape'
+          |  |     |-Node #14 at (l=16.0, t=30.0, r=176.0, b=82.0)px
+          |  |     |  |-Node #28 at (l=16.0, t=30.0, r=176.0, b=82.0)px, Tag: 'profile-chip'
+          |  |     |    Focused = 'false'
+          |  |     |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |     |    Text = '[Personal]'
+          |  |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |     |    MergeDescendants = 'true'
+          |  |     |-Node #18 at (l=172.0, t=32.0, r=220.0, b=80.0)px
+          |  |     | ContentDescription = '[Close search]'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'Button'
+          |  |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |     | Actions = [OnClick, RequestFocus]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #20 at (l=220.0, t=32.0, r=268.0, b=80.0)px
+          |  |     | ContentDescription = '[Filters]'
+          |  |     | Focused = 'false'
+          |  |     | Role = 'Button'
+          |  |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |     | Actions = [OnClick, RequestFocus]
+          |  |     | MergeDescendants = 'true'
+          |  |     |-Node #23 at (l=268.0, t=32.0, r=316.0, b=80.0)px
+          |  |       ContentDescription = '[More options]'
+          |  |       Focused = 'false'
+          |  |       Role = 'Button'
+          |  |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |       Actions = [OnClick, RequestFocus]
+          |  |       MergeDescendants = 'true'
+          |  |-Node #549 at (l=16.0, t=88.0, r=304.0, b=178.0)px
+          |    ContentDataType = 'AndroidContentDataType(androidAutofillType=1)'
+          |    EditableText = 'no matching fixture'
+          |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@fa22ec4'
+          |    Focused = 'true'
+          |    ImeAction = 'Search'
+          |    InputText = 'no matching fixture'
+          |    IsEditable = 'true'
+          |    Text = '[Search apps]'
+          |    TextSelectionRange = 'TextRange(19, 19)'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, InsertTextAtCursor, MagnifierPositionInRoot, OnClick, OnFillData, OnLongClick, PasteText, PerformImeAction, RequestFocus, ScrollBy, ScrollByOffset, SetSelection, SetText, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |     |-Node #555 at (l=16.0, t=109.0, r=64.0, b=157.0)px
+          |     | ContentDescription = '[Back]'
+          |     | Focused = 'false'
+          |     | Role = 'Button'
+          |     | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |     | Actions = [OnClick, RequestFocus]
+          |     | MergeDescendants = 'true'
+          |     |-Node #564 at (l=256.0, t=109.0, r=304.0, b=157.0)px
+          |       ContentDescription = '[Clear search]'
+          |       Focused = 'false'
+          |       Role = 'Button'
+          |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |       Actions = [OnClick, RequestFocus]
+          |       MergeDescendants = 'true'
+          |-Node #488 at (l=0.0, t=379.0, r=320.0, b=541.0)px
+            IsContainer = 'true'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 0.0.dp), bottomStart = CornerSize(size = 0.0.dp))'
+             |-Node #493 at (l=12.0, t=413.0, r=52.0, b=453.0)px
+             | ContentDescription = '[Clear selection]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #495 at (l=56.0, t=387.0, r=312.0, b=479.0)px
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Text = '[1 selected · 1 hidden]'
+             | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+             | MergeDescendants = 'true'
+             |-Node #500 at (l=8.0, t=479.0, r=262.0, b=533.0)px
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 4.0.dp), bottomEnd = CornerSize(size = 4.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+             | Text = '[Uninstall]'
+             | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+             | MergeDescendants = 'true'
+             |-Node #503 at (l=264.0, t=482.0, r=312.0, b=530.0)px
+               ContentDescription = '[More actions]'
+               Focused = 'false'
+               Role = 'Button'
+               Shape = 'RoundedCornerShape(topStart = CornerSize(size = 4.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 4.0.dp))'
+               Actions = [OnClick, RequestFocus]
+               MergeDescendants = 'true'

@@ -13,23 +13,6 @@ internal val JetBrainsMono = FontFamily(
     Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
 )
 
-private val defaults = Typography()
-
-// Bundle the same typeface for every role, including descriptions and controls.
-val Typography = Typography(
-    displayLarge = defaults.displayLarge.copy(fontFamily = JetBrainsMono),
-    displayMedium = defaults.displayMedium.copy(fontFamily = JetBrainsMono),
-    displaySmall = defaults.displaySmall.copy(fontFamily = JetBrainsMono),
-    headlineLarge = defaults.headlineLarge.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.Bold),
-    headlineMedium = defaults.headlineMedium.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.Bold),
-    headlineSmall = defaults.headlineSmall.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.SemiBold),
-    titleLarge = defaults.titleLarge.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.SemiBold),
-    titleMedium = defaults.titleMedium.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.SemiBold),
-    titleSmall = defaults.titleSmall.copy(fontFamily = JetBrainsMono, fontWeight = FontWeight.SemiBold),
-    bodyLarge = defaults.bodyLarge.copy(fontFamily = JetBrainsMono),
-    bodyMedium = defaults.bodyMedium.copy(fontFamily = JetBrainsMono),
-    bodySmall = defaults.bodySmall.copy(fontFamily = JetBrainsMono),
-    labelLarge = defaults.labelLarge.copy(fontFamily = JetBrainsMono),
-    labelMedium = defaults.labelMedium.copy(fontFamily = JetBrainsMono),
-    labelSmall = defaults.labelSmall.copy(fontFamily = JetBrainsMono),
-)
+// Material's native Android sans-serif, weights, tracking and line heights.
+// Keep the bundled lettering above exclusively for the Cana wordmark.
+val Typography = Typography()

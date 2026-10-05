@@ -1,0 +1,59 @@
+Native configuration: 320 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #13 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+ |-Node #14 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+Printing with useUnmergedTree = 'false'
+Node #1762 at (l=0.0, t=0.0, r=320.0, b=622.0)px
+ |-Node #1763 at (l=0.0, t=0.0, r=320.0, b=622.0)px
+   [IsDialog]
+    |-Node #1764 at (l=0.0, t=0.0, r=320.0, b=622.0)px
+      PaneTitle = 'Dialog'
+       |-Node #1765 at (l=0.0, t=0.0, r=320.0, b=622.0)px
+         IsContainer = 'true'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 28.0.dp), topEnd = CornerSize(size = 28.0.dp), bottomEnd = CornerSize(size = 28.0.dp), bottomStart = CornerSize(size = 28.0.dp))'
+          |-Node #1768 at (l=24.0, t=24.0, r=242.0, b=72.0)px
+          | Text = '[Import preset]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #1770 at (l=24.0, t=88.0, r=296.0, b=520.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@e14a7b9'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #1771 at (l=24.0, t=88.0, r=296.0, b=202.0)px
+          |  | Text = '[Import a preset from clipboard or paste JSON text directly.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1784 at (l=24.0, t=218.0, r=296.0, b=314.0)px
+          |  | [SelectableGroup]
+          |  |  |-Node #1785 at (l=24.0, t=218.0, r=296.0, b=266.0)px, Tag: 'preset-import-clipboard'
+          |  |  | Focused = 'false'
+          |  |  | Role = 'RadioButton'
+          |  |  | Selected = 'true'
+          |  |  | Text = '[Clipboard]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #1788 at (l=24.0, t=266.0, r=296.0, b=314.0)px, Tag: 'preset-import-text'
+          |  |    Focused = 'false'
+          |  |    Role = 'RadioButton'
+          |  |    Selected = 'false'
+          |  |    Text = '[Text]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #1774 at (l=24.0, t=330.0, r=296.0, b=520.0)px
+          |    Text = '[Import preset from clipboard. Make sure you have copied a valid Cana preset JSON.]'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #1777 at (l=49.0, t=544.0, r=155.0, b=598.0)px
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Cancel]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #1780 at (l=163.0, t=544.0, r=296.0, b=598.0)px
+            Focused = 'false'
+            Role = 'Button'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+            Text = '[Review]'
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

@@ -6,7 +6,7 @@
     <string name="preset_delete_description">Delete “%1$s” from your saved presets? Your apps and privacy settings will stay as they are.</string>
     <string name="preset_apply_profiles">Apply to: %1$s</string>
     <string name="history_undo_changes">Undo these changes?</string>
-    <string name="settings_theme_summary">Dracula theme · JetBrains Mono</string>
+    <string name="settings_theme_summary">Dracula colors · Android typography</string>
     <string name="logs_expand_entry">Show log message</string>
     <string name="logs_collapse_entry">Hide log message</string>
     <string name="logs_copy_entry">Copy log entry</string>

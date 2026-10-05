@@ -1,0 +1,23 @@
+
+io.github.samolego.canta.ui.SearchNavigationUiTest:
+Error in accessibilityCharacterNavigationExtendsTheQuerySelection(io.github.samolego.canta.ui.SearchNavigationUiTest):
+java.lang.AssertionError: expected:<TextRange(0, 1)> but was:<TextRange(1, 1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at io.github.samolego.canta.ui.SearchNavigationUiTest.accessibilityCharacterNavigationExtendsTheQuerySelection(SearchNavigationUiTest.kt:77)
+
+
+Time: 36.887
+There was 1 failure:
+1) accessibilityCharacterNavigationExtendsTheQuerySelection(io.github.samolego.canta.ui.SearchNavigationUiTest)
+java.lang.AssertionError: expected:<TextRange(0, 1)> but was:<TextRange(1, 1)>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at io.github.samolego.canta.ui.SearchNavigationUiTest.accessibilityCharacterNavigationExtendsTheQuerySelection(SearchNavigationUiTest.kt:77)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1

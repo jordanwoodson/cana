@@ -186,9 +186,9 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.heightIn(min = 48.dp).clickable(role = androidx.compose.ui.semantics.Role.Button) {
                             context.openWebLink("https://github.com/jordanwoodson/cana")
-                        }
+                        }.padding(vertical = 16.dp)
                     )
             }
             }

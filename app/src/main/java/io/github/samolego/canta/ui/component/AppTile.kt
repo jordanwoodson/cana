@@ -44,7 +44,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -105,11 +104,14 @@ fun AppTile(
     val widestBadge = badgeLabels.maxOfOrNull {
         textMeasurer.measure(it, MaterialTheme.typography.labelMedium, softWrap = false).size.width
     }?.plus(with(density) { 38.dp.roundToPx() }) ?: 0
+    val selectionLabel = stringResource(
+        if (isSelected) R.string.app_deselect_description else R.string.app_select_description, appInfo.name)
     Box(modifier.fillMaxWidth().heightIn(min = 88.dp)) {
         ListItem(
             modifier = Modifier.fillMaxWidth().combinedClickable(
                 enabled = enabled,
                 onClick = onShowDialog,
+                onLongClickLabel = selectionLabel,
                 onLongClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onCheckChanged(!isSelected)
@@ -123,8 +125,8 @@ fun AppTile(
             },
             headlineContent = {
                 Text(appInfo.name, modifier = Modifier.alpha(contentAlpha),
-                    style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 2, overflow = TextOverflow.Ellipsis)
             },
             supportingContent = {
                 Column(Modifier.alpha(contentAlpha)) {
@@ -166,8 +168,6 @@ fun AppTile(
                 }
             },
             trailingContent = {
-                val selectionLabel = stringResource(
-                    if (isSelected) R.string.app_deselect_description else R.string.app_select_description, appInfo.name)
                 Checkbox(
                     modifier = Modifier.semantics { contentDescription = selectionLabel },
                     checked = isSelected,

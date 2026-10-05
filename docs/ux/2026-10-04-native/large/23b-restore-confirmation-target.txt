@@ -1,0 +1,54 @@
+Native configuration: 320 x 800dp; fontScale=2.0
+Printing with useUnmergedTree = 'false'
+Node #13 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+ |-Node #14 at (l=0.0, t=0.0, r=320.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+Printing with useUnmergedTree = 'false'
+Node #1849 at (l=0.0, t=0.0, r=320.0, b=668.0)px
+ |-Node #1850 at (l=0.0, t=0.0, r=320.0, b=668.0)px
+   [IsDialog]
+    |-Node #1851 at (l=0.0, t=0.0, r=320.0, b=668.0)px
+      PaneTitle = 'Dialog'
+       |-Node #1852 at (l=0.0, t=0.0, r=320.0, b=668.0)px
+         IsContainer = 'true'
+         Shape = 'RoundedCornerShape(topStart = CornerSize(size = 28.0.dp), topEnd = CornerSize(size = 28.0.dp), bottomEnd = CornerSize(size = 28.0.dp), bottomStart = CornerSize(size = 28.0.dp))'
+          |-Node #1855 at (l=24.0, t=24.0, r=296.0, b=120.0)px
+          | Text = '[Reinstall 1 app in Personal?]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |-Node #1857 at (l=24.0, t=136.0, r=296.0, b=566.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@e14a7b9'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=0.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #1858 at (l=24.0, t=136.0, r=296.0, b=326.0)px
+          |  | Text = '[Restore installation for this profile. Previously deleted app data cannot be recovered by Cana.]'
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1859 at (l=24.0, t=338.0, r=296.0, b=566.0)px
+          |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@b56f601'
+          |    Focused = 'false'
+          |    Role = 'Checkbox'
+          |    Text = '[Optional Weather and Partner Recommendations, example.optional.weather]'
+          |    ToggleableState = 'On'
+          |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |    MergeDescendants = 'true'
+          |     |-Node #1864 at (l=56.0, t=524.0, r=269.0, b=566.0)px
+          |       Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |       Text = '[Recommended]'
+          |       Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |       MergeDescendants = 'true'
+          |-Node #1869 at (l=54.0, t=590.0, r=160.0, b=644.0)px
+          | Focused = 'false'
+          | Role = 'Button'
+          | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          | Text = '[Cancel]'
+          | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          | MergeDescendants = 'true'
+          |-Node #1872 at (l=168.0, t=590.0, r=296.0, b=644.0)px
+            Focused = 'false'
+            Role = 'Button'
+            Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+            Text = '[Reinstall]'
+            Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+            MergeDescendants = 'true'

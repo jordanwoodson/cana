@@ -109,7 +109,8 @@ fun PrivacyDashboardPage(onNavigateBack: () -> Unit) {
             val grouped = entries.groupBy { it.first.userId to it.first.packageName }
                 .toSortedMap(compareBy({ it.first }, { it.second }))
             for ((target, restrictions) in grouped) {
-                ElevatedCard(Modifier.fillMaxWidth()) {
+                Card(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(appNames[target] ?: target.second, style = MaterialTheme.typography.titleMedium)
                         Text(profileName(target.first), style = MaterialTheme.typography.bodySmall,

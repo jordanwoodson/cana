@@ -1,0 +1,176 @@
+Native configuration: 360 x 800dp; fontScale=1.0
+Printing with useUnmergedTree = 'false'
+Node #1 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+ |-Node #2 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+   IsContainer = 'true'
+   Shape = 'RectangleShape'
+    |-Node #1285 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+       |-Node #1286 at (l=0.0, t=0.0, r=360.0, b=800.0)px
+         IsContainer = 'true'
+         Shape = 'RectangleShape'
+          |-Node #1307 at (l=0.0, t=88.0, r=360.0, b=776.0)px
+          | IsTraversalGroup = 'true'
+          | Shape = 'androidx.compose.foundation.VerticalScrollableClipShape@22b55cf'
+          | VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=1045.0, reverseScrolling=false)'
+          | Actions = [ScrollBy, ScrollByOffset]
+          |  |-Node #1308 at (l=0.0, t=88.0, r=360.0, b=140.0)px
+          |  | Text = '[Safety]'
+          |  | [Heading]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1309 at (l=16.0, t=140.0, r=344.0, b=445.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #1311 at (l=16.0, t=140.0, r=344.0, b=260.0)px
+          |  |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@14e6d1a'
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Role = 'Switch'
+          |  |  | Text = '[Require authentication, Require authentication for uninstalling or reinstalling apps.]'
+          |  |  | ToggleableState = 'Off'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #1322 at (l=16.0, t=261.0, r=344.0, b=445.0)px
+          |  |    ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |    FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@fbe904b'
+          |  |    Focused = 'false'
+          |  |    IsContainer = 'true'
+          |  |    Role = 'Switch'
+          |  |    Text = '[Allow removal of Unsafe apps, Allow reviewed removal of apps marked Unsafe, including preset actions. These apps can affect essential device functions.]'
+          |  |    ToggleableState = 'Off'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #1332 at (l=0.0, t=445.0, r=360.0, b=497.0)px
+          |  | Text = '[Bloat list]'
+          |  | [Heading]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1333 at (l=16.0, t=497.0, r=344.0, b=943.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #1335 at (l=16.0, t=497.0, r=344.0, b=637.0)px
+          |  |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@91c7a28'
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Role = 'Switch'
+          |  |  | Text = '[Auto update bloat list, Automatically refresh app recommendations and descriptions when a new list is available.]'
+          |  |  | ToggleableState = 'On'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #1346 at (l=16.0, t=638.0, r=344.0, b=802.0)px
+          |  |  | ContentDataType = 'AndroidContentDataType(androidAutofillType=2)'
+          |  |  | FillableData = 'androidx.compose.ui.autofill.AndroidFillableData@1486341'
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Role = 'Switch'
+          |  |  | Text = '[Update list only on unmetered networks, Applies to automatic updates and pull to refresh. Cached and bundled data remain available offline.]'
+          |  |  | ToggleableState = 'Off'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, OnFillData, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #1357 at (l=16.0, t=803.0, r=344.0, b=943.0)px
+          |  |    Focused = 'false'
+          |  |    IsContainer = 'true'
+          |  |    Text = '[Bloat list URL, https://codeload.github.com/MuntashirAkon/android-debloat-list/zip/refs/heads/master]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #1366 at (l=0.0, t=943.0, r=360.0, b=995.0)px
+          |  | Text = '[Permissions]'
+          |  | [Heading]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1367 at (l=16.0, t=995.0, r=344.0, b=1263.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #1370 at (l=16.0, t=995.0, r=344.0, b=1067.0)px
+          |  |  | IsContainer = 'true'
+          |  |  | Shape = 'RectangleShape'
+          |  |  | Text = '[Secure settings]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #1376 at (l=32.0, t=1029.0, r=117.0, b=1057.0)px
+          |  |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |    Text = '[Missing]'
+          |  |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |    MergeDescendants = 'true'
+          |  |  |-Node #1381 at (l=16.0, t=1067.0, r=344.0, b=1139.0)px
+          |  |  | IsContainer = 'true'
+          |  |  | Shape = 'RectangleShape'
+          |  |  | Text = '[Usage access]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |  |-Node #1387 at (l=32.0, t=1101.0, r=117.0, b=1129.0)px
+          |  |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 12.0.dp), topEnd = CornerSize(size = 12.0.dp), bottomEnd = CornerSize(size = 12.0.dp), bottomStart = CornerSize(size = 12.0.dp))'
+          |  |  |    Text = '[Missing]'
+          |  |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |    MergeDescendants = 'true'
+          |  |  |-Node #1392 at (l=32.0, t=1147.0, r=328.0, b=1195.0)px
+          |  |  | Text = '[Shizuku grants these once. Usage access and supported system settings then remain available when Shizuku stops.]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |  |-Node #1393 at (l=32.0, t=1207.0, r=225.0, b=1247.0)px
+          |  |    Focused = 'false'
+          |  |    Role = 'Button'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    Text = '[Grant through Shizuku]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #1396 at (l=0.0, t=1263.0, r=360.0, b=1315.0)px
+          |  | Text = '[Diagnostics]'
+          |  | [Heading]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1397 at (l=16.0, t=1315.0, r=344.0, b=1448.0)px
+          |  | IsContainer = 'true'
+          |  | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |  |  |-Node #1399 at (l=16.0, t=1315.0, r=344.0, b=1383.0)px
+          |  |  | Focused = 'false'
+          |  |  | IsContainer = 'true'
+          |  |  | Text = '[Logs]'
+          |  |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |  | MergeDescendants = 'true'
+          |  |  |-Node #1409 at (l=24.0, t=1396.0, r=190.0, b=1436.0)px
+          |  |    Focused = 'false'
+          |  |    Role = 'Button'
+          |  |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+          |  |    Text = '[Export recovery script]'
+          |  |    Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |  |    MergeDescendants = 'true'
+          |  |-Node #1412 at (l=0.0, t=1448.0, r=360.0, b=1500.0)px
+          |  | Text = '[About]'
+          |  | [Heading]
+          |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |  |-Node #1413 at (l=16.0, t=1500.0, r=344.0, b=1797.0)px
+          |    IsContainer = 'true'
+          |    Shape = 'RoundedCornerShape(topStart = CornerSize(size = 24.0.dp), topEnd = CornerSize(size = 24.0.dp), bottomEnd = CornerSize(size = 24.0.dp), bottomStart = CornerSize(size = 24.0.dp))'
+          |     |-Node #1417 at (l=136.0, t=1516.0, r=224.0, b=1604.0)px
+          |     | Shape = 'RectangleShape'
+          |     |-Node #1418 at (l=129.0, t=1612.0, r=231.0, b=1649.0)px
+          |     | ContentDescription = '[Cana]'
+          |     | ClearAndSetSemantics = 'true'
+          |     |-Node #1419 at (l=93.0, t=1657.0, r=267.0, b=1677.0)px
+          |     | Text = '[Do more. Because you can.]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #1420 at (l=75.0, t=1685.0, r=285.0, b=1701.0)px
+          |     | Text = '[Dracula colors · Android typography]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #1421 at (l=106.0, t=1709.0, r=254.0, b=1725.0)px
+          |     | Text = '[App version: 3.2.2-cana.8]'
+          |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+          |     |-Node #1422 at (l=61.0, t=1733.0, r=300.0, b=1781.0)px
+          |       Focused = 'false'
+          |       Role = 'Button'
+          |       Text = '[https://github.com/jordanwoodson/cana]'
+          |       Actions = [ClearTextSubstitution, GetTextLayoutResult, OnClick, RequestFocus, SetTextSubstitution, ShowTextSubstitution]
+          |       MergeDescendants = 'true'
+          |-Node #1290 at (l=0.0, t=0.0, r=360.0, b=88.0)px
+            IsContainer = 'true'
+            Shape = 'RectangleShape'
+             |-Node #1292 at (l=4.0, t=32.0, r=52.0, b=80.0)px
+             | ContentDescription = '[Back]'
+             | Focused = 'false'
+             | Role = 'Button'
+             | Shape = 'RoundedCornerShape(topStart = CornerSize(size = 50.0%), topEnd = CornerSize(size = 50.0%), bottomEnd = CornerSize(size = 50.0%), bottomStart = CornerSize(size = 50.0%))'
+             | Actions = [OnClick, RequestFocus]
+             | MergeDescendants = 'true'
+             |-Node #1295 at (l=60.0, t=42.0, r=139.0, b=70.0)px
+               Text = '[Settings]'
+               [Heading]
+               Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+               MergeDescendants = 'true'

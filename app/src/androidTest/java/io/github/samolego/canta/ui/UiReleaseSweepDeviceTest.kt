@@ -69,6 +69,8 @@ import java.util.concurrent.TimeUnit
  * Optional instrumentation argument startAt=details, secondary, or dialogs resumes a partial sweep;
  * omit it for complete coverage. Screenshots from a resumed run cover only that suffix.
  * captureComparison=false skips the comparison screen's real package-inventory refresh.
+ * inventoryTimeoutMillis can allow a slower real package scan on software-only emulators;
+ * it does not change UI, focus, animation, or keyboard assertion timeouts.
  */
 @SdkSuppress(minSdkVersion = 30)
 class UiReleaseSweepDeviceTest {
@@ -86,6 +88,8 @@ class UiReleaseSweepDeviceTest {
         check(Build.HARDWARE in setOf("ranchu", "goldfish")) { "Use an emulator for fixture screenshots" }
         val startAt = InstrumentationRegistry.getArguments().getString("startAt", "main")
         val captureComparison = InstrumentationRegistry.getArguments().getString("captureComparison", "true").toBooleanStrict()
+        val inventoryTimeoutMillis = InstrumentationRegistry.getArguments()
+            .getString("inventoryTimeoutMillis", "90000").toLong().also { require(it > 0) }
         require(startAt in setOf("main", "details", "secondary", "dialogs")) {
             "startAt must be main, details, secondary, or dialogs"
         }
@@ -232,7 +236,7 @@ class UiReleaseSweepDeviceTest {
                 // Comparison refreshes the real package inventory; keep it last in the main-app run.
                 if (captureComparison) {
                     openPage(R.string.comparison_title)
-                    compose.waitUntil(90_000) {
+                    compose.waitUntil(inventoryTimeoutMillis) {
                         compose.onAllNodesWithText(context.getString(R.string.comparison_loading)).fetchSemanticsNodes().isEmpty() &&
                             compose.onAllNodes(hasContentDescription(context.getString(R.string.comparison_refresh)) and isEnabled())
                                 .fetchSemanticsNodes().size == 1

@@ -1,0 +1,43 @@
+
+io.github.samolego.canta.ui.ExpressiveComponentsUiTest:...
+io.github.samolego.canta.ui.SupportingControlsUiTest:..
+io.github.samolego.canta.ui.SearchNavigationUiTest:
+Error in accessibilityCharacterNavigationExtendsTheQuerySelection(io.github.samolego.canta.ui.SearchNavigationUiTest):
+java.lang.AssertionError: Extend selection by one character
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.SearchNavigationUiTest.accessibilityCharacterNavigationExtendsTheQuerySelection(SearchNavigationUiTest.kt:71)
+..
+io.github.samolego.canta.ui.AppSizeUiTest:..
+io.github.samolego.canta.ui.SelectionUxDeviceTest:..
+Error in selectionRemainsReviewableWhenEveryTargetIsHidden(io.github.samolego.canta.ui.SelectionUxDeviceTest):
+java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+	at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at io.github.samolego.canta.ui.SelectionUxDeviceTest.selectionRemainsReviewableWhenEveryTargetIsHidden(SelectionUxDeviceTest.kt:100)
+...
+io.github.samolego.canta.ui.CanaSnackbarNavigationUiTest:.
+
+Time: 176.671
+There were 2 failures:
+1) accessibilityCharacterNavigationExtendsTheQuerySelection(io.github.samolego.canta.ui.SearchNavigationUiTest)
+java.lang.AssertionError: Extend selection by one character
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at io.github.samolego.canta.ui.SearchNavigationUiTest.accessibilityCharacterNavigationExtendsTheQuerySelection(SearchNavigationUiTest.kt:71)
+2) selectionRemainsReviewableWhenEveryTargetIsHidden(io.github.samolego.canta.ui.SelectionUxDeviceTest)
+java.lang.IllegalStateException: No compose hierarchies found in the app. Possible reasons include: (1) the Activity that calls setContent did not launch; (2) setContent was not called; (3) setContent was called before the ComposeTestRule ran. If setContent is called by the Activity, make sure the Activity is launched after the ComposeTestRule runs
+	at androidx.compose.ui.test.TestOwnerKt.getAllSemanticsNodes(TestOwner.kt:106)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test(SemanticsNodeInteraction.kt:64)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNodes$ui_test$default(SemanticsNodeInteraction.kt:59)
+	at androidx.compose.ui.test.AndroidAssertions_androidKt.checkIsDisplayed(AndroidAssertions.android.kt:29)
+	at androidx.compose.ui.test.AssertionsKt.isDisplayed(Assertions.kt:351)
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:33)
+	at io.github.samolego.canta.ui.SelectionUxDeviceTest.selectionRemainsReviewableWhenEveryTargetIsHidden(SelectionUxDeviceTest.kt:100)
+
+FAILURES!!!
+Tests run: 17,  Failures: 2

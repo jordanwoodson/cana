@@ -34,7 +34,7 @@ Presets can include package removals and privacy settings. Import review shows n
 
 ## Recommendations and accessibility
 
-Removal recommendations are guidance, not guarantees. Readable badges identify Recommended, Advanced, Expert, Unsafe, and System apps. The UI pairs Material 3 with the Dracula terminal palette, bundled [JetBrains Mono 2.304](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304) throughout headings, body text, descriptions and controls, localized resources, visible labels, and Android font scaling. Regular, Medium, SemiBold and Bold font weights work offline; their license and provenance ship in the APK assets.
+Removal recommendations are guidance, not guarantees. Readable badges identify Recommended, Advanced, Expert, Unsafe, and System apps. The UI pairs Material 3 with the Dracula palette and native Android sans-serif typography throughout headings, body text, descriptions, and controls. Rounded tonal cards, localized resources, visible labels, and layouts that adapt to Android font scaling keep the interface readable. The Cana wordmark uses bundled [JetBrains Mono 2.304](https://github.com/JetBrains/JetBrainsMono/releases/tag/v2.304); its license and provenance ship in the APK assets.
 
 Recommendation and tracker data can be cached for offline use. Downloads contact the configured sources and expose normal network request metadata. Tracker scans read APK files locally and keep their results on the device. Cana has no analytics SDK. See the [privacy policy](https://github.com/jordanwoodson/cana/blob/master/privacy_policy.md) for local storage, backup, download, and export details.
 
