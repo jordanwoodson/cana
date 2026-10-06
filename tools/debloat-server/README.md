@@ -46,7 +46,7 @@ Cana's verdict; upstream's display name, warning, references and replacement rec
 serves it at `/devices/NAME/uad_lists.json`. The default `/uad_lists.json` is unchanged.
 
 The Metro Motorola Edge 2025 review lives in `docs/package-audit/2026-10-01/motorola_packages.json`
-(current decisions: [v4, 2026-10-06](../../docs/package-audit/2026-10-06/rerating-v4-report.md)):
+(current decisions: [v5, 2026-10-06](../../docs/package-audit/2026-10-06/privacy-sweep.md)):
 
 ```sh
 python3 tools/debloat-server/prepare-context.py --destination ~/containers/debloat \
@@ -54,9 +54,17 @@ python3 tools/debloat-server/prepare-context.py --destination ~/containers/deblo
 cd ~/containers/debloat && sudo docker compose build && sudo docker compose up -d
 ```
 
-In Cana, set Settings → Bloat list URL to
+Cana's default Bloat list URL is
 `https://ubuntu-server.taila70e29.ts.net:3090/devices/moto-edge-2025/uad_lists.json`
-(the plain `/uad_lists.json` address is routed back to the upstream default).
+(`BloatListSource.kt`); the earlier defaults, including the plain `/uad_lists.json` address and the
+upstream archive, are routed to it. The app also bundles the same review as
+`app/src/main/assets/moto-edge-2025.json` and merges it over its bundled Android Debloat List when
+the server cannot be reached. After a new decisions layer, redeploy the server as above and copy the
+file into the assets (that copy ships with the next app release):
+
+```sh
+cp docs/package-audit/2026-10-01/motorola_packages.json app/src/main/assets/moto-edge-2025.json
+```
 
 ## Historical audit tools
 

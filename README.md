@@ -64,7 +64,7 @@ that profile's apps, and uninstall / reinstall then act on that profile only
 * Durable history, Undo last batch, and a PC restore script exported from History or Logs.
 * Per-profile runtime permissions, background restrictions, metered data restrictions and
   Android 14+ network blocks, with current state and revert controls.
-* Offline Android Debloat List recommendations, removal warnings, replacement apps, all list categories, tracker component inspection, privacy presets,
+* Offline Android Debloat List recommendations with the audited Moto Edge 2025 review merged over them (bundled, and refreshed by default from the tailnet debloat server), removal warnings, replacement apps, all list categories, tracker component inspection, privacy presets,
   OTA change review, APK-size sorting, and last-used sorting in Cana's own profile.
 * A separate System screen for Private DNS, captive checks, scanning, mobile data and Data Saver.
 * Exact preflight plans, persistent batch progress and stop controls, hidden-selection review,
