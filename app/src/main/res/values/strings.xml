@@ -365,6 +365,13 @@
     <string name="open_link_failed">Could not open this link. Install or enable a web browser and try again.</string>
     <string name="retry">Retry</string>
     <string name="tracker_scan_all">Scan for trackers</string>
+    <string name="package_csv_export">Export package list (CSV)</string>
+    <plurals name="package_csv_saved">
+        <item quantity="one">Saved %1$d package to CSV</item>
+        <item quantity="other">Saved %1$d packages to CSV</item>
+    </plurals>
+    <string name="package_csv_empty">No packages are loaded for this profile.</string>
+    <string name="package_csv_failed">Could not export package list: %1$s</string>
     <string name="tracker_scan_progress">Scanning trackers: %1$d of %2$d apps</string>
     <string name="tracker_scanned_count">%1$d of %2$d installed apps scanned</string>
     <string name="tracker_scan_summary">Tracker scan finished: %1$d of %2$d successfully scanned apps contain tracker signatures; %3$d failed</string>

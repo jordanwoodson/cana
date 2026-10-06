@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.TableView
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenu
@@ -26,6 +27,7 @@ fun MoreOptionsMenu(
         showMenu: Boolean,
         navigateToPage: (route: String) -> Unit,
         onScanTrackers: () -> Unit,
+        onExportCsv: () -> Unit,
         onDismiss: () -> Unit,
 ) {
 
@@ -54,6 +56,9 @@ fun MoreOptionsMenu(
         DropdownMenuItem(text = { Text(stringResource(R.string.tracker_scan_all)) },
             leadingIcon = { Icon(Icons.Default.TrackChanges, contentDescription = null) },
             onClick = { onScanTrackers(); onDismiss() })
+        DropdownMenuItem(text = { Text(stringResource(R.string.package_csv_export)) },
+            leadingIcon = { Icon(Icons.Default.TableView, contentDescription = null) },
+            onClick = { onExportCsv(); onDismiss() })
         HorizontalDivider()
         DropdownMenuItem(text = { Text(stringResource(R.string.settings)) },
             leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) },

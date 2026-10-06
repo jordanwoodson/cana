@@ -56,6 +56,7 @@ fun CantaTopBar(
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
+    val exportCsv = rememberPackageCsvExport(appListViewModel)
     val currentProfileName = profileName(appListViewModel.selectedUserId)
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -106,7 +107,7 @@ fun CantaTopBar(
                 IconClickButton(onClick = { filters = true }, icon = Icons.Default.FilterAlt, contentDescription = stringResource(R.string.filters_action))
                 Box {
                     IconClickButton(onClick = { more = true }, icon = Icons.Default.MoreVert, contentDescription = stringResource(R.string.more_options_action))
-                    MoreOptionsMenu(more, navigateToPage, { startTrackerScan(context, appListViewModel) }) { more = false }
+                    MoreOptionsMenu(more, navigateToPage, { startTrackerScan(context, appListViewModel) }, exportCsv) { more = false }
                 }
             })
         if (searchVisible) {
