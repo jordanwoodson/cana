@@ -1,5 +1,7 @@
 # Builds MuntashirAkon's Android Debloat List browser directly from upstream.
-# REF picks a branch or commit. No supplements, UAD-NG extras or audit overrides are applied.
+# REF picks a branch or commit. The default list applies no supplements, UAD-NG extras or audit
+# overrides. Each overlays/<name>.json (a package-keyed device review staged by prepare-context.py)
+# is additionally merged over upstream and served as /devices/<name>/uad_lists.json.
 ARG REF=master
 
 FROM php:8.4-cli-alpine AS build
@@ -10,6 +12,7 @@ RUN wget -qO- "https://github.com/rust-lang/mdBook/releases/download/v${MDBOOK_V
 ARG REF
 ADD https://github.com/MuntashirAkon/android-debloat-list.git#${REF} /src
 COPY uad_lists.php browser_suggestions.php /usr/local/bin/
+COPY overlays/ /overlays/
 WORKDIR /src
 # Convert only upstream's five categories for clients using the package-keyed JSON format.
 # The reference browser uses upstream's original descriptions, warnings and replacements.
@@ -22,6 +25,9 @@ RUN php scripts/lint.php \
  && mdbook build browser \
  && cp COPYING browser/book/LICENSE \
  && cp /tmp/uad_lists.json browser/book/ \
+ && for overlay in /overlays/*.json; do [ -f "$overlay" ] || continue; name=$(basename "$overlay" .json); \
+      mkdir -p "browser/book/devices/$name" \
+      && php /usr/local/bin/uad_lists.php . "browser/book/devices/$name/uad_lists.json" --overlay "$overlay"; done \
  && find browser/book -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.json' \
       -o -name '*.svg' -o -name '*.txt' -o -name LICENSE \) -size +1k -exec gzip -9kn {} +
 

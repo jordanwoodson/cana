@@ -1,8 +1,8 @@
 <?php
 // Builds package-keyed JSON from MuntashirAkon's five Android Debloat List categories.
 // The default browser build uses only these upstream records and replacements.
-// Optional --supplement / --uadng / --overlay flags remain for historical audit tooling;
-// the Dockerfile does not use them. The removal mapping preserves Canta-compatible badges.
+// Optional --supplement / --uadng flags remain for historical audit tooling. --overlay builds a
+// device-reviewed list (the Dockerfile serves one per file under /devices/<name>/uad_lists.json). The removal mapping preserves Canta-compatible badges.
 // Usage: php uad_lists.php <adl root> <output file> [--uadng <file>] [--supplement <file>] [--overlay <file>]...
 declare(strict_types=1);
 
@@ -152,7 +152,10 @@ foreach ($overlays as $file) {
                 || !is_string($verdict['reason'] ?? null) || trim($verdict['reason']) === '') fail("$file: $id has an invalid verdict");
         }
         if (isset($uad[$id])) $replaced++; else $added++;
-        $uad[$id] = array_intersect_key($item, array_flip(['list', 'description', 'source', 'dependencies', 'neededBy', 'labels', 'suggestions', 'verdict']));
+        // The overlay decides the rating, description and source; upstream's display name,
+        // warning, references and replacement records stay unless the overlay supplies its own.
+        $kept = array_intersect_key($uad[$id] ?? [], array_flip(['label', 'warning', 'web', 'suggestions', 'alternatives']));
+        $uad[$id] = array_intersect_key($item, array_flip(['list', 'description', 'source', 'dependencies', 'neededBy', 'labels', 'suggestions', 'verdict'])) + $kept;
         $uad[$id]['removal'] = $item['removal'];
     }
     note(basename($file) . ": $replaced existing entries reviewed, $added new entries");

@@ -3,7 +3,8 @@
 # solely through `sudo tailscale serve --bg --https=3090 http://127.0.0.1:3090`
 # → https://ubuntu-server.taila70e29.ts.net:3090
 # Pull the latest upstream: `sudo docker compose build --pull && sudo docker compose up -d`.
-# Pin an upstream commit by setting REF below. No local recommendation overrides are applied.
+# Pin an upstream commit by setting REF below. The default list applies no local overrides;
+# device-reviewed lists staged by prepare-context.py --device-list are served under /devices/<name>/.
 name: debloat
 
 services:

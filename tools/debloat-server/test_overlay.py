@@ -120,6 +120,28 @@ class OverlayMergeTest(unittest.TestCase):
                 self.assertNotEqual(0, self.run_merge({'com.bad': entry(verdict=bad)}).returncode)
                 self.assertEqual('previous validated output', (self.root / 'result.json').read_text())
 
+    def test_device_overlay_keeps_upstream_display_fields_it_does_not_supply(self):
+        fixture = self.root / 'fixture'
+        (fixture / 'google.json').write_text(json.dumps([{
+            'id': 'com.example.browser', 'label': 'Stock Browser', 'description': 'Browser.',
+            'removal': 'replace', 'warning': 'Replace it first.', 'web': ['https://example.com/report'],
+            'suggestions': 'browsers'}]))
+        (fixture / 'suggestions').mkdir()
+        alternatives = [{'id': 'org.example.browser', 'label': 'Open Browser', 'repo': 'https://example.com/browser'}]
+        (fixture / 'suggestions/browsers.json').write_text(json.dumps(alternatives))
+        verdict = {'action': 'Uninstall', 'benefits': ['privacy'], 'reason': 'Audited on the device.'}
+        overlay = {'com.example.browser': entry('Device-audited browser.', list='Google', removal='Recommended', verdict=verdict)}
+        result = self.run_merge(overlay, legacy_sources=False)
+        self.assertEqual(0, result.returncode, result.stderr)
+        data = json.loads((self.root / 'result.json').read_text())['com.example.browser']
+        self.assertEqual(('Device-audited browser.', 'Recommended', 'Test-reviewed audit', verdict),
+                         (data['description'], data['removal'], data['source'], data['verdict']))
+        self.assertEqual('Stock Browser', data['label'])
+        self.assertEqual('Replace it first.', data['warning'])
+        self.assertEqual(['https://example.com/report'], data['web'])
+        self.assertEqual('Open Browser', data['suggestions'])
+        self.assertEqual(alternatives, data['alternatives'])
+
     def test_later_reviewed_overlay_wins_deterministically(self):
         first = {'android': entry('First review.')}
         second = {'android': entry('Later review.')}
