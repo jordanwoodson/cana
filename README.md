@@ -22,8 +22,9 @@ Powered by [Shizuku](https://shizuku.rikka.app/).
 Cana is a fork of [Canta](https://github.com/samolego/Canta) by [samolego](https://github.com/samolego).
 The name turns **(cant)a** into **(can)a**: a fork built to do more. Cana lets you
 **pick which user profile to work on**, so system apps inside a work profile can
-be debloated too. It uses Shizuku and recommendations from the
-[Android Debloat List](https://github.com/MuntashirAkon/android-debloat-list).
+be debloated too. It uses Shizuku and, like Canta, recommendations from the
+[Universal Android Debloater](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation)
+list, with the [Android Debloat List](https://github.com/MuntashirAkon/android-debloat-list) bundled for offline use.
 
 - ✅ No root required
 - ✅ Personal, work, clone and private space profiles, and secondary users
@@ -64,7 +65,7 @@ that profile's apps, and uninstall / reinstall then act on that profile only
 * Durable history, Undo last batch, and a PC restore script exported from History or Logs.
 * Per-profile runtime permissions, background restrictions, metered data restrictions and
   Android 14+ network blocks, with current state and revert controls.
-* Offline Android Debloat List recommendations with the audited Moto Edge 2025 review merged over them (bundled, and refreshed by default from the tailnet debloat server), removal warnings, replacement apps, all list categories, tracker component inspection, privacy presets,
+* Recommendations from Canta's default Universal Android Debloater list (the Android Debloat List is bundled as the offline fallback), removal warnings, replacement apps, all list categories, tracker component inspection, privacy presets,
   OTA change review, APK-size sorting, and last-used sorting in Cana's own profile.
 * A separate System screen for Private DNS, captive checks, scanning, mobile data and Data Saver.
 * Exact preflight plans, persistent batch progress and stop controls, hidden-selection review,

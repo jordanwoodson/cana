@@ -65,24 +65,10 @@ class BloatListRepository(context: Context) {
         }
     }
 
-    /** The offline fallback: the bundled Android Debloat List with the bundled device review merged over it. */
-    private fun bundledList(): String {
-        val upstream = context.assets.open("android-debloat-list.zip").use {
-            parseAndroidDebloatArchive(it.readBloatBytes())
-        }
-        return try {
-            val review = context.assets.open(DEVICE_REVIEW_ASSET).use {
-                JSONObject(it.readBloatBytes().toString(Charsets.UTF_8))
-            }
-            applyDeviceReview(upstream, review)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            // A broken bundled review must not take the upstream fallback down with it.
-            LogUtils.e("BloatList", "Bundled device review unusable; falling back to the upstream list", e)
-            upstream
-        }.toString()
-    }
+    /** The offline fallback until the first download: the bundled Android Debloat List. */
+    private fun bundledList(): String = context.assets.open("android-debloat-list.zip").use {
+        parseAndroidDebloatArchive(it.readBloatBytes())
+    }.toString()
 
     companion object {
         private val refreshLock = Mutex()
