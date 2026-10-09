@@ -5,7 +5,7 @@ You're working on **Cana**, my fork of samolego/Canta (LGPL-3.0). Cana debloats 
 ## Context
 - Repo: `/home/jordan/projects/cana/canta`, branch `master`. Remotes: `origin` = jordanwoodson/cana, `upstream` = samolego/Canta. It has a single `:app` module using Kotlin, Jetpack Compose with Material 3, proto DataStore (`app/src/main/proto`), Shizuku API 13.1.5, and `org.lsposed.hiddenapibypass` for hidden APIs.
 - The Kotlin packages stay `io.github.samolego.canta` on purpose, to make upstream merges easier. The application id is `io.github.jordanwoodson.cana`.
-- Toolchain: `export JAVA_HOME=~/.local/share/jdk-21 ANDROID_HOME=~/Android/Sdk`. Build with `./gradlew assembleDebug`.
+- Toolchain: `export JAVA_HOME=~/.local/opt/jdk-21 ANDROID_HOME=~/.local/opt/android-sdk`. Build with `./gradlew assembleDebug`.
 - Emulator: AVD `canta35` (Android 15). There's no KVM, so start it with `-accel off`. To make it usable, run `cmd package compile -m speed -f <pkg>` on the app and `wm size 540x1200`. It's slow, so batch your checks. If Shizuku isn't on the AVD, install the latest release from RikkaApps/Shizuku and start it over adb.
 - Key files:
   - `MainActivity.kt`: uninstall and reinstall through PackageInstaller and Shizuku
