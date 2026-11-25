@@ -27,7 +27,8 @@ class PrivacyDeviceTest {
     }
 
     @Test fun typedPrivacyActionsAndUndoPreservePeerAndCapturedValues() = runBlocking {
-        for ((user, peer) in listOf(0 to 10, 10 to 0)) for (action in PrivacyAction.entries) {
+        val workUser = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("workUser")?.toInt() ?: 10
+        for ((user, peer) in listOf(0 to workUser, workUser to 0)) for (action in PrivacyAction.entries) {
             val before = services.privacy.snapshot(pkg, user, action)
             val peerBefore = services.privacy.snapshot(pkg, peer, action)
             val result = services.privacy.restrict(pkg, user, action)
@@ -36,7 +37,13 @@ class PrivacyDeviceTest {
                 assertTrue(result.message, result.message.contains("exempts"))
                 assertEquals("ignore", services.privacy.snapshot(pkg, user, action).getString("runAnyInBackground"))
             } else assertTrue("$action user=$user: ${result.message}", result.success)
-            assertEquals(peerBefore.toString(), services.privacy.snapshot(pkg, peer, action).toString())
+            val peerAfter = services.privacy.snapshot(pkg, peer, action)
+            if (action == PrivacyAction.NETWORK) {
+                assertTrue(peerAfter.getBoolean("chainEnabled"))
+                peerBefore.remove("chainEnabled")
+                peerAfter.remove("chainEnabled")
+            }
+            assertTrue(SnapshotState.equal(peerBefore, peerAfter))
             val record = services.history.records.first().last { it.packageName == pkg && it.action == action.key && it.userId == user }
             assertTrue(record.completed)
             val undo = services.privacy.undo(record)

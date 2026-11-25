@@ -26,7 +26,13 @@ env:
   CERT_SHA256: 748e751a9dd9240f9e8cc7cd7f7218dd1541e6abaa09603d282284062639e345
 
 jobs:
+  profile-checks:
+    uses: ./.github/workflows/profile-regressions.yml
+    permissions:
+      contents: read
+
   release:
+    needs: profile-checks
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout repository

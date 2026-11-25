@@ -3,7 +3,7 @@
 set -euo pipefail
 : "${ANDROID_HOME:?Set ANDROID_HOME to the Android SDK}"
 if [[ -n "${JAVA_HOME:-}" ]]; then export PATH="$JAVA_HOME/bin:$PATH"; fi
-fixture_dir=/tmp/cana-roadmap-fixture
+fixture_dir=${CANA_FIXTURE_DIR:-/tmp/cana-roadmap-fixture}
 mkdir -p "$fixture_dir"
 cat > "$fixture_dir/AndroidManifest.xml" <<'MANIFEST'
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jordanwoodson.cana.fixture" android:versionCode="2" android:versionName="2.0">

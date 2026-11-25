@@ -32,7 +32,8 @@ class ActionCapabilityDeviceTest {
         fun adb(command: String): String = ParcelFileDescriptor.AutoCloseInputStream(
             InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand(command))
             .bufferedReader().use { it.readText() }
-        for ((selected, other) in listOf(0 to 10, 10 to 0)) {
+        val workUser = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("workUser")?.toInt() ?: 10
+        for ((selected, other) in listOf(0 to workUser, workUser to 0)) {
             assertTrue(services.packageOps.reinstall(pkg, selected).success)
             assertTrue(services.packageOps.reinstall(pkg, other).success)
             val original = Packages.applicationEnabledSetting(pkg, selected)
@@ -58,7 +59,7 @@ class ActionCapabilityDeviceTest {
                 adb("run-as $pkg --user $selected mkdir -p files")
                 adb("run-as $pkg --user $selected touch files/cana-retained")
                 assertTrue(adb("run-as $pkg --user $selected ls files").contains("cana-retained"))
-                val removed = services.packageOps.uninstallStep(pkg, selected, 1)
+                val removed = services.packageOps.uninstall(pkg, selected, keepData = true)
                 assertTrue(removed.message, removed.success)
                 assertTrue(services.packageOps.reinstall(pkg, selected).success)
                 assertTrue("DELETE_KEEP_DATA must preserve the marker", adb("run-as $pkg --user $selected ls files").contains("cana-retained"))

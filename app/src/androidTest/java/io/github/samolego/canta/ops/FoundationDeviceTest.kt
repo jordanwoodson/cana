@@ -75,19 +75,65 @@ class FoundationDeviceTest {
     }
 
     @Test fun userAppRemovalIsScopedToPersonalAndWorkProfiles() = runBlocking {
+        val workUser = androidx.test.platform.app.InstrumentationRegistry.getArguments().getString("workUser")?.toInt()
+        if (workUser != null) assertEquals(workUser, android.os.Process.myUid() / 100_000)
+        val work = workUser ?: 10
         val name = "io.github.jordanwoodson.cana.fixture"
         assertTrue("Install the fixture before running this test", installed(name, 0))
-        assertTrue(services.packageOps.reinstall(name, 10).success)
+        assertTrue(services.packageOps.reinstall(name, work).success)
         val personal = services.packageOps.uninstall(name, 0)
         assertTrue(personal.message, personal.success)
         assertFalse(installed(name, 0))
-        assertTrue(installed(name, 10))
+        assertTrue(installed(name, work))
         assertTrue(services.packageOps.reinstall(name, 0).success)
-        val work = services.packageOps.uninstall(name, 10)
-        assertTrue(work.message, work.success)
-        assertFalse(installed(name, 10))
+        val removedFromWork = services.packageOps.uninstall(name, work)
+        assertTrue(removedFromWork.message, removedFromWork.success)
+        assertFalse(installed(name, work))
         assertTrue(installed(name, 0))
-        assertTrue(services.packageOps.reinstall(name, 10).success)
+        assertTrue(services.packageOps.reinstall(name, work).success)
+    }
+
+    @Test fun interruptedPrivacyRecordIsSettledFromTheSelectedProfileWithoutReplaying() = runBlocking {
+        val name = "io.github.jordanwoodson.cana.fixture"
+        val user = io.github.samolego.canta.util.apps.UserProfile.currentUserId
+        val action = PrivacyAction.BACKGROUND
+        val before = services.privacy.snapshot(name, user, action)
+        val id = java.util.UUID.randomUUID().toString()
+        services.history.append(io.github.samolego.canta.data.proto.OperationRecord.newBuilder()
+            .setId(id).setTimestampMs(System.currentTimeMillis()).setUserId(user).setPackageName(name)
+            .setAction(action.key).setPreviousState(before.toString()).build())
+        services.reconcileInterruptedJournals()
+        val record = services.history.records.first().single { it.id == id }
+        assertTrue(record.completed)
+        assertFalse(record.success)
+        assertFalse(record.changed)
+        assertTrue(SnapshotState.equal(before, SnapshotState.read(record.afterState)))
+        assertTrue(SnapshotState.equal(before, services.privacy.snapshot(name, user, action)))
+    }
+
+    @Test fun changedKeyboardRequiresNewApprovalBeforeMutation() = runBlocking {
+        val name = "io.github.jordanwoodson.cana.fixture"
+        val user = io.github.samolego.canta.util.apps.UserProfile.currentUserId
+        val settings = listOf("settings", "--user", user.toString())
+        val key = "enabled_input_methods"
+        val previous = services.shell.exec(settings + listOf("get", "secure", key))
+        assertTrue(previous.message, previous.success)
+        val value = previous.stdout.trim()
+        val preview = services.safety.inspect(listOf(name), user).getValue(name)
+        assertTrue(preview.permits(emptySet()))
+        try {
+            val enabled = listOf(value.takeUnless { it == "null" || it.isBlank() }, "$name/.Keyboard").filterNotNull()
+            val write = services.shell.exec(settings + listOf("put", "secure", key, enabled.joinToString(":")))
+            assertTrue(write.message, write.success)
+            val live = services.safety.inspect(listOf(name), user).getValue(name)
+            assertTrue(live.warnings.any { it.kind == "keyboard" })
+            val result = services.packageOps.setEnabled(name, user, false)
+            assertFalse(result.message, result.success)
+            assertFalse(result.changed)
+        } finally {
+            val restore = if (value == "null") listOf("delete", "secure", key) else listOf("put", "secure", key, value)
+            assertTrue(services.shell.exec(settings + restore).success)
+        }
     }
 
     @Test fun missingPackageFailureIsPersistedAndCounted() = runBlocking {
