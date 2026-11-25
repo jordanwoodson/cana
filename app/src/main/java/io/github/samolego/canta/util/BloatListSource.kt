@@ -16,8 +16,10 @@ object BloatListSource {
         ANDROID_DEBLOAT_LIST_URL,
     )
 
-    /** Switch existing Cana installations to the current default while preserving other custom lists. */
-    fun effectiveUrl(savedUrl: String): String = savedUrl.trim().let {
+    fun effectiveUrl(savedUrl: String): String = savedUrl.trim().ifEmpty { DEFAULT_BLOAT_URL }
+
+    /** Switch former defaults once while preserving other custom lists. */
+    fun migrateLegacyUrl(savedUrl: String): String = savedUrl.trim().let {
         if (it.isEmpty() || it in legacyUrls) DEFAULT_BLOAT_URL else it
     }
 }

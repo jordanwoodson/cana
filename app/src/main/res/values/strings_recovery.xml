@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="recovery_pending_review">Android has not confirmed the previous operation. This package is paused in every profile. Reconnect and review History before retrying.</string>
+    <string name="recovery_pending_review">Android has not confirmed the previous operation. Conflicting changes to this package are paused. Reconnect and review History before retrying.</string>
+    <string name="settings_recovery_title">Recover Cana settings</string>
+    <string name="settings_recovery_message">Cana could not read your preferences. Unlock your device to use the default settings and keep authentication enabled. Your operation history is stored separately.</string>
+    <string name="settings_recovery_action">Authenticate and recover</string>
+    <string name="settings_recovery_auth_failed">Confirm your screen lock to recover settings. If you have no screen lock, set one in Android Settings first.</string>
+    <string name="journal_interrupted">Cana was interrupted. Review the recorded state before retrying or undoing this change.</string>
 </resources>

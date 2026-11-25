@@ -84,6 +84,8 @@ import io.github.samolego.canta.util.apps.UserProfile
 import io.github.samolego.canta.ui.theme.LocalCanaColors
 import io.github.samolego.canta.util.shizuku.ShizukuPermission
 import io.github.samolego.canta.util.shizuku.AuthorizationState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
 
@@ -94,6 +96,14 @@ fun CantaApp(
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
+
+    val settings = remember { SettingsStore.getInstance() }
+    val recoveryRequired by settings.recoveryRequired.collectAsStateWithLifecycle(initialValue = null)
+    when (recoveryRequired) {
+        null -> return
+        true -> { SettingsRecoveryDialog(settings, closeApp); return }
+        false -> Unit
+    }
 
     val appListViewModel = viewModel<AppListViewModel>()
     val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory())
@@ -117,11 +127,12 @@ fun CantaApp(
         composable(Screen.Welcome.route) {
             WelcomePage(appListViewModel, closeApp) {
                 SettingsStore.getInstance().setDisableRiskDialog(true)
-                navController.navigate(Screen.Main.route) {
-                    popUpTo(Screen.Welcome.route) { inclusive = true }
-                    launchSingleTop = true
+                withContext(Dispatchers.Main.immediate) {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
-                onboardingDone = true
             }
         }
         composable(Screen.AppDetail.route) { entry ->

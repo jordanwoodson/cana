@@ -20,4 +20,6 @@ message AppSettings {
   string tracker_list_url = 14;
   // Legacy preference retained for data compatibility; Cana now always uses Dracula.
   bool use_dynamic_color = 15 [deprecated = true];
+  bool list_source_migrated = 16;
+  bool settings_recovery_required = 17;
 }

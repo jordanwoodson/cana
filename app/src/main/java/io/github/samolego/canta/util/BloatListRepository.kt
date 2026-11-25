@@ -16,27 +16,43 @@ import java.security.MessageDigest
 class BloatListRepository(context: Context) {
     private val context = context.applicationContext
 
-    /** Atomic cache replacement makes this safe without waiting behind a network refresh. */
-    suspend fun cached(): JSONObject = withContext(Dispatchers.IO) {
-        val snapshot = SettingsStore.getInstance().bloatUpdateSettings()
-        val url = BloatListSource.effectiveUrl(snapshot.bloatListUrl)
+    private val guidanceLock = Mutex()
+    private var lastSource: Pair<String, Long>? = null
+    private var lastGuidance = emptyMap<String, BloatData>()
+
+    private fun cacheFile(url: String): File {
         val key = MessageDigest.getInstance("SHA-256").digest(url.toByteArray())
             .joinToString("") { "%02x".format(it) }
-        BloatListCache(File(context.filesDir, "uad-$key.json")) {
-            bundledList()
-        }.load().data
+        return File(context.filesDir, "uad-$key.json")
+    }
+
+    /** A completed refresh invalidates parsed guidance for the next safety check. */
+    suspend fun guidance(configuredUrl: String): Map<String, BloatData> = withContext(Dispatchers.IO) {
+        guidanceLock.withLock {
+            val url = BloatListSource.effectiveUrl(configuredUrl)
+            val source = url to generation.get()
+            if (source != lastSource) {
+                val json = BloatListCache(cacheFile(url), ::bundledList).load().data
+                lastGuidance = buildMap {
+                    for (name in json.keys()) json.optJSONObject(name)?.let { put(name, BloatData.fromJson(it)) }
+                }
+                lastSource = source
+            }
+            lastGuidance
+        }
+    }
+
+    suspend fun cached(): JSONObject = withContext(Dispatchers.IO) {
+        val url = BloatListSource.effectiveUrl(SettingsStore.getInstance().snapshot().bloatListUrl)
+        BloatListCache(cacheFile(url), ::bundledList).load().data
     }
 
     suspend fun load(forceRefresh: Boolean = false): JSONObject = withContext(Dispatchers.IO) {
         refreshLock.withLock {
             val settings = SettingsStore.getInstance()
-            val snapshot = settings.bloatUpdateSettings()
+            val snapshot = settings.snapshot()
             val url = BloatListSource.effectiveUrl(snapshot.bloatListUrl)
-            val key = MessageDigest.getInstance("SHA-256").digest(url.toByteArray())
-                .joinToString("") { "%02x".format(it) }
-            val cache = BloatListCache(File(context.filesDir, "uad-$key.json")) {
-                bundledList()
-            }
+            val cache = BloatListCache(cacheFile(url), ::bundledList)
             val current = cache.load()
             val sameUrl = snapshot.bloatCacheUrl == url
             val lastChecked = if (sameUrl) snapshot.bloatLastCheckedMs else 0
@@ -45,7 +61,7 @@ class BloatListRepository(context: Context) {
             val now = System.currentTimeMillis()
             if (!BloatUpdatePolicy.shouldFetch(
                     now, lastChecked, snapshot.autoUpdateBloatList, forceRefresh,
-                    snapshot.bloatUnmeteredOnly, manager?.isActiveNetworkMetered != false,
+                    snapshot.bloatUnmeteredOnly, manager.isActiveNetworkMetered,
                 )) return@withLock current.data
 
             val etag = if (sameUrl) snapshot.bloatEtag else ""
@@ -53,6 +69,7 @@ class BloatListRepository(context: Context) {
             settings.setBloatCacheMetadata(url, etag, now)
             try {
                 val updated = cache.refresh(BloatListClient(), url, etag)
+                generation.incrementAndGet()
                 settings.setBloatCacheMetadata(url, updated.etag, now)
                 LogUtils.i("BloatList", "List checked using conditional GET: $url")
                 updated.data
@@ -72,5 +89,6 @@ class BloatListRepository(context: Context) {
 
     companion object {
         private val refreshLock = Mutex()
+        private val generation = java.util.concurrent.atomic.AtomicLong()
     }
 }

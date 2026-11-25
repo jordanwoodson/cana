@@ -1,6 +1,11 @@
 package io.github.samolego.canta.util
 
+import android.app.Activity
+import android.app.KeyguardManager
 import android.content.Context
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import java.util.UUID
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -16,7 +21,31 @@ fun showBiometricPrompt(
     context: Context,
     onError: () -> Unit = {},
     onSuccess: () -> Unit
-): BiometricPrompt {
+): () -> Unit {
+    val activity = context as FragmentActivity
+    if (Build.VERSION.SDK_INT < 30) {
+        // Android 9 and 10 cannot combine strong biometrics and device credentials in BiometricPrompt.
+        @Suppress("DEPRECATION")
+        val intent = context.getSystemService(KeyguardManager::class.java)
+            .createConfirmDeviceCredentialIntent(context.getString(R.string.auth_required), null)
+        if (intent == null) {
+            onError()
+            return {}
+        }
+        lateinit var unregister: () -> Unit
+        val launcher = activity.activityResultRegistry.register(UUID.randomUUID().toString(),
+            ActivityResultContracts.StartActivityForResult()) { result ->
+            unregister()
+            if (result.resultCode == Activity.RESULT_OK) onSuccess() else onError()
+        }
+        unregister = launcher::unregister
+        try { launcher.launch(intent) } catch (_: android.content.ActivityNotFoundException) {
+            unregister()
+            onError()
+        }
+        return unregister
+    }
+
     val executor = ContextCompat.getMainExecutor(context)
 
     val promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -33,7 +62,7 @@ fun showBiometricPrompt(
 
     }
 
-    val biometricPrompt = BiometricPrompt(context as FragmentActivity, executor,
+    val biometricPrompt = BiometricPrompt(activity, executor,
         object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(
                 result: BiometricPrompt.AuthenticationResult
@@ -52,5 +81,5 @@ fun showBiometricPrompt(
         })
 
     biometricPrompt.authenticate(promptInfo)
-    return biometricPrompt
+    return biometricPrompt::cancelAuthentication
 }

@@ -2,6 +2,8 @@ package io.github.samolego.canta.data
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.datastore.core.DataMigration
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import io.github.samolego.canta.data.proto.AppSettings
@@ -9,13 +11,27 @@ import io.github.samolego.canta.util.BloatListSource
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 
-// Proto DataStore instance
+internal val settingsCorruptionHandler = ReplaceFileCorruptionHandler {
+    AppSettingsSerializer.defaultValue.toBuilder().setAuthEnabled(true).setSettingsRecoveryRequired(true).build()
+}
+
 private val Context.dataStore: DataStore<AppSettings> by
-        dataStore(fileName = "app_settings.pb", serializer = AppSettingsSerializer)
+        dataStore(fileName = "app_settings.pb", serializer = AppSettingsSerializer,
+            corruptionHandler = settingsCorruptionHandler,
+            produceMigrations = { listOf(ListSourceMigration) })
 
-class SettingsStore private constructor(context: Context) {
+internal object ListSourceMigration : DataMigration<AppSettings> {
+    override suspend fun shouldMigrate(currentData: AppSettings) = !currentData.listSourceMigrated
+    override suspend fun migrate(currentData: AppSettings): AppSettings {
+        val url = BloatListSource.migrateLegacyUrl(currentData.bloatListUrl)
+        return currentData.toBuilder().setListSourceMigrated(true).setBloatListUrl(url).apply {
+            if (url != currentData.bloatListUrl) clearBloatCacheUrl().clearBloatEtag().clearBloatLastCheckedMs()
+        }.build()
+    }
+    override suspend fun cleanUp() = Unit
+}
 
-    private val dataStore = context.dataStore
+class SettingsStore internal constructor(private val dataStore: DataStore<AppSettings>) {
     val autoUpdateBloatListFlow = dataStore.data.map { it.autoUpdateBloatList }
     val confirmBeforeUninstallFlow = dataStore.data.map { it.confirmBeforeUninstall }
     val disableRiskDialogFlow = dataStore.data.map { it.disableRiskDialog }
@@ -24,6 +40,14 @@ class SettingsStore private constructor(context: Context) {
     }
     val bloatUnmeteredOnlyFlow = dataStore.data.map { it.bloatUnmeteredOnly }
     val allowUnsafeUninstallsFlow = dataStore.data.map { it.allowUnsafeUninstalls }
+
+    val recoveryRequired = dataStore.data.map { it.settingsRecoveryRequired }
+    suspend fun acknowledgeSettingsRecovery() {
+        dataStore.updateData { settings ->
+            if (settings.settingsRecoveryRequired) settings.toBuilder().setAuthEnabled(true).clearSettingsRecoveryRequired().build()
+            else settings
+        }
+    }
 
     val authEnabledFlow = dataStore.data.map { it.authEnabled }
     val trackerListUrlFlow = dataStore.data.map { it.trackerListUrl }
@@ -52,7 +76,7 @@ class SettingsStore private constructor(context: Context) {
         }
     }
 
-    suspend fun bloatUpdateSettings(): AppSettings = dataStore.data.first()
+    suspend fun snapshot(): AppSettings = dataStore.data.first()
 
     suspend fun setBloatUnmeteredOnly(value: Boolean) {
         dataStore.updateData { it.toBuilder().setBloatUnmeteredOnly(value).build() }
@@ -82,7 +106,7 @@ class SettingsStore private constructor(context: Context) {
         fun initialize(appContext: Context) {
             synchronized(this) {
                 if (INSTANCE == null) {
-                    INSTANCE = SettingsStore(appContext)
+                    INSTANCE = SettingsStore(appContext.dataStore)
                 }
             }
         }
