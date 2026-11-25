@@ -24,6 +24,14 @@ MANIFEST
 "$ANDROID_HOME/build-tools/36.0.0/aapt2" link -I "$ANDROID_HOME/platforms/android-36/android.jar" \
   --manifest "$fixture_dir/AndroidManifest.xml" -o "$fixture_dir/unsigned.apk"
 "$ANDROID_HOME/build-tools/36.0.0/zipalign" -f 4 "$fixture_dir/unsigned.apk" "$fixture_dir/aligned.apk"
-"$ANDROID_HOME/build-tools/36.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" \
+fixture_key="${ANDROID_USER_HOME:-$HOME/.android}/debug.keystore"
+if [[ ! -f "$fixture_key" ]]; then
+  fixture_key="$fixture_dir/fixture.jks"
+  if [[ ! -f "$fixture_key" ]]; then
+    keytool -genkeypair -keystore "$fixture_key" -storepass android -keypass android \
+      -alias fixture -keyalg RSA -keysize 2048 -validity 365 -dname 'CN=Cana Emulator Fixture' >&2
+  fi
+fi
+"$ANDROID_HOME/build-tools/36.0.0/apksigner" sign --ks "$fixture_key" \
   --ks-pass pass:android --key-pass pass:android --out "$fixture_dir/fixture.apk" "$fixture_dir/aligned.apk"
 echo "$fixture_dir/fixture.apk"
