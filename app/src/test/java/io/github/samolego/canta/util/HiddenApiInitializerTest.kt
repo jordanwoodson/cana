@@ -12,7 +12,7 @@ class HiddenApiInitializerTest {
         val calls = AtomicInteger()
         val initializer = HiddenApiInitializer { prefixes ->
             assertEquals(setOf("Landroid/content/pm/", "Landroid/os/IUserManager", "Landroid/app/admin/IDevicePolicyManager",
-                "Landroid/net/", "Landroid/permission/"), prefixes.toSet())
+                "Landroid/app/role/", "Landroid/net/", "Landroid/permission/"), prefixes.toSet())
             calls.incrementAndGet()
             true
         }

@@ -39,7 +39,7 @@ class CanaServices private constructor(context: Context) {
         appContext.getString(io.github.samolego.canta.R.string.batch_operation_failed),
         appContext.getString(io.github.samolego.canta.R.string.batch_storage_failed),
     ), onAttemptFinished = { inventory.invalidate(refresh = false) },
-        onBatchFinished = { safety.invalidate(); inventory.invalidate() })
+        onBatchFinished = { inventory.invalidate() })
     val savedViews = io.github.samolego.canta.data.SavedViewStore(appContext)
     private val installationId = OperationalIdentity.current(appContext)
     val history = HistoryStore(appContext.historyDataStore,
@@ -106,12 +106,26 @@ class CanaServices private constructor(context: Context) {
         ReconcileJobService.schedule(appContext)
     }
 
+    internal suspend fun reconcileInterruptedJournals() {
+        val privacyActions = PrivacyAction.entries.map { it.key }.toSet() + setOf("network_reapply", "metered_reapply",
+            "network_forget", "metered_forget", "network_desired_restore", "metered_desired_restore")
+        val actions = privacyActions + setOf("system", "self_grant_secure_settings", "self_grant_usage_stats")
+        journal.reconcileInterrupted(actions::contains) { record ->
+            when (record.action) {
+                "system" -> system.snapshot(SystemControl.valueOf(SnapshotState.read(record.previousState).getString("control")))
+                "self_grant_secure_settings", "self_grant_usage_stats" -> selfGrants.snapshot(record.action)
+                else -> privacy.interruptedSnapshot(record)
+            }
+        }
+    }
+
     suspend fun reconcileNow() {
         try { ota.check() }
         catch (e: CancellationException) { throw e }
         catch (e: Exception) { LogUtils.e("CanaServices", "Could not check system update changes", e) }
         try {
             if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                reconcileInterruptedJournals()
                 selfGrants.grantMissing()
                 packageOps.reconcilePending()
                 privacy.reapplyDesired()

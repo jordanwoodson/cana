@@ -8,7 +8,7 @@ internal class HiddenApiInitializer(private val register: (Array<String>) -> Boo
     @Synchronized fun ensureReady() {
         if (ready) return
         check(register(arrayOf("Landroid/content/pm/", "Landroid/os/IUserManager",
-            "Landroid/app/admin/IDevicePolicyManager", "Landroid/net/", "Landroid/permission/"))) {
+            "Landroid/app/admin/IDevicePolicyManager", "Landroid/app/role/", "Landroid/net/", "Landroid/permission/"))) {
             "Android restricted API access could not be initialized"
         }
         ready = true

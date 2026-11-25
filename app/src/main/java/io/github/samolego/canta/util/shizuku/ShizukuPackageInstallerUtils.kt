@@ -1,6 +1,8 @@
 package io.github.samolego.canta.util.shizuku
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import android.content.ComponentName
 import android.content.pm.IPackageInstaller
 import android.content.pm.IPackageManager
@@ -30,9 +32,31 @@ object ShizukuPackageInstallerUtils {
         )
     }
 
+    /** Android 9 returns the install status synchronously and takes an explicit target user. */
+    fun installExistingOnPie(packageName: String, userId: Int): Int =
+        HiddenApiBypass.invoke(IPackageManager::class.java, PACKAGE_MANAGER, "installExistingPackageAsUser",
+            packageName, userId, 0, PackageManager.INSTALL_REASON_UNKNOWN) as Int
+
     fun getPrivilegedPackageInstaller(): IPackageInstaller {
         val packageInstaller: IPackageInstaller = PACKAGE_MANAGER.packageInstaller
         return IPackageInstaller.Stub.asInterface(ShizukuBinderWrapper(packageInstaller.asBinder()))
+    }
+
+    fun installSource(packageName: String, userId: Int): String? {
+        if (Build.VERSION.SDK_INT < 30) return null
+        val source = HiddenApiBypass.invoke(IPackageManager::class.java, PACKAGE_MANAGER, "getInstallSourceInfo",
+            packageName, userId) as? android.content.pm.InstallSourceInfo
+        return source?.installingPackageName
+    }
+
+    fun activityHandlers(intent: Intent, userId: Int): Set<String> {
+        val flags = PackageManager.MATCH_DISABLED_COMPONENTS or PackageManager.MATCH_UNINSTALLED_PACKAGES
+        val platformFlags: Any = if (Build.VERSION.SDK_INT >= 33) flags.toLong() else flags
+        val slice = checkNotNull(HiddenApiBypass.invoke(IPackageManager::class.java, PACKAGE_MANAGER,
+            "queryIntentActivities", intent, intent.type, platformFlags, userId))
+        @Suppress("UNCHECKED_CAST")
+        val matches = slice.javaClass.getMethod("getList").invoke(slice) as List<ResolveInfo>
+        return matches.map { it.activityInfo.packageName }.toSet()
     }
 
     fun permissionControllerPackage(): String? = HiddenApiBypass.invoke(

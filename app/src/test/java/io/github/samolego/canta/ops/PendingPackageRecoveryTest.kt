@@ -8,6 +8,23 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 class PendingPackageRecoveryTest {
+    @Test fun conflictsFollowTheTargetProfileAndSharedInstallerState() {
+        fun conflicts(previous: String, next: String, user: Int) =
+            PendingPackageRecovery.conflicts(removal(previous), "test.app", user, next)
+        assertFalse(conflicts("network", "uninstall", 10))
+        assertTrue(conflicts("component", "disable", 10))
+        assertFalse(conflicts("component", "disable", 0))
+        assertTrue(conflicts("component", "remove_updates", 0))
+        assertTrue(conflicts("uninstall", "disable", 0))
+        assertFalse(PendingPackageRecovery.conflicts(removal(), "different.app", 10, "uninstall"))
+    }
+
+    @Test fun interruptedPieReinstallCanSettleWithoutACallback() {
+        val record = removal("reinstall").toBuilder().setPreviousState("{\"installed\":false}").build()
+        assertEquals(false, PendingPackageRecovery.settle(record, record.previousState, null, false, synchronousInstall = true))
+        assertNull(PendingPackageRecovery.settle(record, record.previousState, null, false, synchronousInstall = false))
+    }
+
     @Test fun delayedRemovalCannotSucceedWithoutVerifyingThePersistedOtherProfiles() {
         for (action in listOf("uninstall", "uninstall_keep_data", "remove_updates", "reinstall")) {
             val record = removal(action).toBuilder().setPreviousState(

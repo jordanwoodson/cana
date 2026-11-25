@@ -263,6 +263,27 @@ class PrivacyOps(private val context: Context, private val shell: ShellRunner,
         }
     }
 
+    /** Project the same fields that were journaled by restrictions, saved-rule edits and Undo. */
+    internal suspend fun interruptedSnapshot(record: OperationRecord): JSONObject {
+        val previous = SnapshotState.read(record.previousState)
+        val pkg = record.packageName
+        val user = record.userId
+        val action = PrivacyAction.entries.single { it.key == record.action.substringBefore('_') }
+        return when {
+            record.action.endsWith("_forget") -> JSONObject().put("saved", savedEntries().any {
+                it.first.packageName == pkg && it.first.userId == user && it.second == action
+            })
+            record.action.endsWith("_desired_restore") -> {
+                val saved = savedEntries().firstOrNull { it.first.packageName == pkg && it.first.userId == user && it.second == action }?.first
+                JSONObject().put("appId", previous.getInt("appId")).put("ownerUserId", ownerUserId)
+                    .put("savedConsent", captureConsent(saved))
+                    .put(if (action == PrivacyAction.METERED) "desiredMetered" else "desiredBlock", saved != null)
+            }
+            action == PrivacyAction.PERMISSIONS -> PermissionChoices.snapshot(snapshot(pkg, user, action), PermissionChoices.selected(previous))
+            else -> snapshot(pkg, user, action)
+        }
+    }
+
     suspend fun markDisconnected() {
         initialize()
         for ((block, action) in savedEntries()) if (block.status != "needs_review")

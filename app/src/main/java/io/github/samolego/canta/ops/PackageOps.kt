@@ -1,5 +1,6 @@
 package io.github.samolego.canta.ops
 
+import android.content.IntentSender
 import android.content.Context
 import android.content.ComponentName
 import android.content.pm.ApplicationInfo
@@ -23,7 +24,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
 import org.json.JSONObject
-import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import java.util.UUID
 import java.io.File
@@ -201,7 +201,10 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         packageName: String,
         userId: Int,
         batchId: String = UUID.randomUUID().toString(),
-    ): OperationResult = recorded(packageName, userId, "reinstall", batchId) {
+    ): OperationResult = recorded(packageName, userId, "reinstall", batchId) { before ->
+        if (before?.applicationInfo?.let { it.flags and ApplicationInfo.FLAG_INSTALLED != 0 } == true) {
+            return@recorded OperationResult(true, context.getString(R.string.operation_skipped), skipped = true)
+        }
         val result = installExistingStep(packageName, userId)
         if (!result.success) OperationResult(false, result.message ?: context.getString(R.string.operation_failed),
             outcomeUnknown = result.outcomeUnknown, installerRequestId = result.requestId)
@@ -269,7 +272,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
         val results = mutableListOf<OperationResult>()
         val known = history.records.first()
         for (record in known.filter { !it.completed && it.packageName.isNotBlank() &&
-            it.action in setOf("uninstall", "uninstall_keep_data", "reinstall", "remove_updates", "disable", "enable", "suspend", "unsuspend", "component") }) {
+            PendingPackageRecovery.handles(it.action) }) {
             val after = runCatching {
                 val previous = SnapshotState.read(record.previousState)
                 val component = previous.optString("component").takeIf { it.isNotBlank() }?.let(ComponentName::unflattenFromString)
@@ -281,7 +284,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             }.getOrNull()
             val terminal = PackageInstallerResult.terminalResult(record.installerRequestId)
             val settled = after?.let { PendingPackageRecovery.settle(record, it, terminal,
-                PackageInstallerResult.isAwaiting(record.installerRequestId)) }
+                PackageInstallerResult.isAwaiting(record.installerRequestId), synchronousInstall = android.os.Build.VERSION.SDK_INT == 28) }
             if (settled == null) {
                 val message = context.getString(R.string.recovery_pending_review)
                 history.markPending(record.id, message, after ?: "{}", installerRequestId = record.installerRequestId)
@@ -307,11 +310,16 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
 
     internal fun installExistingStep(packageName: String, userId: Int): PackageInstallerResult.Result {
         LogUtils.i("PackageOps", "install-existing $packageName user=$userId")
+        if (android.os.Build.VERSION.SDK_INT == 28) {
+            val status = ShizukuPackageInstallerUtils.installExistingOnPie(packageName, userId)
+            return PackageInstallerResult.Result(status == 1, if (status == 1) null else "Package manager returned $status")
+        }
+        val installer = ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller()
+        val method = IPackageInstaller::class.java.getMethod("installExistingPackage", String::class.java,
+            Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, IntentSender::class.java,
+            Int::class.javaPrimitiveType, List::class.java)
         return PackageInstallerResult.await(context) { sender ->
-            HiddenApiBypass.invoke(IPackageInstaller::class.java,
-                ShizukuPackageInstallerUtils.getPrivilegedPackageInstaller(),
-                "installExistingPackage", packageName, 0x00400000,
-                PackageManager.INSTALL_REASON_UNKNOWN, sender, userId, null)
+            method.invoke(installer, packageName, 0x00400000, PackageManager.INSTALL_REASON_UNKNOWN, sender, userId, null)
         }
     }
 
@@ -350,8 +358,9 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
             throw PackageMutationRefused((e.cause ?: e).message ?: context.getString(R.string.operation_failed), e)
         }
         LogUtils.i("PackageOps", "uninstall $packageName user=$userId flags=$flags")
+        val method = PackageInstaller::class.java.getMethod("uninstall", String::class.java, Int::class.javaPrimitiveType, IntentSender::class.java)
         val result = PackageInstallerResult.await(context) { sender ->
-            HiddenApiBypass.invoke(PackageInstaller::class.java, installer, "uninstall", packageName, flags, sender)
+            method.invoke(installer, packageName, flags, sender)
         }
         if (!result.success) LogUtils.e("PackageOps", "uninstall failed: ${result.message}")
         if (result.outcomeUnknown) return result
@@ -404,7 +413,7 @@ class PackageOps(context: Context, private val history: HistoryStore, private va
     ): OperationResult = withContext(Dispatchers.IO) { mutationMutex.withLock {
         LogUtils.i("PackageOps", "$action $packageName user=$userId batch=$batchId")
         // Resetting updates can affect every profile, so uncertainty gates the package globally.
-        if (history.records.first().any { it.packageName == packageName && !it.completed }) {
+        if (history.records.first().any { PendingPackageRecovery.conflicts(it, packageName, userId, action) }) {
             return@withContext OperationResult(false, context.getString(R.string.recovery_pending_review), outcomeUnknown = true)
         }
         val id = UUID.randomUUID().toString()

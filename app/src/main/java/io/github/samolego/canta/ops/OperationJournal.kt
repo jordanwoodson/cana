@@ -5,6 +5,8 @@ import io.github.samolego.canta.R
 import io.github.samolego.canta.data.HistoryStore
 import io.github.samolego.canta.data.proto.OperationRecord
 import io.github.samolego.canta.util.LogUtils
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
@@ -16,6 +18,22 @@ import java.util.UUID
 /** Serializes privacy/system changes and refuses mutations that cannot first be journaled. */
 class OperationJournal(private val context: Context, private val history: HistoryStore) {
     private val mutex = history.mutationMutex
+    /** An interrupted synchronous transaction has no success receipt. Preserve its observable
+     * changes for Undo without replaying it or guessing which commands finished. */
+    suspend fun reconcileInterrupted(supports: (String) -> Boolean, readState: suspend (OperationRecord) -> JSONObject) =
+        withContext(Dispatchers.IO) { mutex.withLock {
+            for (record in history.records.first().filter { !it.completed && supports(it.action) }) {
+                val after = try { SnapshotState.version(readState(record)).toString() }
+                catch (e: CancellationException) { throw e }
+                catch (e: Exception) {
+                    LogUtils.w("OperationJournal", "Cannot read interrupted ${record.action}: ${e.message}")
+                    null
+                }
+                val changed = record.previousState != "{}" && (after == null || !SnapshotState.equal(record.previousState, after))
+                history.complete(record.id, false, context.getString(R.string.journal_interrupted), after ?: "{}", changed)
+            }
+        } }
+
     suspend fun run(packageName: String, userId: Int, action: String, batchId: String,
         undoOf: String = "", snapshot: suspend () -> JSONObject,
         mutate: suspend (JSONObject) -> OperationResult,

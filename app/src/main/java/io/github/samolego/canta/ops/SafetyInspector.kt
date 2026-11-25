@@ -1,6 +1,8 @@
 package io.github.samolego.canta.ops
 
 import android.content.ComponentName
+import android.content.Intent
+import android.net.Uri
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.Build
@@ -8,16 +10,12 @@ import android.os.IBinder
 import io.github.samolego.canta.R
 import io.github.samolego.canta.data.SettingsStore
 import io.github.samolego.canta.util.RemovalRecommendation
-import io.github.samolego.canta.util.BloatData
 import io.github.samolego.canta.util.BloatListRepository
-import io.github.samolego.canta.util.TimedCache
 import io.github.samolego.canta.util.shizuku.ShizukuPackageInstallerUtils
 import io.github.samolego.canta.util.shizuku.ShizukuUserUtils
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.flow.first
-import org.json.JSONObject
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import io.github.samolego.canta.util.HiddenApiAccess
 import rikka.shizuku.ShizukuBinderWrapper
@@ -28,22 +26,19 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
     private val context = context.applicationContext
     val alwaysProtected = SafetyPolicy.protectedPackages(context.packageName)
 
-    /** Role holders, keyboards, admins, installed set and bloat metadata from one privileged query. */
-    private class Baseline(val snapshot: SafetySnapshot, val metadata: Map<String, BloatData>)
-
-    // Querying the platform costs about ten shell commands. A batch shares one baseline per profile
-    // instead of paying that for every package; the batch drops it again when it finishes.
-    private val baselines = TimedCache<Int, Baseline>(BASELINE_TTL_MS)
+    private val lists = BloatListRepository(context)
 
     suspend fun inspect(names: List<String>, userId: Int, removing: Boolean = false): Map<String, SafetyAssessment> = withContext(Dispatchers.IO) {
         if (names.all { it in alwaysProtected }) return@withContext names.associateWith { SafetyAssessment(protected = true) }
         try {
-            val baseline = baselines.getOrCompute(userId) { queryBaseline(userId) }
-            val allowUnsafe = SettingsStore.getInstance().allowUnsafeUninstallsFlow.first()
+            val settings = SettingsStore.getInstance().snapshot()
+            val metadata = lists.guidance(settings.bloatListUrl)
+            val snapshot = querySnapshot(userId)
+            val allowUnsafe = settings.allowUnsafeUninstalls
             names.associateWith { name ->
-                val data = baseline.metadata[name]
-                val dependents = SafetyPolicy.installedDependents(name, baseline.metadata, baseline.snapshot.installedPackages)
-                val assessment = SafetyPolicy.assess(name, baseline.snapshot, dependents, userId)
+                val data = metadata[name]
+                val dependents = SafetyPolicy.installedDependents(name, metadata, snapshot.installedPackages)
+                val assessment = SafetyPolicy.assess(name, snapshot, dependents, userId)
                 if (removing && !allowUnsafe && data?.removal == RemovalRecommendation.UNSAFE)
                     assessment.copy(error = context.getString(R.string.unsafe_uninstall_blocked)) else assessment
             }
@@ -54,22 +49,18 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
         }
     }
 
-    /** Forget cached platform state, e.g. after a batch may have moved roles to other packages. */
-    fun invalidate() = baselines.invalidate()
-
-    private suspend fun queryBaseline(userId: Int): Baseline {
+    private suspend fun querySnapshot(userId: Int): SafetySnapshot {
         val profile = ShizukuUserUtils.getUsers().firstOrNull { it.id == userId }
             ?: error(context.getString(R.string.profile_missing))
         check(!profile.blocksShell && !profile.blocksUninstall) { context.getString(R.string.safety_profile_restricted) }
         val protected = alwaysProtected.toMutableSet()
-        protected += handlers(userId, listOf("-a", "android.intent.action.INSTALL_PACKAGE", "-d", "content://cana.invalid/update.apk", "-t", "application/vnd.android.package-archive"))
-        protected += handlers(userId, listOf("-a", "android.intent.action.MANAGE_PERMISSIONS"))
-        protected += handlers(userId, listOf("-a", "android.settings.SETTINGS"))
+        protected += ShizukuPackageInstallerUtils.activityHandlers(Intent(Intent.ACTION_INSTALL_PACKAGE)
+            .setDataAndType(Uri.parse("content://cana.invalid/update.apk"), "application/vnd.android.package-archive"), userId)
+        protected += ShizukuPackageInstallerUtils.activityHandlers(Intent("android.intent.action.MANAGE_PERMISSIONS"), userId)
+        protected += ShizukuPackageInstallerUtils.activityHandlers(Intent(android.provider.Settings.ACTION_SETTINGS), userId)
         if (Build.VERSION.SDK_INT >= 29) ShizukuPackageInstallerUtils.permissionControllerPackage()?.let { protected += it }
         val roles = listOf("HOME", "SMS", "DIALER", "BROWSER", "ASSISTANT").associateWith { role ->
-            if (Build.VERSION.SDK_INT >= 29) checked(listOf("cmd", "role", "get-role-holders", "--user", "$userId", "android.app.role.$role"))
-                .lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toSet()
-            else legacyRole(role, userId)
+            if (Build.VERSION.SDK_INT >= 29) roleHolders(role, userId) else legacyRole(role, userId)
         }
         val keyboards = SafetyPolicy.keyboardPackages(
             checked(listOf("settings", "--user", "$userId", "get", "secure", "default_input_method")).trim(),
@@ -78,12 +69,19 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
             .filter { (it.applicationInfo?.flags ?: 0) and ApplicationInfo.FLAG_INSTALLED != 0 }.map { it.packageName }.toSet()
         val admins = activeAdmins(userId)
         if (profile.kind == io.github.samolego.canta.util.apps.UserProfile.Kind.WORK) protected += admins
-        val snapshot = SafetySnapshot(protected, roles, keyboards, admins, installed)
-        val json = BloatListRepository(context).load(false)
-        val metadata = buildMap {
-            for (name in json.keys()) json.optJSONObject(name)?.let { put(name, BloatData.fromJson(it)) }
-        }
-        return Baseline(snapshot, metadata)
+        return SafetySnapshot(protected, roles, keyboards, admins, installed)
+    }
+
+    /** Android 10 introduced the role service before its shell exposed a read command. */
+    private fun roleHolders(role: String, userId: Int): Set<String> {
+        HiddenApiAccess.ensureReady()
+        val type = Class.forName("android.app.role.IRoleManager")
+        val stub = Class.forName("android.app.role.IRoleManager\$Stub")
+        val manager = stub.getMethod("asInterface", IBinder::class.java).invoke(null,
+            ShizukuBinderWrapper(SystemServiceHelper.getSystemService("role")))
+        @Suppress("UNCHECKED_CAST")
+        return (HiddenApiBypass.invoke(type, manager, "getRoleHoldersAsUser", "android.app.role.$role", userId)
+            as List<String>).toSet()
     }
 
     suspend fun requireAllowed(name: String, userId: Int, approved: Set<String>, removing: Boolean = false) {
@@ -106,11 +104,6 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
         val result = shell.exec(args)
         check(result.success) { result.message }
         return result.stdout
-    }
-
-    private suspend fun handlers(userId: Int, intent: List<String>): Set<String> {
-        val output = checked(listOf("cmd", "package", "query-activities", "--brief", "--components", "--query-flags", "8704", "--user", "$userId") + intent)
-        return output.lineSequence().map { it.trim() }.filter { '/' in it }.map { it.substringBefore('/') }.toSet()
     }
 
     private suspend fun legacyRole(role: String, userId: Int): Set<String> = when (role) {
@@ -139,5 +132,4 @@ class SafetyInspector(context: Context, private val shell: ShellRunner) {
         return admins.orEmpty().map { it.packageName }.toSet()
     }
 
-    companion object { private const val BASELINE_TTL_MS = 60_000L }
 }

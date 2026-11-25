@@ -5,6 +5,14 @@ import io.github.samolego.canta.util.PackageInstallerResult
 
 /** Read-only settlement. A live request is never settled just because an interim state looks final. */
 internal object PendingPackageRecovery {
+    private val installerActions = setOf("uninstall", "uninstall_keep_data", "reinstall", "remove_updates")
+    private val profileActions = setOf("disable", "enable", "suspend", "unsuspend", "component")
+    fun handles(action: String) = action in installerActions || action in profileActions
+
+    fun conflicts(record: OperationRecord, packageName: String, userId: Int, action: String): Boolean =
+        !record.completed && record.packageName == packageName && handles(record.action) &&
+            (record.userId == userId || record.action in installerActions || action in installerActions)
+
     fun finish(record: OperationRecord, after: String, settled: Boolean, message: String, original: OperationRecord? = null): OperationResult {
         val notes = if (settled && record.undoOf.isNotBlank() && original != null) RestoreScript.plan(original).notes else emptyList()
         return OperationResult(settled && notes.isEmpty(), notes.joinToString("\n").ifBlank { message },
@@ -12,7 +20,7 @@ internal object PendingPackageRecovery {
             recoveryComplete = settled && record.undoOf.isNotBlank())
     }
 
-    fun settle(record: OperationRecord, after: String, terminal: PackageInstallerResult.Result?, awaiting: Boolean): Boolean? {
+    fun settle(record: OperationRecord, after: String, terminal: PackageInstallerResult.Result?, awaiting: Boolean, synchronousInstall: Boolean = false): Boolean? {
         if (awaiting) return null
         val before = runCatching { SnapshotState.read(record.previousState) }.getOrNull() ?: return null
         // Empty pre-state means preflight failed before the mutation closure could run.
@@ -51,6 +59,7 @@ internal object PendingPackageRecovery {
         return when {
             terminal != null -> terminal.success && expected
             expected -> true
+            synchronousInstall && record.action == "reinstall" && record.undoOf.isEmpty() -> false
             else -> null // A process restart lost the callback; absence of change proves nothing.
         }
     }
