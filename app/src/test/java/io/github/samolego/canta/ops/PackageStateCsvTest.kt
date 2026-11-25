@@ -73,7 +73,7 @@ class PackageStateCsvTest {
         assertEquals("2", notes["trackers_found"]); assertEquals("Firebase Analytics; AdMob", notes["trackers"])
         assertEquals("1970-01-11T00:00:00Z", notes["first_installed"])
 
-        assertEquals("true", chrome["disabled"]); assertEquals("never", chrome["last_used"])
+        assertEquals("true", chrome["disabled"]); assertEquals("no recorded use", chrome["last_used"])
         assertEquals("true", chrome["unused_90_days"])
     }
 

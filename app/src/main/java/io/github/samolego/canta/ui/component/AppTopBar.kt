@@ -56,7 +56,7 @@ fun CantaTopBar(
     val focus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
-    val exportCsv = rememberPackageCsvExport(appListViewModel)
+    val exportCsv = rememberPackageCsvExport(appListViewModel.selectedUserId, appListViewModel.selectedProfile?.kind)
     val currentProfileName = profileName(appListViewModel.selectedUserId)
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current

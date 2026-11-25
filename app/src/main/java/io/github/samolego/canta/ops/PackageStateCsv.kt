@@ -65,7 +65,7 @@ object PackageStateCsv {
                 info?.uid?.toString().orEmpty(),
                 info?.let { it.flags and ApplicationInfo.FLAG_PERSISTENT != 0 }?.toString().orEmpty(),
                 time(app.firstInstallTime),
-                when (app.lastUsed) { null -> ""; 0L -> "never"; else -> time(app.lastUsed) },
+                when (app.lastUsed) { null -> ""; 0L -> "no recorded use"; else -> time(app.lastUsed) },
                 if (app.isUninstalled || app.lastUsed == null) "" else
                     ManagementPolicy.unused90Days(app.lastUsed, app.firstInstallTime, now).toString(),
                 bloat?.installData?.name?.lowercase(Locale.ROOT).orEmpty(),
