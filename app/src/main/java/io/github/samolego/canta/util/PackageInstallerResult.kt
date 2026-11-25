@@ -90,7 +90,7 @@ object PackageInstallerResult {
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 requestCode,
-                Intent(intentAction).setPackage(context.packageName),
+                Intent(intentAction).setPackage(context.packageName).addFlags(Intent.FLAG_RECEIVER_FOREGROUND),
                 PendingIntent.FLAG_UPDATE_CURRENT or mutable
             )
             callbackIntent = pendingIntent

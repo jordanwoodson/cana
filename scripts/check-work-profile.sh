@@ -36,7 +36,10 @@ manager=$("${adb[@]}" shell pm path --user 0 moe.shizuku.privileged.api | sed -n
 run_test() {
   "${adb[@]}" shell am instrument --user "$work_user" -w -e workUser "$work_user" -e class "$1" \
     io.github.jordanwoodson.cana.test/androidx.test.runner.AndroidJUnitRunner | tee "$workdir/result"
-  grep -Eq '^OK \([1-9][0-9]* tests?\)' "$workdir/result"
+  if ! grep -Eq '^OK \([1-9][0-9]* tests?\)' "$workdir/result"; then
+    "${adb[@]}" logcat -d -t 8000 -s PackageOps ActivityManager:W BroadcastQueue:W PackageManager:W | tail -120
+    return 1
+  fi
 }
 run_test io.github.samolego.canta.ops.WorkProfileAuthorizationTest
 run_test 'io.github.samolego.canta.ops.FoundationDeviceTest#userAppRemovalIsScopedToPersonalAndWorkProfiles'

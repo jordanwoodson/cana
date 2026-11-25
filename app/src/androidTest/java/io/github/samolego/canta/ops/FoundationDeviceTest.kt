@@ -79,18 +79,33 @@ class FoundationDeviceTest {
         if (workUser != null) assertEquals(workUser, android.os.Process.myUid() / 100_000)
         val work = workUser ?: 10
         val name = "io.github.jordanwoodson.cana.fixture"
+        suspend fun verify(result: OperationResult) {
+            if (!result.outcomeUnknown) {
+                assertTrue(result.message, result.success)
+                return
+            }
+            // A newly started profile can still be delivering package broadcasts after the UI timeout.
+            assertTrue(result.installerRequestId.isNotEmpty())
+            val pending = services.history.records.first().single { it.installerRequestId == result.installerRequestId }
+            val completed = withTimeout(180_000) {
+                while (!services.history.records.first().single { it.id == pending.id }.completed) {
+                    delay(2_000)
+                    services.packageOps.reconcilePending()
+                }
+                services.history.records.first().single { it.id == pending.id }
+            }
+            assertTrue(completed.resultMessage, completed.success)
+        }
         assertTrue("Install the fixture before running this test", installed(name, 0))
-        assertTrue(services.packageOps.reinstall(name, work).success)
-        val personal = services.packageOps.uninstall(name, 0)
-        assertTrue(personal.message, personal.success)
+        verify(services.packageOps.reinstall(name, work))
+        verify(services.packageOps.uninstall(name, 0))
         assertFalse(installed(name, 0))
         assertTrue(installed(name, work))
-        assertTrue(services.packageOps.reinstall(name, 0).success)
-        val removedFromWork = services.packageOps.uninstall(name, work)
-        assertTrue(removedFromWork.message, removedFromWork.success)
+        verify(services.packageOps.reinstall(name, 0))
+        verify(services.packageOps.uninstall(name, work))
         assertFalse(installed(name, work))
         assertTrue(installed(name, 0))
-        assertTrue(services.packageOps.reinstall(name, work).success)
+        verify(services.packageOps.reinstall(name, work))
     }
 
     @Test fun interruptedPrivacyRecordIsSettledFromTheSelectedProfileWithoutReplaying() = runBlocking {
