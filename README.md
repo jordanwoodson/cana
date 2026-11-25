@@ -38,11 +38,10 @@ block it entirely, see [below](#limits-set-by-the-work-profile-admin).
 
 ### What's different from Canta
 
-Canta only sees and uninstalls apps in the profile it's installed in, and with Shizuku running
-over adb it always uninstalls for user 0. Cana adds a profile switcher (the person / briefcase
-icon in the top bar), which lists every user on the device through Shizuku. Picking one loads
-that profile's apps, and uninstall / reinstall then act on that profile only
-(`pm uninstall --user <id>` / `pm install-existing --user <id>` semantics).
+Canta 4.1 can manage apps in the Android profile where it is installed. One installation of Cana
+can switch between personal, work and other profiles from the top bar. Cana loads the selected
+profile’s inventory, targets its Android user ID for uninstall and reinstall, and checks whether
+Android would also change a linked profile.
 
 * Uninstall / reinstall wait for Android's result and verify the resulting state. Failures
   and unknown installer outcomes remain visible in History; an outstanding request blocks

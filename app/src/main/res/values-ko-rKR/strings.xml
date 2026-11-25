@@ -81,4 +81,5 @@
     <string name="require_auth_setting_desc">Require authentication for uninstalling or reinstalling apps.</string>
     <string name="require_auth_setting">Require authentication</string>
     <string name="enable_usb_debugging">(Optional) Enable USB debugging</string>
+    <string name="tab_installed">설치된 앱</string>
 </resources>
